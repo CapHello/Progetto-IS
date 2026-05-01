@@ -1,0 +1,33 @@
+#File Zip
+Gruppo_IS_*.zip
+*.zip
+
+#File temporanei di word
+~$*.docx
+~$*.doc
+*.tmp
+
+#File temporanei VPP
+*.vpp.bak
+*.vpp.lck
+.vp/
+vpreport/
+
+#File java
+JavaProject/target/
+JavaProject/bin/
+JavaProject/build/
+JavaProject/.gradle/
+*.class
+*.log
+*.jar
+*.war
+*.ear
+
+#Configurazioni IDE
+.idea/
+*.iml
+.settings/
+.classpath
+.project
+.vscode/
