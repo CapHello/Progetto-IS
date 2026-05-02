@@ -31,3 +31,5 @@ JavaProject/.gradle/
 .classpath
 .project
 .vscode/
+
+*.bak*

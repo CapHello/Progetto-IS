@@ -1,20 +1,32 @@
 # Sistema Prenotazione Posti In Biblioteca Universitaria
-Progetto per l'esame di Ingegneria del Software
-Università degli Studi di Napoli Federico II.
+
+Progetto per l'esame di **Ingegneria del Software** — a.a. 2025/26  
+Prof. Anna Rita Fasolino  
+Corso di Laurea in **Ingegneria Informatica** — Università degli Studi di Napoli Federico II
 
 ## 👥 Team
-* [Antonio Cacciatore](https://github.com/ZSoul8) 
-* [Antonio Caprio](https://github.com/CapHello) - Team Leader
-* [Salvatore Di Costanzo](https://github.com/salvatoredc04) 
-* [Giovanni Fragola](https://github.com/giob22) 
+
+| Nome | GitHub |
+|:------|:--------|
+| Antonio Cacciatore | [@ZSoul8](https://github.com/ZSoul8) |
+| Antonio Caprio *(Team Leader)* | [@CapHello](https://github.com/CapHello) |
+| Salvatore Di Costanzo | [@salvatoredc04](https://github.com/salvatoredc04) |
+| Giovanni Fragola | [@giob22](https://github.com/giob22) |
 
 ## 📁 Struttura della Repository
 
-* 📄 **`Documentation/`**
-* 📐 **`VisualParadigm/`**
-* ☕ **`JavaProject/`**
+```
+Progetto-IS/
+├── Documentation/     # Documentazione del progetto (.doc e .pdf)
+├── VisualParadigm/    # Modello Visual Paradigm (.vpp)
+└── JavaProject/       # Implementazione Java del progetto
+```
 
 ## 🛠️ Tecnologie utilizzate
-* **Linguaggio:** Java
-* **Modellazione:** Visual Paradigm
-* **Documentazione:** Microsoft Word
+
+| Componente | Tecnologia |
+|------------|------------|
+| Linguaggio | Java |
+| Modellazione UML | Visual Paradigm |
+| Documentazione | Microsoft Word |
+| Versioning | Git / GitHub |
