@@ -12,6 +12,7 @@ Gruppo_IS_*.zip
 *.vpp.lck
 .vp/
 vpreport/
+Sequence Diagram personali/
 
 #File java
 JavaProject/target/
