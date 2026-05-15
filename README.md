@@ -22,18 +22,31 @@ Progetto-IS/
 └── JavaProject/       # Implementazione Java del progetto
 ```
 
-## Project Management
+## 🏭 Project Management
 Lo stato di avanzamento è tracciato su GitHub Projects:
 - **Board**: [Link alla Board IS Biblioteca](https://github.com/users/CapHello/projects/1)
 - **Milestones**: [Visualizza scadenze](https://github.com/CapHello/progetto-is/milestones)
 - **Issues aperte**: [Lista task](https://github.com/CapHello/progetto-is/issues)
 
-## Stato per fase
-- [ ] M1 — Analisi e specifica dei requisiti
-- [ ] M2 — Piano di test funzionale
-- [ ] M3 — Progettazione
-- [ ] M4 — Implementazione
-- [ ] M5 — Testing
+<!-- MILESTONES:START -->
+## 🧗🏼‍♂️ Milestones
+
+### M1 - Analisi e specifica dei requisiti · scadenza 2026-05-19
+`[███████████░░░░░░░░░] 55%`  (16/29 issue chiuse)
+
+### M2 - Piano di test funzionale · scadenza 2026-05-26
+`[░░░░░░░░░░░░░░░░░░░░] 0%`  (0/7 issue chiuse)
+
+### M3 - Progettazione · scadenza 2026-06-02
+`[░░░░░░░░░░░░░░░░░░░░] 0%`  (0/5 issue chiuse)
+
+### M4 - Implementazione · scadenza 2026-06-09
+`[░░░░░░░░░░░░░░░░░░░░] 0%`  (0/0 issue chiuse)
+
+### M5 - Testing · scadenza 2026-06-16
+`[░░░░░░░░░░░░░░░░░░░░] 0%`  (0/0 issue chiuse)
+
+<!-- MILESTONES:END -->
 
 ## 🛠️ Tecnologie utilizzate
 
