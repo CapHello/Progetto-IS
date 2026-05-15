@@ -5,7 +5,7 @@ on:
     types: [created, edited, closed, reopened]
   issues:
     types: [opened, edited, closed, reopened, milestoned, demilestoned]
-  workflow_dispatch: # Permette l'avvio manuale
+  workflow_dispatch:
 
 jobs:
   update-readme:
@@ -21,17 +21,31 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Recupera le milestone tramite GitHub CLI e genera la tabella
-          echo "Recupero dati milestone..."
-          MILESTONES_DATA=$(gh api repos/${{ github.repository }}/milestones --jq '. | sort_by(.number) | .[] | "| **\(.title)** | [\(.closed_issues)/\(($(.open_issues + .closed_issues)))] | \(.description // "-") |"')
+          # 1. Recupero dati con JQ corretto (rimossi i dollari extra)
+          MILESTONES_DATA=$(gh api repos/${{ github.repository }}/milestones --jq '. | sort_by(.number) | .[] | "| **\(.title)** | [\(.closed_issues)/\(.open_issues + .closed_issues)] | \(.description // "-") |"')
           
-          # Costruisci l'intestazione della tabella
+          # 2. Preparazione tabella
           HEADER="| Fase | Task Completati | Descrizione |\n|:---|:---:|:---|"
-          TABLE="${HEADER}\n${MILESTONES_DATA}"
+          export FULL_TABLE="${HEADER}\n${MILESTONES_DATA}"
+
+          # 3. Script Python per rimpiazzare il testo in modo sicuro
+          python3 -c "
+          import os
+          table = os.environ['FULL_TABLE'].replace('\\n', '\n')
+          with open('README.md', 'r') as f:
+              content = f.read()
           
-          # Inserisce la tabella tra i tag nel README
-          sed -i "//,//{ //!{ //!d; }; }" README.md
-          sed -i "//a \\$TABLE" README.md
+          start_tag = ''
+          end_tag = ''
+          
+          start_idx = content.find(start_tag) + len(start_tag)
+          end_idx = content.find(end_tag)
+          
+          if start_idx != -1 and end_idx != -1:
+              new_content = content[:start_idx] + '\n' + table + '\n' + content[end_idx:]
+              with open('README.md', 'w') as f:
+                  f.write(new_content)
+          "
 
       - name: Commit and Push changes
         run: |
