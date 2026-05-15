@@ -1,0 +1,40 @@
+name: Update Milestone Progress
+
+on:
+  milestone:
+    types: [created, edited, closed, reopened]
+  issues:
+    types: [opened, edited, closed, reopened, milestoned, demilestoned]
+  workflow_dispatch: # Permette l'avvio manuale
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch Milestones and Update README
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Recupera le milestone tramite GitHub CLI e genera la tabella
+          echo "Recupero dati milestone..."
+          MILESTONES_DATA=$(gh api repos/${{ github.repository }}/milestones --jq '. | sort_by(.number) | .[] | "| **\(.title)** | [\(.closed_issues)/\(($(.open_issues + .closed_issues)))] | \(.description // "-") |"')
+          
+          # Costruisci l'intestazione della tabella
+          HEADER="| Fase | Task Completati | Descrizione |\n|:---|:---:|:---|"
+          TABLE="${HEADER}\n${MILESTONES_DATA}"
+          
+          # Inserisce la tabella tra i tag nel README
+          sed -i "//,//{ //!{ //!d; }; }" README.md
+          sed -i "//a \\$TABLE" README.md
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: update milestone progress" && git push)
