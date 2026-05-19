@@ -32,7 +32,7 @@ Lo stato di avanzamento è tracciato su GitHub Projects:
 ## 🧗🏼‍♂️ Milestones
 
 ### M1 - Analisi e specifica dei requisiti · scadenza 2026-05-19
-`[███████████░░░░░░░░░] 55%`  (16/29 issue chiuse)
+`[████████████████░░░░] 82%`  (27/33 issue chiuse)
 
 ### M2 - Piano di test funzionale · scadenza 2026-05-26
 `[░░░░░░░░░░░░░░░░░░░░] 0%`  (0/7 issue chiuse)
