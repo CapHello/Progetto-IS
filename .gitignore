@@ -8,8 +8,10 @@ Gruppo_IS_*.zip
 *.tmp
 
 #File temporanei VPP
+VisualParadigm/
 *.vpp.bak
 *.vpp.lck
+*.vpp
 .vp/
 vpreport/
 Sequence Diagram personali/
