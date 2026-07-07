@@ -29,27 +29,32 @@ import java.util.Set;
  * Gestore (Singleton) delle prenotazioni: EffettuaPrenotazione (UC7), AnnullaPrenotazione
  * (UC9), EffettuaCheck-in (UC10), MonitoraPrenotazioni (UC5), ConsultaStorico (UC12),
  * GestisciTerminePrenotazione (UC16), MonitoraStatisticheServizio (UC13).
- * Usa il pattern Strategy per l'assegnazione automatica della postazione.
+ * Come da diagramma delle classi, gli unici attributi sono l'istanza Singleton
+ * {@code instance} e la strategia di assegnazione {@code strategia} (composizione 1-1,
+ * pattern Strategy); le dipendenze d'uso verso i registri del livello entity e verso
+ * GestoreNotifiche non sono attributi e vengono risolte localmente nei metodi.
  */
 public class GestorePrenotazioni {
 
-    private static final int TOLLERANZA_CHECKIN_MIN = 10; // V08
-
-    private static GestorePrenotazioni istanza;
+    private static GestorePrenotazioni instance;
 
     private final RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
     private final RegistroSale registroSale = RegistroSale.getInstance();
     private final RegistroUtenti registroUtenti = RegistroUtenti.getInstance();
     private StrategiaAssegnazione strategiaAssegnazione;
 
-    private GestorePrenotazioni() {}
+    private final StrategiaAssegnazione strategia;
+
+    private GestorePrenotazioni() {
+        this.strategia = new AssegnazionePrimaLibera(); // la parte è creata dal tutto (composizione)
+    }
 
     public static GestorePrenotazioni getInstance() {
         if (istanza == null) {
             istanza = new GestorePrenotazioni();
             istanza.setStrategiaAssegnazione(new AssegnazionePrimaLibera());
         }
-        return istanza;
+        return instance;
     }
 
 
@@ -186,40 +191,89 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ UC9
+    /**
+     * Traduce il Sequence Diagram "AnnullaPrenotazione": la verifica del vincolo temporale
+     * (1.1.1, V07) e la transizione di stato (1.1.3) sono responsabilità dell'entity
+     * Prenotazione; il rilascio della postazione (1.1.4-1.1.5) è conseguenza dello stato
+     * ANNULLATA, che esclude la prenotazione dal calcolo della disponibilità.
+     */
     public void annullaPrenotazione(Long idPrenotazione) {
-        Prenotazione p = registroPrenotazioni.trovaPerId(idPrenotazione);
-        if (p == null) {
+        Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);
+        if (prenotazione == null) {
             throw new IllegalArgumentException("Prenotazione non trovata");
         }
-        p.attach(GestoreNotifiche.getInstance());          // notifica automatica al cambio di stato
-        p.annullaPrenotazione();                           // verifica V07 (6h) + stato ANNULLATA
-        p.getPostazione().rendiDisponibile(p.getData(), p.getFasciaOraria()); // RF20 (derivato)
-        registroPrenotazioni.aggiorna(p);
+
+        // AnnullaPrenotazione() sull'entity → verificaIntervalloAnnullamentoPrenotazione(),
+        //      setStato("annullata") → flagIntervalloAnnullamentoPrenotazione
+        //      (l'esito negativo è comunicato dall'entity tramite eccezione).
+        boolean flagIntervalloAnnullamentoPrenotazione;
+        String motivoNonValido = null;
+        try {
+            prenotazione.annullaPrenotazione();
+            flagIntervalloAnnullamentoPrenotazione = true;
+        } catch (IllegalStateException e) {
+            flagIntervalloAnnullamentoPrenotazione = false;
+            motivoNonValido = e.getMessage();
+        }
+
+        if (flagIntervalloAnnullamentoPrenotazione) {
+            // alt [AnnullamentoPrenotazioneValido] annullamentoConfermato → persistenza.
+            registroPrenotazioni.aggiorna(prenotazione);
+
+            // inviaNotifica(destinatari, messaggio);
+            Studente destinatario = prenotazione.getStudente();
+            if (destinatario != null) {
+                GestoreNotifiche.getInstance().inviaNotifica(List.of(toUtenteDTO(destinatario)),
+                        "La prenotazione #" + prenotazione.getId() + " è stata annullata.");
+            }
+            //annullamentoPrenotazioneConfermato (ritorno regolare).
+        } else {
+            // alt [AnnullamentoPrenotazioneNonValido] limiteTemporaleAnnullamentoPrenotazioneSuperato.
+            throw new IllegalStateException(motivoNonValido);
+        }
     }
 
     // ------------------------------------------------------------------ UC10
+    /**
+     * Traduce il Sequence Diagram "EffettuaCheckIn": il check-in è consentito solo se la
+     * prenotazione è ATTIVA nella data corrente; la conferma (setStato "confermata") è
+     * responsabilità dell'entity Prenotazione.
+     */
     public void effettuaCheckIn(Long idPrenotazione) {
-        Prenotazione p = registroPrenotazioni.trovaPerId(idPrenotazione);
-        if (p == null) {
+        Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);
+        if (prenotazione == null) {
             throw new IllegalArgumentException("Prenotazione non trovata");
         }
-        p.verificaPrenotazioneAttivaInDataCorrente();      // ATTIVA + giornata corrente
-        p.attach(GestoreNotifiche.getInstance());
-        p.effettuaCheckin();                               // stato CONFERMATA + notifica
 
-        // Aggiorna il numero totale di accessi dello studente (RD05).
-        Studente studente = registroUtenti.trovaStudentePerId(p.getStudente().getId());
-        if (studente != null) {
-            studente.setNumeroTotaleAccessi(studente.getNumeroTotaleAccessi() + 1);
-            registroUtenti.aggiorna(studente);
+        // verificaPrenotazioneAttivaInDataCorrente() →  flagAttivaInDataCorrente
+        //      (l'esito negativo è comunicato dall'entity tramite eccezione).
+        boolean flagAttivaInDataCorrente;
+        String motivoNonConsentito = null;
+        try {
+            prenotazione.verificaPrenotazioneAttivaInDataCorrente();
+            flagAttivaInDataCorrente = true;
+        } catch (IllegalStateException e) {
+            flagAttivaInDataCorrente = false;
+            motivoNonConsentito = e.getMessage();
         }
-        registroPrenotazioni.aggiorna(p);
+
+        if (flagAttivaInDataCorrente) {
+            // alt [Prenotazione attiva nella data corrente] — EffettuaCheckIn() sull'entity
+            //     → setStato("confermata") → prenotazioneConfermata → persistenza.
+            prenotazione.effettuaCheckin();
+            registroPrenotazioni.aggiorna(prenotazione);
+            //checkInEffettuato (ritorno regolare).
+        } else {
+            // alt [Prenotazione non attiva nella data corrente] checkInNonConsentito.
+            throw new IllegalStateException("Check-in non consentito: " + motivoNonConsentito);
+        }
     }
 
     // ------------------------------------------------------------------ UC5
     public List<Object> monitoraPrenotazioni(Long idSalaStudio) {
         List<Object> risultato = new ArrayList<>();
-        for (Prenotazione p : registroPrenotazioni.cercaPrenotazioniPerSalaEData(idSalaStudio, LocalDate.now())) {
+        for (Prenotazione p : RegistroPrenotazioni.getInstance()
+                .cercaPrenotazioniPerSalaEData(idSalaStudio, LocalDate.now())) {
             risultato.add(toDTO(p));
         }
         return risultato;
@@ -227,12 +281,13 @@ public class GestorePrenotazioni {
 
     // ------------------------------------------------------------------ UC12
     public List<Object> consultaStoricoPrenotazioni(Long idStudente) {
-        Studente studente = registroUtenti.trovaStudentePerId(idStudente);
+        Studente studente = RegistroUtenti.getInstance().trovaStudentePerId(idStudente);
         if (studente == null) {
             throw new IllegalArgumentException("Studente non trovato");
         }
         List<Object> risultato = new ArrayList<>();
-        for (Prenotazione p : registroPrenotazioni.cercaPrenotazioniPerStudente(studente.getMatricola())) {
+        for (Prenotazione p : RegistroPrenotazioni.getInstance()
+                .cercaPrenotazioniPerStudente(studente.getMatricola())) {
             risultato.add(toDTO(p));
         }
         return risultato;
@@ -240,13 +295,14 @@ public class GestorePrenotazioni {
 
     // ------------------------------------------------------------------ UC16
     public void gestisciTerminePrenotazione() {
+        RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
         LocalDateTime adesso = LocalDateTime.now();
         for (Prenotazione p : registroPrenotazioni.getPrenotazioniInScadenza()) {
             StatoEnum stato = p.getStato().getStatoEnum();
             LocalDateTime inizio = LocalDateTime.of(p.getData(), p.getFasciaOraria().getOraInizio());
             LocalDateTime fine = LocalDateTime.of(p.getData(), p.getFasciaOraria().getOraFine());
 
-            if (stato == StatoEnum.ATTIVA && adesso.isAfter(inizio.plusMinutes(TOLLERANZA_CHECKIN_MIN))) {
+            if (stato == StatoEnum.ATTIVA && adesso.isAfter(inizio.plusMinutes(10))) { // tolleranza check-in (V08)
                 // Check-in non effettuato entro la tolleranza → SCADUTA (RF18).
                 p.attach(GestoreNotifiche.getInstance());
                 p.gestisciTermine();
@@ -263,7 +319,7 @@ public class GestorePrenotazioni {
     // ------------------------------------------------------------------ UC13
     public Object monitoraStatisticheServizio() {
         LocalDate oggi = LocalDate.now();
-        List<Prenotazione> tutte = registroPrenotazioni.getTutte();
+        List<Prenotazione> tutte = RegistroPrenotazioni.getInstance().getTutte();
 
         int prenotazioniOggi = 0;
         int nonConfermate = 0;
@@ -285,7 +341,7 @@ public class GestorePrenotazioni {
         }
 
         int totali = 0;
-        for (SalaStudio sala : registroSale.getTutteLeSale()) {
+        for (SalaStudio sala : RegistroSale.getInstance().getTutteLeSale()) {
             totali += sala.getNumeroPostazioniTotali();
         }
 
@@ -299,8 +355,21 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ helper
+    /** Validità e coerenza dei dati della richiesta di prenotazione (UC7, passo 1). */
+    private void verificaValiditaDati(Studente studente, SalaStudio sala, LocalDate data) {
+        if (studente == null) {
+            throw new IllegalArgumentException("Studente non trovato");
+        }
+        if (sala == null) {
+            throw new IllegalArgumentException("Sala studio non trovata");
+        }
+        if (!sala.verificaDataInGiorniApertura(data)) {
+            throw new IllegalArgumentException("La sala è chiusa nella data selezionata (giorni feriali)");
+        }
+    }
+
     private FasciaOraria risolviFasciaDellaSala(Long idSala, Long idFascia) {
-        for (FasciaOraria f : registroSale.getFascePerSala(idSala)) {
+        for (FasciaOraria f : RegistroSale.getInstance().getFascePerSala(idSala)) {
             if (f.getId().equals(idFascia)) {
                 return f;
             }
@@ -349,7 +418,7 @@ public class GestorePrenotazioni {
         if (disponibili.isEmpty()) {
             throw new IllegalStateException("Nessuna postazione disponibile per l'area e la fascia selezionate");
         }
-        return strategiaAssegnazione.selezionaPostazione(disponibili);
+        return strategia.selezionaPostazione(disponibili);
     }
 
     private PrenotazioneDTO toDTO(Prenotazione p) {
@@ -372,7 +441,7 @@ public class GestorePrenotazioni {
         if (area == null) {
             return 0;
         }
-        List<Postazione> lista = new ArrayList<>(registroSale.getPostazioniPerArea(area.getId()));
+        List<Postazione> lista = new ArrayList<>(RegistroSale.getInstance().getPostazioniPerArea(area.getId()));
         lista.sort(Comparator.comparing(Postazione::getId));
         for (int i = 0; i < lista.size(); i++) {
             if (lista.get(i).getId().equals(postazione.getId())) {
