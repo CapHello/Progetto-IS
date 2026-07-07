@@ -66,7 +66,6 @@ public class GestoreSale {
         if (tipi.size() != posti.size()) {
             throw new IllegalArgumentException("Dati delle aree incoerenti (tipologie e postazioni non corrispondono)");
         }
-        int sommaAree = getSommaAree(numeroPostazioni, tipi, posti);
 
         SalaStudio sala = new SalaStudio(nome, descrizione, numeroPostazioni);
 
@@ -95,13 +94,17 @@ public class GestoreSale {
         }
 
         // Aree specifiche indicate dal bibliotecario.
+        int sommaAree = getSommaAree(numeroPostazioni, tipi, posti);
+
         for (int i = 0; i < tipi.size(); i++) {
             sala.aggiungiArea(tipi.get(i).trim(), posti.get(i));
         }
         int rimanenti = numeroPostazioni - sommaAree;
-        sala.creaAreaDefault(rimanenti);
+        if (rimanenti > 0) {
+            sala.creaAreaDefault(rimanenti);
+        }
 
-        // 5. Persistenza
+        //Persistenza
         registroSale.salvaSala(sala);
         return toDTO(sala);
     }
@@ -121,9 +124,9 @@ public class GestoreSale {
             sommaAree += posti.get(i);
         }
 
-        if (sommaAree >= numeroPostazioni) {
+        if (sommaAree > numeroPostazioni) {
             throw new IllegalArgumentException("Le aree specifiche (" + sommaAree
-                    + " postazioni) devono lasciarne almeno una all'area comune (totale sala "
+                    + " postazioni) occupano più postazioni di quelle possibili (totale sala "
                     + numeroPostazioni + ")");
         }
         return sommaAree;
@@ -349,10 +352,12 @@ public class GestoreSale {
         }
         dto.setFasceOrarie(fasce);
 
+        /* Se serve verrà riaggiunto
         List<String> orariLavorativi = new ArrayList<>();
-        for (FasciaOraria ol : registroSale.getOrariLavorativiPerSala(sala.getId())) {
+        for (FasciaOraria ol: registroSale.getOrariLavorativiPerSala(sala.getId())) {
             orariLavorativi.add(ol.getEtichetta());
         }
+        */
 
         return dto;
     }

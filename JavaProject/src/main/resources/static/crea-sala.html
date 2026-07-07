@@ -126,13 +126,12 @@
             document.querySelectorAll('#areeContainer .area-posti').forEach(i => { somma += parseInt(i.value, 10) || 0; });
             const comune = totale - somma;
             const el = document.getElementById('riepilogoAree');
-            if (comune < 1) {
+            if (comune < 0) {
                 el.style.color = '#e53e3e';
-                el.textContent = 'Le aree specifiche occupano ' + somma + '/' + totale
-                    + ': lascia almeno 1 postazione all\'area comune (sempre presente).';
+                el.textContent = 'Le aree specifiche occupano ' + somma + '/' + totale;
             } else {
                 el.style.color = '#718096';
-                el.textContent = 'Aree specifiche: ' + somma + ' postazioni. Area comune (sempre presente): ' + comune + '.';
+                el.textContent = 'Aree specifiche: ' + somma + ' postazioni. Area comune: ' + comune + '.';
             }
         }
 
@@ -164,8 +163,8 @@
                 postazioniAree.push(np);
                 somma += np;
             }
-            if (totale - somma < 1) {
-                mostraErrore('errore', 'Le aree specifiche devono lasciare almeno una postazione all\'area comune (sempre presente)');
+            if (totale - somma < 0) {
+                mostraErrore('errore', 'Le aree specifiche occupano più postazioni di quelle effettivamente disponibili');
                 return;
             }
 
