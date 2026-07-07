@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Studente - Prenotazioni Biblioteca</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/wizard.css">
+</head>
+<body class="dashboard-body">
+
+    <nav class="navbar">
+        <a href="dashboard-studente.html" class="navbar-brand">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 3L1 9L5 11.18V17.18L12 21L19 17.18V11.18L21 10.09V17H23V9L12 3ZM18.82 9L12 12.72L5.18 9L12 5.28L18.82 9ZM17 15.99L12 18.72L7 15.99V12.27L12 15L17 12.27V15.99Z"/>
+            </svg>
+            Dashboard Studente
+        </a>
+        <a href="#" class="btn-logout" onclick="logout(); return false;">Logout</a>
+    </nav>
+
+    <main class="dashboard-container">
+
+        <div class="user-profile-header">
+            <h2 id="titoloProfilo">Profilo Personale</h2>
+            <p id="identificativoProfilo"></p>
+            <p id="totaleAccessi">Totale accessi: -</p>
+        </div>
+
+        <div class="section-header">
+            <h3>Prenotazioni</h3>
+            <div class="sort-control">
+                <label>ordina per:</label>
+                <select id="ordina">
+                    <option value="data">data</option>
+                    <option value="stato">stato</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="errore" style="color:#e53e3e; margin-bottom:1rem;"></div>
+        <div class="prenotazioni-grid" id="grigliaPrenotazioni"></div>
+        <p id="vuoto" style="display:none; color:var(--text-muted); text-align:center; margin-bottom:2rem;">
+            Non hai ancora prenotazioni.
+        </p>
+
+        <a href="prenotazione.html" class="btn-primary"
+           style="display:block; width:max-content; margin:0 auto; text-decoration:none; padding:1rem 3rem; border-radius:99px;">
+            + Nuova Prenotazione
+        </a>
+
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        const utente = richiediRuolo('Studente');
+        let prenotazioni = [];
+
+        function formattaData(iso) {
+            if (!iso) return '';
+            const [a, m, g] = iso.split('-');
+            return `${g}-${m}-${a}`;
+        }
+
+        function render() {
+            const criterio = document.getElementById('ordina').value;
+            const lista = [...prenotazioni].sort((x, y) =>
+                criterio === 'stato'
+                    ? x.stato.localeCompare(y.stato)
+                    : (y.data || '').localeCompare(x.data || ''));
+
+            const cont = document.getElementById('grigliaPrenotazioni');
+            cont.innerHTML = '';
+            document.getElementById('vuoto').style.display = lista.length ? 'none' : 'block';
+
+            lista.forEach(p => {
+                const attiva = p.stato === 'ATTIVA';
+                const azioni = attiva ? `
+                    <div class="card-actions">
+                        <button class="btn-sm btn-success" onclick="checkin(${p.idPrenotazione})">Effettua Check-In</button>
+                        <button class="btn-sm btn-outline-danger" onclick="annulla(${p.idPrenotazione})">Annulla</button>
+                    </div>` : '';
+                const card = document.createElement('div');
+                card.className = 'prenotazione-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <h4>Prenotazione #${p.idPrenotazione}</h4>
+                        <span class="badge-status ${p.stato.toLowerCase()}">${p.stato}</span>
+                    </div>
+                    <div class="card-body">
+                        <p>Data: ${formattaData(p.data)}</p>
+                        <p>Orario: ${p.fasciaOraria}</p>
+                        <p>${p.nomeSala} - ${p.tipologiaArea} - Postazione #${p.numeroPostazione}</p>
+                    </div>
+                    ${azioni}`;
+                cont.appendChild(card);
+            });
+        }
+
+        async function carica() {
+            mostraErrore('errore', '');
+            try {
+                const profilo = await api('GET', '/studente/' + utente.id + '/profilo');
+                const nomeCompleto = [profilo.nome, profilo.cognome].filter(Boolean).join(' ');
+                document.getElementById('titoloProfilo').textContent =
+                    'Profilo Personale di ' + (nomeCompleto || profilo.identificativo || '');
+                document.getElementById('identificativoProfilo').textContent =
+                    'Matricola: ' + (profilo.identificativo || '');
+                document.getElementById('totaleAccessi').textContent =
+                    'Totale accessi: ' + profilo.numeroTotaleAccessi;
+                prenotazioni = await api('GET', '/studente/' + utente.id + '/storico');
+                render();
+            } catch (err) {
+                mostraErrore('errore', err.message);
+            }
+        }
+
+        async function checkin(id) {
+            try { await api('PUT', '/prenotazioni/' + id + '/checkin'); carica(); }
+            catch (err) { alert(err.message); }
+        }
+        async function annulla(id) {
+            if (!confirm('Confermi l\'annullamento della prenotazione?')) return;
+            try { await api('PUT', '/prenotazioni/' + id + '/annulla'); carica(); }
+            catch (err) { alert(err.message); }
+        }
+
+        document.getElementById('ordina').addEventListener('change', render);
+        carica();
+    </script>
+</body>
+</html>

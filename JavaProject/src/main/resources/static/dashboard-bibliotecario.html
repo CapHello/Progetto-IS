@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Bibliotecario - Prenotazioni Biblioteca</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/wizard.css">
+</head>
+<body class="dashboard-body">
+
+    <nav class="navbar">
+        <a href="dashboard-bibliotecario.html" class="navbar-brand">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 3L1 9L5 11.18V17.18L12 21L19 17.18V11.18L21 10.09V17H23V9L12 3ZM18.82 9L12 12.72L5.18 9L12 5.28L18.82 9ZM17 15.99L12 18.72L7 15.99V12.27L12 15L17 12.27V15.99Z"/>
+            </svg>
+            Dashboard Bibliotecario
+        </a>
+        <a href="#" class="btn-logout" onclick="logout(); return false;">Logout</a>
+    </nav>
+
+    <main class="dashboard-container">
+
+        <section class="sale-section">
+            <div class="section-header">
+                <h2>Stato Sale Studio</h2>
+            </div>
+
+            <div id="statistiche" style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1rem; color:var(--text-muted); font-size:0.9rem;"></div>
+
+            <div id="errore" style="color:#e53e3e; margin-bottom:1rem;"></div>
+            <div class="sale-scroll-container" id="contenitoreSale"></div>
+            <p id="vuoto" style="display:none; color:var(--text-muted);">Nessuna sala presente. Creane una nuova qui sotto.</p>
+        </section>
+
+        <section class="actions-section">
+            <a href="crea-sala.html" class="action-card">
+                <div class="action-icon">
+                    <div class="plus-badge">+</div>
+                    <svg viewBox="0 0 24 24">
+                        <path d="M22 14v-2h-2v-4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4H2v2h2v6h2v-4h12v4h2v-6h2zm-16-6h12v4H6V8z"/>
+                        <rect x="10" y="10" width="4" height="6" rx="1"/>
+                    </svg>
+                </div>
+                <h3>Crea nuova Sala Studio</h3>
+            </a>
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        richiediRuolo('Bibliotecario');
+
+        async function carica() {
+            mostraErrore('errore', '');
+            try {
+                const s = await api('GET', '/monitoraggio/statistiche');
+                document.getElementById('statistiche').innerHTML = `
+                    <span class="area-pill">Tasso occupazione oggi: <strong>${s.tassoOccupazione.toFixed(1)}%</strong></span>
+                    <span class="area-pill">Prenotazioni oggi: <strong>${s.prenotazioniOggi}</strong></span>
+                    <span class="area-pill">Non confermate: <strong>${s.prenotazioniNonConfermate}</strong></span>
+                    <span class="area-pill">Postazioni: <strong>${s.postazioniOccupateOggi}/${s.postazioniTotali}</strong></span>`;
+
+                const sale = await api('GET', '/monitoraggio/sale');
+                const cont = document.getElementById('contenitoreSale');
+                cont.innerHTML = '';
+                document.getElementById('vuoto').style.display = sale.length ? 'none' : 'block';
+
+                sale.forEach(sala => {
+                    const pills = sala.aree.map(a => `<span class="area-pill">${a}</span>`).join('');
+                    const card = document.createElement('div');
+                    card.className = 'sala-card';
+                    card.innerHTML = `
+                        <h3 class="sala-title">${sala.nomeSala}</h3>
+                        <div class="sala-stats">
+                            <span class="badge badge-success" title="Posti liberi">${sala.postiLiberi}</span>
+                            <span class="badge badge-warning" title="Attive (non confermate)">${sala.postiAttivi}</span>
+                            <span class="badge badge-danger" title="Confermate (presenti)">${sala.postiConfermati}</span>
+                        </div>
+                        <div class="sala-areas">${pills || '<span class="area-pill">nessuna area</span>'}</div>
+                        <div style="text-align:center; margin-top:1rem;">
+                            <button class="btn-sm btn-outline-danger" onclick="elimina(${sala.idSala}, '${(sala.nomeSala || '').replace(/'/g, '')}')">Elimina sala</button>
+                        </div>`;
+                    cont.appendChild(card);
+                });
+            } catch (err) {
+                mostraErrore('errore', err.message);
+            }
+        }
+
+        async function elimina(id, nome) {
+            if (!confirm('Eliminare la sala "' + nome + '"? Le prenotazioni attive/confermate saranno annullate.')) return;
+            try { await api('DELETE', '/sale/' + id); carica(); }
+            catch (err) { alert(err.message); }
+        }
+
+        carica();
+    </script>
+</body>
+</html>

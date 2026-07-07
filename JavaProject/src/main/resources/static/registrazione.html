@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crea Account - Prenotazioni Biblioteca</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="brand-logo" title="Sistema di Prenotazioni">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 3L1 9L5 11.18V17.18L12 21L19 17.18V11.18L21 10.09V17H23V9L12 3ZM18.82 9L12 12.72L5.18 9L12 5.28L18.82 9ZM17 15.99L12 18.72L7 15.99V12.27L12 15L17 12.27V15.99Z"/>
+        </svg>
+    </div>
+
+    <main class="auth-container">
+        <h1 class="auth-title">Crea Account</h1>
+        <form id="registerForm">
+            <div class="form-group">
+                <input type="text" id="nome" class="form-control" placeholder="Nome" required aria-label="Nome">
+            </div>
+            <div class="form-group">
+                <input type="text" id="cognome" class="form-control" placeholder="Cognome" required aria-label="Cognome">
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" class="form-control" placeholder="Email Istituzionale" required aria-label="Email Istituzionale">
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" class="form-control" placeholder="Password" required aria-label="Password">
+            </div>
+            <div class="form-group">
+                <select id="ruolo" class="form-control" required aria-label="Ruolo">
+                    <option value="Studente" selected>Studente</option>
+                    <option value="Bibliotecario">Bibliotecario</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" id="identificativo" class="form-control" placeholder="Matricola/Codice" required aria-label="Matricola o Codice">
+            </div>
+            <button type="submit" class="btn-primary">Registrati</button>
+        </form>
+        <div id="errore" style="color:#e53e3e; text-align:center; margin-top:1rem; font-size:0.9rem; min-height:18px;"></div>
+        <div class="auth-footer">
+            <span>Hai già un account?</span><a href="index.html">Accedi</a>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            mostraErrore('errore', '');
+            try {
+                await api('POST', '/auth/registrazione', {
+                    ruolo: document.getElementById('ruolo').value,
+                    nome: document.getElementById('nome').value.trim(),
+                    cognome: document.getElementById('cognome').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    password: document.getElementById('password').value,
+                    identificativo: document.getElementById('identificativo').value.trim()
+                });
+                alert('Registrazione completata! Ora puoi accedere.');
+                location.href = 'index.html';
+            } catch (err) {
+                mostraErrore('errore', err.message);
+            }
+        });
+    </script>
+</body>
+</html>

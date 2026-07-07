@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accedi - Prenotazioni Biblioteca</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="brand-logo" title="Sistema di Prenotazioni">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 3L1 9L5 11.18V17.18L12 21L19 17.18V11.18L21 10.09V17H23V9L12 3ZM18.82 9L12 12.72L5.18 9L12 5.28L18.82 9ZM17 15.99L12 18.72L7 15.99V12.27L12 15L17 12.27V15.99Z"/>
+        </svg>
+    </div>
+
+    <main class="auth-container">
+        <h1 class="auth-title">Accedi</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <input type="email" id="email" class="form-control" placeholder="Email Istituzionale" required aria-label="Email Istituzionale">
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" class="form-control" placeholder="Password" required aria-label="Password">
+            </div>
+            <button type="submit" class="btn-primary">Login</button>
+        </form>
+        <div id="errore" style="color:#e53e3e; text-align:center; margin-top:1rem; font-size:0.9rem; min-height:18px;"></div>
+        <div class="auth-footer">
+            <span>Non hai un account?</span><a href="registrazione.html">Registrati</a>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            mostraErrore('errore', '');
+            try {
+                const utente = await api('POST', '/auth/login', {
+                    email: document.getElementById('email').value.trim(),
+                    password: document.getElementById('password').value
+                });
+                salvaUtente(utente);
+                location.href = utente.ruolo === 'Bibliotecario'
+                    ? 'dashboard-bibliotecario.html' : 'dashboard-studente.html';
+            } catch (err) {
+                mostraErrore('errore', err.message);
+            }
+        });
+    </script>
+</body>
+</html>

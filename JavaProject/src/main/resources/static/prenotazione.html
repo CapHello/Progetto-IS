@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effettua Prenotazione - Prenotazioni Biblioteca</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/wizard.css">
+</head>
+<body class="dashboard-body">
+
+    <nav class="navbar">
+        <a href="dashboard-studente.html" class="navbar-brand">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 3L1 9L5 11.18V17.18L12 21L19 17.18V11.18L21 10.09V17H23V9L12 3ZM18.82 9L12 12.72L5.18 9L12 5.28L18.82 9ZM17 15.99L12 18.72L7 15.99V12.27L12 15L17 12.27V15.99Z"/>
+            </svg>
+            Dashboard Studente
+        </a>
+        <a href="#" class="btn-logout" onclick="logout(); return false;">Logout</a>
+    </nav>
+
+    <main class="dashboard-container">
+
+        <div class="wizard-progress" id="progress">
+            <div class="wizard-step" data-step="1"><div class="step-number">1</div><span>Data &amp; Sala</span></div>
+            <div class="step-line"></div>
+            <div class="wizard-step" data-step="2"><div class="step-number">2</div><span>Fascia Oraria</span></div>
+            <div class="step-line"></div>
+            <div class="wizard-step" data-step="3"><div class="step-number">3</div><span>Area</span></div>
+            <div class="step-line"></div>
+            <div class="wizard-step" data-step="4"><div class="step-number">4</div><span>Postazione</span></div>
+            <div class="step-line"></div>
+            <div class="wizard-step" data-step="5"><div class="step-number">5</div><span>Conferma</span></div>
+        </div>
+
+        <div id="errore" style="color:#e53e3e; text-align:center; margin-bottom:1rem; min-height:18px;"></div>
+
+        <!-- STEP 1: Data & Sala -->
+        <div id="step1">
+            <div class="wizard-split-layout">
+                <div class="wizard-panel" style="flex: 0.8;">
+                    <h3>1.1 Scegli la data</h3>
+                    <div class="calendar-widget">
+                        <div class="calendar-header">
+                            <button type="button" onclick="cambiaMese(-1)">&lt;&lt;</button>
+                            <span id="calendarLabel"></span>
+                            <button type="button" onclick="cambiaMese(1)">&gt;&gt;</button>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid"></div>
+                        <div class="calendar-legend">
+                            <div class="legend-item"><div class="legend-color" style="background-color:#fbd38d;"></div> oggi</div>
+                            <div class="legend-item"><div class="legend-color" style="background-color:#e2e8f0;"></div> chiuso</div>
+                            <div class="legend-item"><div class="legend-color" style="background-color:var(--primary);"></div> selezionato</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wizard-panel" style="flex: 1.2;">
+                    <h3>1.2 Scegli la Sala Studio</h3>
+                    <div class="radio-list" id="listaSale">
+                        <p style="color:var(--text-muted);">Seleziona prima una data dal calendario.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="wizard-footer">
+                <button class="btn-primary" style="width:auto; padding:0.8rem 2.5rem;" onclick="vaiStep2()">Continua</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: Fascia -->
+        <div id="step2" style="display:none;">
+            <div class="wizard-panel">
+                <h3>2. Scegli una fascia oraria</h3>
+                <p id="sub2" style="color:var(--text-muted); margin-bottom:2rem; font-size:0.95rem;"></p>
+                <div class="selection-grid" id="listaFasce"></div>
+                <div class="wizard-footer">
+                    <button class="btn-sm" style="color:var(--text-muted); background:none; margin-right:auto;" onclick="mostraStep(1)">&larr; Indietro</button>
+                    <button class="btn-primary" style="width:auto; padding:0.8rem 2.5rem;" onclick="vaiStep3()">Continua</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Area -->
+        <div id="step3" style="display:none;">
+            <div class="wizard-panel">
+                <h3>3. Scegli un'Area</h3>
+                <p id="sub3" style="color:var(--text-muted); margin-bottom:2rem; font-size:0.95rem;"></p>
+                <div class="selection-grid" id="listaAree"></div>
+                <div class="wizard-footer">
+                    <button class="btn-sm" style="color:var(--text-muted); background:none; margin-right:auto;" onclick="mostraStep(2)">&larr; Indietro</button>
+                    <button class="btn-primary" style="width:auto; padding:0.8rem 2.5rem;" onclick="vaiStep4()">Continua</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 4: Postazione -->
+        <div id="step4" style="display:none;">
+            <div class="wizard-split-layout">
+                <div class="wizard-panel" style="flex: 2;">
+                    <h3>4. Scegli la postazione</h3>
+                    <p id="sub4" style="color:var(--text-muted); margin-bottom:2rem; font-size:0.95rem;"></p>
+                    <div class="selection-grid-small" id="grigliaPostazioni"></div>
+                </div>
+                <div style="flex: 1; display:flex; flex-direction:column; gap:1.5rem;">
+                    <div class="wizard-panel" style="background-color:#f8fafc;">
+                        <h4 style="margin-bottom:1.25rem; font-size:1.1rem;" id="dettaglioTitolo">Postazione</h4>
+                        <div id="dettaglioPosto" style="display:flex; flex-direction:column; gap:0.75rem; font-size:0.95rem; color:var(--text-muted);">
+                            Seleziona una postazione libera.
+                        </div>
+                    </div>
+                    <div class="wizard-panel">
+                        <h4 style="margin-bottom:1rem; font-size:1.1rem;">Oppure</h4>
+                        <label class="radio-card" id="cardAuto">
+                            <input type="radio" name="auto" value="true" onclick="scegliAuto()">
+                            <div class="radio-card-content">
+                                <strong>Assegnazione automatica</strong>
+                                <span>il sistema sceglie per te</span>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="wizard-footer" style="margin-top:0;">
+                        <button class="btn-primary" style="width:100%; padding:1rem;" onclick="vaiStep5()">Continua</button>
+                    </div>
+                </div>
+            </div>
+            <div class="wizard-footer" style="justify-content:flex-start;">
+                <button class="btn-sm" style="color:var(--text-muted); background:none;" onclick="mostraStep(3)">&larr; Indietro</button>
+            </div>
+        </div>
+
+        <!-- STEP 5: Conferma -->
+        <div id="step5" style="display:none;">
+            <div class="wizard-panel" style="max-width:800px; margin:0 auto;">
+                <h3 style="font-size:1.4rem; margin-bottom:2rem;">5. Riepilogo e Conferma</h3>
+                <div style="background-color:#f8fafc; padding:2rem; border-radius:12px; margin-bottom:2.5rem; border:1px solid var(--border-color);">
+                    <div id="riepilogo" style="display:grid; grid-template-columns:160px 1fr; gap:1.25rem; font-size:1.05rem;"></div>
+                </div>
+                <div style="border:1px solid #e2e8f0; border-left:4px solid var(--primary); padding:1.5rem 2rem; border-radius:8px; background-color:white;">
+                    <h4 style="margin-bottom:1rem; color:var(--text-main);">Promemoria importante:</h4>
+                    <ul style="padding-left:1.25rem; color:var(--text-muted); line-height:1.8; font-size:0.95rem;">
+                        <li>Il check-in va effettuato al più 10 minuti dopo l'orario di inizio della prenotazione.</li>
+                        <li>L'annullamento è possibile fino ad almeno 6 ore prima dell'inizio della fascia oraria.</li>
+                        <li>Alla conferma riceverai una notifica sulla tua casella di posta istituzionale.</li>
+                    </ul>
+                </div>
+                <div class="wizard-footer">
+                    <button class="btn-sm" style="color:var(--text-muted); background:none; margin-right:auto;" onclick="mostraStep(4)">&larr; Indietro</button>
+                    <button class="btn-primary" style="width:auto; padding:0.8rem 3rem; background-color:#48bb78; box-shadow:0 4px 12px rgba(72,187,120,0.3);" onclick="conferma()">Conferma Prenotazione</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUCCESSO -->
+        <div id="successo" style="display:none;">
+            <div style="background:white; border-radius:20px; padding:4rem 3rem; text-align:center; box-shadow:0 15px 40px rgba(0,0,0,0.08); max-width:500px; margin:1rem auto; border:1px solid var(--border-color); animation:slideUp 0.5s ease-out;">
+                <div style="width:90px; height:90px; background-color:#c6f6d5; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 2rem auto;">
+                    <svg viewBox="0 0 24 24" style="width:54px; height:54px; fill:#38a169;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                </div>
+                <h2 style="color:var(--text-main); margin-bottom:1rem; font-size:2rem;">Prenotazione Confermata</h2>
+                <p id="msgSuccesso" style="color:var(--text-muted); margin-bottom:2.5rem; font-size:1.05rem;"></p>
+                <div id="boxSuccesso" style="background-color:#f8fafc; border:1px solid var(--border-color); border-radius:12px; padding:1.5rem; margin-bottom:2.5rem;"></div>
+                <a href="dashboard-studente.html" class="btn-primary" style="text-decoration:none; display:block; padding:1rem;">Torna alla dashboard</a>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        const utente = richiediRuolo('Studente');
+        const MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+        const stato = { dataISO:null, idSala:null, nomeSala:null, idFascia:null, fasciaLabel:null,
+                        idArea:null, tipologia:null, idPostazione:null, postazioneLabel:null, dettaglio:null };
+        let mostrato = new Date(); // mese visualizzato nel calendario
+
+        // ---------- Navigazione step ----------
+        function mostraStep(n) {
+            for (let i = 1; i <= 5; i++) document.getElementById('step' + i).style.display = (i === n ? 'block' : 'none');
+            document.getElementById('successo').style.display = 'none';
+            document.querySelectorAll('#progress .wizard-step').forEach(el => {
+                const s = Number(el.dataset.step);
+                el.classList.toggle('active', s === n);
+                el.classList.toggle('completed', s < n);
+            });
+            mostraErrore('errore', '');
+        }
+
+        // ---------- Calendario ----------
+        function iso(d) {
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+        function renderCalendario() {
+            const anno = mostrato.getFullYear(), mese = mostrato.getMonth();
+            document.getElementById('calendarLabel').textContent = MESI[mese] + ' ' + anno;
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            ['L','M','M','G','V','S','D'].forEach(g => {
+                const h = document.createElement('div'); h.className = 'calendar-day-header'; h.textContent = g; grid.appendChild(h);
+            });
+            const primo = new Date(anno, mese, 1);
+            const offset = (primo.getDay() + 6) % 7; // lunedì = 0
+            for (let i = 0; i < offset; i++) grid.appendChild(document.createElement('div'));
+            const giorni = new Date(anno, mese + 1, 0).getDate();
+            const oggi = new Date(); const oggi0 = new Date(oggi.getFullYear(), oggi.getMonth(), oggi.getDate());
+            for (let g = 1; g <= giorni; g++) {
+                const d = new Date(anno, mese, g);
+                const cell = document.createElement('div');
+                cell.className = 'calendar-cell';
+                cell.textContent = g;
+                const weekend = (d.getDay() === 0 || d.getDay() === 6);
+                const passato = d < oggi0;
+                if (weekend || passato) {
+                    cell.classList.add('disabled');
+                } else {
+                    if (d.getTime() === oggi0.getTime()) cell.classList.add('today');
+                    if (stato.dataISO === iso(d)) cell.classList.add('selected');
+                    cell.addEventListener('click', () => selezionaData(iso(d)));
+                }
+                grid.appendChild(cell);
+            }
+        }
+        function cambiaMese(delta) { mostrato = new Date(mostrato.getFullYear(), mostrato.getMonth() + delta, 1); renderCalendario(); }
+
+        async function selezionaData(dataISO) {
+            stato.dataISO = dataISO;
+            stato.idSala = null;
+            renderCalendario();
+            const cont = document.getElementById('listaSale');
+            cont.innerHTML = '<p style="color:var(--text-muted);">Caricamento…</p>';
+            try {
+                const sale = await api('GET', '/sale/disponibili', { data: dataISO });
+                cont.innerHTML = sale.length ? '' : '<p style="color:var(--text-muted);">Nessuna sala disponibile per questa data.</p>';
+                sale.forEach(s => {
+                    const label = document.createElement('label');
+                    label.className = 'radio-card';
+                    label.innerHTML = `<input type="radio" name="sala" value="${s.id}">
+                        <div class="radio-card-content"><strong>${s.nome}</strong>
+                        <span>${s.numeroPostazioniTotali} postazioni totali · ${s.descrizione || ''}</span></div>`;
+                    label.addEventListener('click', () => {
+                        document.querySelectorAll('#listaSale .radio-card').forEach(x => x.classList.remove('selected'));
+                        label.classList.add('selected');
+                        label.querySelector('input').checked = true;
+                        stato.idSala = s.id; stato.nomeSala = s.nome;
+                    });
+                    cont.appendChild(label);
+                });
+            } catch (err) { cont.innerHTML = '<p style="color:#e53e3e;">' + err.message + '</p>'; }
+        }
+
+        // ---------- Step 2: fasce ----------
+        async function vaiStep2() {
+            if (!stato.dataISO) { mostraErrore('errore', 'Seleziona una data'); return; }
+            if (!stato.idSala) { mostraErrore('errore', 'Seleziona una sala'); return; }
+            try {
+                const fasce = await api('GET', '/sale/' + stato.idSala + '/fasce', { data: stato.dataISO });
+                document.getElementById('sub2').innerHTML =
+                    'Sala selezionata: <strong style="color:var(--text-main);">' + stato.nomeSala +
+                    '</strong> &nbsp;|&nbsp; data: <strong style="color:var(--text-main);">' + formattaData(stato.dataISO) + '</strong>';
+                const cont = document.getElementById('listaFasce');
+                cont.innerHTML = fasce.length ? '' : '<p style="color:var(--text-muted);">Nessuna fascia disponibile.</p>';
+                stato.idFascia = null;
+                fasce.forEach(f => {
+                    const label = document.createElement('label');
+                    label.className = 'radio-card';
+                    label.innerHTML = `<input type="radio" name="fascia" value="${f.idFascia}">
+                        <div class="radio-card-content"><strong>${f.etichetta}</strong>
+                        <span>${f.postiDisponibili} postazioni disponibili</span></div>`;
+                    label.addEventListener('click', () => {
+                        document.querySelectorAll('#listaFasce .radio-card').forEach(x => x.classList.remove('selected'));
+                        label.classList.add('selected');
+                        label.querySelector('input').checked = true;
+                        stato.idFascia = f.idFascia; stato.fasciaLabel = f.etichetta;
+                    });
+                    cont.appendChild(label);
+                });
+                mostraStep(2);
+            } catch (err) { mostraErrore('errore', err.message); }
+        }
+
+        // ---------- Step 3: aree ----------
+        async function vaiStep3() {
+            if (!stato.idFascia) { mostraErrore('errore', 'Seleziona una fascia oraria'); return; }
+            try {
+                stato.dettaglio = await api('GET', '/sale/' + stato.idSala + '/dettaglio', { idFascia: stato.idFascia, data: stato.dataISO });
+                document.getElementById('sub3').innerHTML =
+                    "Scegli un'area della sala <strong>" + stato.nomeSala +
+                    "</strong> (l'area <em>comune</em> è sempre disponibile).";
+                const cont = document.getElementById('listaAree');
+                cont.innerHTML = '';
+                stato.idArea = null; stato.tipologia = null;
+
+                stato.dettaglio.aree.forEach(a => {
+                    const label = document.createElement('label');
+                    label.className = 'radio-card';
+                    label.innerHTML = `<input type="radio" name="area" value="${a.idArea}">
+                        <div class="radio-card-content">
+                        <strong style="font-size:1.1rem;">Area: ${a.tipologia}</strong>
+                        <div style="display:flex; align-items:center; gap:6px; margin-top:8px;">
+                            <div class="legend-color" style="background-color:#48bb78; border-radius:50%;"></div>
+                            <span style="font-size:0.8rem; font-weight:500;">${a.postiDisponibili} postazioni disponibili</span>
+                        </div></div>`;
+                    label.addEventListener('click', () => selezionaArea(label, a.idArea, a.tipologia));
+                    cont.appendChild(label);
+                });
+                mostraStep(3);
+            } catch (err) { mostraErrore('errore', err.message); }
+        }
+        function selezionaArea(el, idArea, tipologia) {
+            document.querySelectorAll('#listaAree .radio-card').forEach(x => x.classList.remove('selected'));
+            el.classList.add('selected');
+            el.querySelector('input').checked = true;
+            stato.idArea = idArea; stato.tipologia = tipologia;
+        }
+
+        // ---------- Step 4: postazioni ----------
+        function vaiStep4() {
+            if (stato.idArea === null) {
+                mostraErrore('errore', "Seleziona un'area"); return;
+            }
+            const area = stato.dettaglio.aree.find(a => a.idArea === stato.idArea);
+            document.getElementById('sub4').textContent =
+                stato.nomeSala + ' · ' + stato.tipologia + ' · ' + formattaData(stato.dataISO) + ' · ' + stato.fasciaLabel;
+            const grid = document.getElementById('grigliaPostazioni');
+            grid.innerHTML = '';
+            stato.idPostazione = null; stato.postazioneLabel = null;
+            document.getElementById('cardAuto').classList.remove('selected');
+            document.getElementById('dettaglioPosto').innerHTML = 'Seleziona una postazione libera.';
+            document.getElementById('dettaglioTitolo').textContent = 'Postazione';
+
+            area.postazioni.forEach((p, i) => {
+                const label = 'P' + p.numero;
+                const cell = document.createElement('div');
+                cell.className = 'seat-cell ' + (p.disponibile ? 'libera' : 'occupata');
+                cell.textContent = label;
+                if (p.disponibile) {
+                    cell.addEventListener('click', () => {
+                        document.querySelectorAll('#grigliaPostazioni .seat-cell').forEach(x => x.classList.remove('selezionata'));
+                        document.getElementById('cardAuto').classList.remove('selected');
+                        document.querySelector('#cardAuto input').checked = false;
+                        cell.classList.remove('libera'); cell.classList.add('selezionata');
+                        // ripristina le altre libere
+                        area.postazioni.forEach((pp, j) => {
+                            const c = grid.children[j];
+                            if (pp.disponibile && j !== i) { c.classList.remove('selezionata'); c.classList.add('libera'); }
+                        });
+                        stato.idPostazione = p.id; stato.postazioneLabel = label;
+                        document.getElementById('dettaglioTitolo').textContent = 'Postazione ' + label;
+                        document.getElementById('dettaglioPosto').innerHTML = `
+                            <div><span>Sala:</span> <strong>${stato.nomeSala}</strong></div>
+                            <div><span>Area:</span> <strong>${stato.tipologia}</strong></div>
+                            <div><span>Fascia:</span> <strong>${stato.fasciaLabel}</strong></div>
+                            <div><span>Stato:</span> <strong style="color:#38a169;">libera</strong></div>`;
+                    });
+                }
+                grid.appendChild(cell);
+            });
+            mostraStep(4);
+        }
+        function scegliAuto() {
+            document.querySelectorAll('#grigliaPostazioni .seat-cell.selezionata').forEach(c => { c.classList.remove('selezionata'); c.classList.add('libera'); });
+            document.getElementById('cardAuto').classList.add('selected');
+            stato.idPostazione = 0; stato.postazioneLabel = 'Assegnazione automatica';
+        }
+
+        // ---------- Step 5: riepilogo ----------
+        function vaiStep5() {
+            if (stato.idPostazione === null) {
+                mostraErrore('errore', "Seleziona una postazione o l'assegnazione automatica"); return;
+            }
+            const posto = (!stato.idPostazione || stato.idPostazione === 0) ? 'Assegnazione automatica' : stato.postazioneLabel;
+            document.getElementById('riepilogo').innerHTML = `
+                <div style="color:var(--text-muted);">Sala Studio:</div><div style="font-weight:600;">${stato.nomeSala}</div>
+                <div style="color:var(--text-muted);">Data:</div><div style="font-weight:600;">${formattaData(stato.dataISO)}</div>
+                <div style="color:var(--text-muted);">Fascia Oraria:</div><div style="font-weight:600;">${stato.fasciaLabel}</div>
+                <div style="color:var(--text-muted);">Area:</div><div style="font-weight:600;">${stato.tipologia}</div>
+                <div style="color:var(--text-muted);">Postazione:</div><div style="font-weight:600;">${posto}</div>`;
+            mostraStep(5);
+        }
+
+        async function conferma() {
+            try {
+                const p = await api('POST', '/prenotazioni/effettua', {
+                    idSala: stato.idSala,
+                    idArea: stato.idArea,
+                    idPostazione: stato.idPostazione,
+                    data: stato.dataISO,
+                    idFascia: stato.idFascia,
+                    idStudente: utente.id
+                });
+                document.getElementById('msgSuccesso').innerHTML =
+                    'La prenotazione <strong>#' + p.idPrenotazione + '</strong> è stata registrata in stato ' +
+                    '<span style="color:#3182ce; font-weight:700;">' + p.stato + '</span>.';
+                document.getElementById('boxSuccesso').innerHTML =
+                    '<p style="font-weight:600; color:var(--text-main); font-size:1.1rem; margin-bottom:0.5rem;">' +
+                    p.nomeSala + ' · ' + p.tipologiaArea + ' · Postazione #' + p.numeroPostazione + '</p>' +
+                    '<p style="color:var(--text-muted);">' + formattaData(p.data) + ' &nbsp;|&nbsp; ' + p.fasciaOraria + '</p>';
+                for (let i = 1; i <= 5; i++) document.getElementById('step' + i).style.display = 'none';
+                document.querySelectorAll('#progress .wizard-step').forEach(el => el.classList.add('completed'));
+                document.getElementById('successo').style.display = 'block';
+            } catch (err) { mostraStep(5); mostraErrore('errore', err.message); }
+        }
+
+        function formattaData(isoStr) {
+            if (!isoStr) return '';
+            const [a, m, g] = isoStr.split('-');
+            return parseInt(g, 10) + ' ' + MESI[parseInt(m, 10) - 1].toLowerCase() + ' ' + a;
+        }
+
+        renderCalendario();
+        mostraStep(1);
+    </script>
+</body>
+</html>

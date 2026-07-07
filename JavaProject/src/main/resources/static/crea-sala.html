@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crea nuova Sala Studio - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body class="dashboard-body">
+
+    <nav class="navbar">
+        <a href="dashboard-bibliotecario.html" class="navbar-brand">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 3L1 9L5 11.18V17.18L12 21L19 17.18V11.18L21 10.09V17H23V9L12 3ZM18.82 9L12 12.72L5.18 9L12 5.28L18.82 9ZM17 15.99L12 18.72L7 15.99V12.27L12 15L17 12.27V15.99Z"/>
+            </svg>
+            Dashboard Bibliotecario
+        </a>
+        <a href="#" class="btn-logout" onclick="logout(); return false;">Logout</a>
+    </nav>
+
+    <main class="dashboard-form-container">
+        <h2>Crea nuova Sala Studio</h2>
+        <form id="creaSalaForm">
+            <div class="form-group">
+                <input type="text" id="nome" class="form-control" placeholder="Nome Sala" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="descrizione" class="form-control" placeholder="Descrizione" required>
+            </div>
+            <div class="form-group">
+                <input type="number" id="numeroPostazioni" class="form-control" placeholder="Numero postazioni totali" min="1" value="20" required>
+            </div>
+            <div class="form-group">
+                <input type="number" id="numeroAree" class="form-control" placeholder="Numero aree specifiche (oltre alla comune)" min="0" max="10" value="1" required>
+            </div>
+
+            <!-- Aree specifiche (nome + postazioni); l'area "comune" di default è sempre aggiunta. -->
+            <div id="areeContainer"></div>
+            <div id="riepilogoAree" style="font-size:0.85rem; margin:-0.25rem 0 1rem 0.25rem; color:#718096;"></div>
+
+            <div class="form-group" style="position: relative;">
+                <label for="orarioApertura" style="position: absolute; font-size: 0.75rem; color: #718096; top: 0.25rem; left: 1.25rem;">Orario apertura</label>
+                <input type="time" id="orarioApertura" class="form-control" style="padding-top: 1.25rem; padding-bottom: 0.5rem;" value="08:30" required>
+            </div>
+            <div class="form-group" style="position: relative;">
+                <label for="orarioChiusura" style="position: absolute; font-size: 0.75rem; color: #718096; top: 0.25rem; left: 1.25rem;">Orario chiusura</label>
+                <input type="time" id="orarioChiusura" class="form-control" style="padding-top: 1.25rem; padding-bottom: 0.5rem;" value="18:30" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="grana" class="form-control" placeholder="grana suddivisioni (es. 30m, 1h)" value="2h" required>
+            </div>
+            <button type="submit" class="btn-primary">Procedi</button>
+        </form>
+        <div id="errore" style="color:#e53e3e; text-align:center; margin-top:1rem; font-size:0.9rem; min-height:18px;"></div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        richiediRuolo('Bibliotecario');
+
+        // Converte una grana testuale ("30m", "1h", "1h30m", "90") in minuti.
+        function granaInMinuti(testo) {
+            const s = testo.trim().toLowerCase().replace(/\s/g, '');
+            if (/^\d+$/.test(s)) return parseInt(s, 10);
+            let minuti = 0;
+            const h = s.match(/(\d+)h/);
+            const m = s.match(/(\d+)m/);
+            if (h) minuti += parseInt(h[1], 10) * 60;
+            if (m) minuti += parseInt(m[1], 10);
+            return minuti;
+        }
+
+        const escapeAttr = (v) => (v || '').replace(/"/g, '&quot;');
+
+        // Rigenera le righe-area in base al "Numero aree", preservando i valori già inseriti.
+        function renderAree() {
+            const n = Math.max(0, parseInt(document.getElementById('numeroAree').value, 10) || 0);
+            const cont = document.getElementById('areeContainer');
+            const nomi = [...cont.querySelectorAll('.area-nome')].map(i => i.value);
+            const posti = [...cont.querySelectorAll('.area-posti')].map(i => i.value);
+            cont.innerHTML = '';
+            for (let i = 0; i < n; i++) {
+                const row = document.createElement('div');
+                row.className = 'form-group';
+                row.style.display = 'flex';
+                row.style.gap = '0.75rem';
+                row.innerHTML =
+                    '<input type="text" class="form-control area-nome" style="flex:2;" required ' +
+                        'placeholder="Nome area ' + (i + 1) + ' (es. Silenziosa)" value="' + escapeAttr(nomi[i]) + '">' +
+                    '<input type="number" class="form-control area-posti" style="flex:1;" min="1" required ' +
+                        'placeholder="Postazioni" value="' + (posti[i] || 1) + '">';
+                cont.appendChild(row);
+            }
+            cont.querySelectorAll('.area-posti, .area-nome').forEach(el => el.addEventListener('input', aggiornaRiepilogo));
+            aggiornaRiepilogo();
+        }
+
+        // L'area "comune" di default è SEMPRE presente (V19) e riceve le postazioni non
+        // assegnate alle aree specifiche; deve avere almeno 1 postazione (V04).
+        function aggiornaRiepilogo() {
+            const totale = parseInt(document.getElementById('numeroPostazioni').value, 10) || 0;
+            let somma = 0;
+            document.querySelectorAll('#areeContainer .area-posti').forEach(i => { somma += parseInt(i.value, 10) || 0; });
+            const comune = totale - somma;
+            const el = document.getElementById('riepilogoAree');
+            if (comune < 1) {
+                el.style.color = '#e53e3e';
+                el.textContent = 'Le aree specifiche occupano ' + somma + '/' + totale
+                    + ': lascia almeno 1 postazione all\'area comune (sempre presente).';
+            } else {
+                el.style.color = '#718096';
+                el.textContent = 'Aree specifiche: ' + somma + ' postazioni. Area comune (sempre presente): ' + comune + '.';
+            }
+        }
+
+        document.getElementById('numeroAree').addEventListener('input', renderAree);
+        document.getElementById('numeroPostazioni').addEventListener('input', aggiornaRiepilogo);
+
+        document.getElementById('creaSalaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            mostraErrore('errore', '');
+            const granaMinuti = granaInMinuti(document.getElementById('grana').value);
+            if (!granaMinuti || granaMinuti < 1) {
+                mostraErrore('errore', 'Grana non valida (usa es. 30m, 1h, 90)');
+                return;
+            }
+
+            const totale = parseInt(document.getElementById('numeroPostazioni').value, 10) || 0;
+            const nomiEl = [...document.querySelectorAll('#areeContainer .area-nome')];
+            const postiEl = [...document.querySelectorAll('#areeContainer .area-posti')];
+            const tipologie = [];
+            const postazioniAree = [];
+            let somma = 0;
+            for (let i = 0; i < nomiEl.length; i++) {
+                const nome = nomiEl[i].value.trim();
+                const np = parseInt(postiEl[i].value, 10) || 0;
+                if (!nome) { mostraErrore('errore', 'Inserisci il nome dell\'area ' + (i + 1)); return; }
+                if (nome.toLowerCase() === 'comune') { mostraErrore('errore', 'Il nome "comune" è riservato all\'area di default'); return; }
+                if (np < 1) { mostraErrore('errore', 'L\'area "' + nome + '" deve avere almeno una postazione'); return; }
+                tipologie.push(nome);
+                postazioniAree.push(np);
+                somma += np;
+            }
+            if (totale - somma < 1) {
+                mostraErrore('errore', 'Le aree specifiche devono lasciare almeno una postazione all\'area comune (sempre presente)');
+                return;
+            }
+
+            try {
+                await api('POST', '/sale/crea', {
+                    nome: document.getElementById('nome').value.trim(),
+                    descrizione: document.getElementById('descrizione').value.trim(),
+                    numeroPostazioni: totale,
+                    orarioApertura: document.getElementById('orarioApertura').value,
+                    orarioChiusura: document.getElementById('orarioChiusura').value,
+                    granaMinuti: granaMinuti,
+                    tipologie: tipologie,
+                    postazioniAree: postazioniAree
+                });
+                alert('Sala creata con successo!');
+                location.href = 'dashboard-bibliotecario.html';
+            } catch (err) {
+                mostraErrore('errore', err.message);
+            }
+        });
+
+        renderAree();
+    </script>
+</body>
+</html>
