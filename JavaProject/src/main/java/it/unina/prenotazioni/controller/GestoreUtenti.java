@@ -3,10 +3,7 @@ package it.unina.prenotazioni.controller;
 import it.unina.prenotazioni.controller.factory.BibliotecarioFactory;
 import it.unina.prenotazioni.controller.factory.StudenteFactory;
 import it.unina.prenotazioni.dto.UtenteDTO;
-import it.unina.prenotazioni.entity.Bibliotecario;
-import it.unina.prenotazioni.entity.RegistroUtenti;
-import it.unina.prenotazioni.entity.Studente;
-import it.unina.prenotazioni.entity.Utente;
+import it.unina.prenotazioni.entity.*;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +16,8 @@ public class GestoreUtenti {
 
     private static final int MAX_TENTATIVI = 5;
     private static final int MINUTI_BLOCCO = 15;
+
+    private final RegistroUtenti registroUtenti = RegistroUtenti.getInstance();
 
     private static GestoreUtenti istanza;
 
@@ -57,32 +56,30 @@ public class GestoreUtenti {
         }
 
         // Un solo RegistroUtenti per l'intera operazione.
-        RegistroUtenti registro = new RegistroUtenti();
-        if (registro.esisteEmailIstituzionale(email)) {
+        if (registroUtenti.esisteEmailIstituzionale(email)) {
             throw new IllegalArgumentException("Email già associata a un account.");
         }
 
         Utente nuovoUtente;
         if (studente) {
-            if (registro.cercaStudentePerMatricola(identificativo) != null) {
+            if (registroUtenti.cercaStudentePerMatricola(identificativo) != null) {
                 throw new IllegalArgumentException("Matricola già in uso.");
             }
             nuovoUtente = new StudenteFactory().creaUtente(nome, cognome, email, password, identificativo);
         } else {
-            if (registro.cercaBibliotecarioPerCodice(identificativo) != null) {
+            if (registroUtenti.cercaBibliotecarioPerCodice(identificativo) != null) {
                 throw new IllegalArgumentException("Codice identificativo già in uso.");
             }
             nuovoUtente = new BibliotecarioFactory().creaUtente(nome, cognome, email, password, identificativo);
         }
 
-        registro.registraUtente(nuovoUtente);
+        registroUtenti.registraUtente(nuovoUtente);
         return toDTO(nuovoUtente);
     }
 
     // ------------------------------------------------------------------ UC2
     public Object autenticazione(String email, String password) {
-        RegistroUtenti registro = RegistroUtenti.getInstance();
-        Utente utente = registro.cercaUtentePerEmail(email);
+        Utente utente = registroUtenti.cercaUtentePerEmail(email);
 
         if (utente == null) {
             throw new SecurityException("Credenziali errate");
@@ -96,19 +93,18 @@ public class GestoreUtenti {
             if (utente.getTentativiFalliti() >= MAX_TENTATIVI) {
                 bloccaAccountTemporaneamente(utente, MINUTI_BLOCCO);
             }
-            registro.aggiorna(utente);
+            registroUtenti.aggiorna(utente);
             throw new SecurityException("Credenziali errate");
         }
 
         resetTentativi(utente);
-        registro.aggiorna(utente);
+        registroUtenti.aggiorna(utente);
         return toDTO(utente);
     }
 
     // -------------------------------------------------------------- UC8 (profilo)
     public Object visualizzaProfilo(Long idStudente) {
-        RegistroUtenti registro = RegistroUtenti.getInstance();
-        Studente studente = registro.trovaStudentePerId(idStudente);
+        Studente studente = registroUtenti.trovaStudentePerId(idStudente);
         if (studente == null) {
             throw new IllegalArgumentException("Studente non trovato");
         }
