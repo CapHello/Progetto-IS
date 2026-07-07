@@ -54,7 +54,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <!-- Mantiene i nomi dei parametri nei .class (necessario a Spring MVC per il
+            <!-- Mantiene i nomi dei parametri nei class (necessario a Spring MVC per il
                  binding di @RequestParam/@PathVariable). Utile anche quando la build è
                  lanciata da IntelliJ dopo il reimport del pom. -->
             <plugin>

@@ -263,3 +263,46 @@ body.dashboard-body::before, body.dashboard-body::after {
     color: var(--text-main);
     font-size: 1.75rem;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0 1rem;
+    }
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+    .navbar-brand svg {
+        width: 28px;
+        height: 28px;
+        margin-right: 0.5rem;
+    }
+    .btn-logout {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+    .dashboard-container {
+        padding: 0 1rem;
+        margin: 1.5rem auto;
+    }
+    .actions-section {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .action-card {
+        width: 100%;
+        max-width: 320px;
+        padding: 1.5rem;
+    }
+    .dashboard-form-container {
+        margin: 2rem auto;
+        padding: 2rem 1.5rem;
+        width: calc(100% - 2rem);
+    }
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}

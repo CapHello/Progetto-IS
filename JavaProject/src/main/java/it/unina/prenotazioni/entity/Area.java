@@ -17,7 +17,7 @@ public class Area {
     @JoinColumn(name = "sala_studio_id", nullable = false)
     private SalaStudio salaStudio;
 
-    @OneToMany(mappedBy = "area")
+    @OneToMany(mappedBy = "area", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Postazione> postazioni = new ArrayList<>();
 
     public Area() {}

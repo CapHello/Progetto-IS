@@ -383,3 +383,30 @@
     fill: white;
     margin-bottom: 4px;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .prenotazioni-grid {
+        grid-template-columns: 1fr;
+    }
+    .wizard-progress {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .step-line {
+        display: none;
+    }
+    .selection-grid-small {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .wizard-panel {
+        padding: 1rem;
+    }
+    .calendar-grid {
+        gap: 0.15rem;
+    }
+    .calendar-cell {
+        font-size: 0.8rem;
+    }
+}

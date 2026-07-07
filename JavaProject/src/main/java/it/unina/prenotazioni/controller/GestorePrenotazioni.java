@@ -36,7 +36,7 @@ import java.util.Set;
  */
 public class GestorePrenotazioni {
 
-    private static GestorePrenotazioni instance;
+    private static GestorePrenotazioni istanza;
 
     private final RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
     private final RegistroSale registroSale = RegistroSale.getInstance();
@@ -54,7 +54,7 @@ public class GestorePrenotazioni {
             istanza = new GestorePrenotazioni();
             istanza.setStrategiaAssegnazione(new AssegnazionePrimaLibera());
         }
-        return instance;
+        return istanza;
     }
 
 

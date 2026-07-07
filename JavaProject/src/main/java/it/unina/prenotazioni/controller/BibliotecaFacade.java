@@ -37,10 +37,10 @@ public class BibliotecaFacade {
 
     // --- GestoreSale (UC3, UC4, UC6, UC11 + Aggiungi Area) ---
     public Object creaSalaStudio(String nome, String descrizione, int numeroPostazioni,
-                                 String orarioApertura, String orarioChiusura, int granaMinuti,
-                                 java.util.List<String> tipologie, java.util.List<Integer> postazioniAree) {
+                                 List<String> orariApertura, List<String> orariChiusura, int granaMinuti,
+                                 List<String> tipologie, List<Integer> postazioniAree) {
         return GestoreSale.getInstance().creaSalaStudio(nome, descrizione, numeroPostazioni,
-                orarioApertura, orarioChiusura, granaMinuti, tipologie, postazioniAree);
+                orariApertura, orariChiusura, granaMinuti, tipologie, postazioniAree);
     }
 
     public void eliminaSalaStudio(Long idSalaStudio) {

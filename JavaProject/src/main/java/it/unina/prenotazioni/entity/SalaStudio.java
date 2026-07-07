@@ -107,14 +107,8 @@ public class SalaStudio {
 
         Area area = new Area(tipologia, this);
 
-        // GESTIONE ID = 0 PER L'AREA COMUNE
-        if ("comune".equalsIgnoreCase(tipologia)) {
-            area.setId(0L);
-        }
-
         aree.add(area);
         for (int i = 0; i < numPostazioni; i++) {
-            // La Postazione ora prende solo l'Area nel costruttore
             Postazione p = new Postazione(area);
             area.addPostazione(p);
         }
