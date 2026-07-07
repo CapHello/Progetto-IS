@@ -57,7 +57,7 @@ public class GestoreUtenti {
         }
 
         // Un solo RegistroUtenti per l'intera operazione.
-        RegistroUtenti registro = new RegistroUtenti();
+        RegistroUtenti registro = RegistroUtenti.getInstance();
         if (registro.esisteEmailIstituzionale(email)) {
             throw new IllegalArgumentException("Email già associata a un account.");
         }
