@@ -38,6 +38,8 @@ public class GestorePrenotazioni {
 
     private static GestorePrenotazioni instance;
 
+    private final RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
+
     private final StrategiaAssegnazione strategia;
 
     private GestorePrenotazioni() {
@@ -96,7 +98,6 @@ public class GestorePrenotazioni {
      * ANNULLATA, che esclude la prenotazione dal calcolo della disponibilità.
      */
     public void annullaPrenotazione(Long idPrenotazione) {
-        RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
         Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);
         if (prenotazione == null) {
             throw new IllegalArgumentException("Prenotazione non trovata");
@@ -139,7 +140,6 @@ public class GestorePrenotazioni {
      * responsabilità dell'entity Prenotazione.
      */
     public void effettuaCheckIn(Long idPrenotazione) {
-        RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
         Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);
         if (prenotazione == null) {
             throw new IllegalArgumentException("Prenotazione non trovata");
