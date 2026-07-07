@@ -50,14 +50,15 @@ public class GestoreSale {
     // La creazione della sala include la definizione delle aree (ciclo dello scenario
     // CreaSalaStudio): tipologie[i] + postazioniAree[i] descrivono le aree; le postazioni
     // non assegnate confluiscono nell'area di default "comune".
-    public Object creaSalaStudio(String nome, String descrizione, int numeroPostazioni,
-                                 String orarioApertura, String orarioChiusura, int granaMinuti,
+    public SalaStudioDTO creaSalaStudio(String nome, String descrizione, int numeroPostazioni,
+                                 List<String> orariApertura, List<String> orariChiusura, int granaMinuti,
                                  List<String> tipologie, List<Integer> postazioniAree) {
+
         verificaValiditaDati(nome, descrizione, numeroPostazioni, granaMinuti);
-        LocalTime apertura = parseOrario(orarioApertura);
-        LocalTime chiusura = parseOrario(orarioChiusura);
-        if (!apertura.isBefore(chiusura)) {
-            throw new IllegalArgumentException("L'orario di apertura deve precedere quello di chiusura");
+
+        if (orariApertura == null || orariChiusura == null ||
+                orariApertura.size() != 5 || orariChiusura.size() != 5) {
+            throw new IllegalArgumentException("Devi fornire esattamente 5 orari di apertura e chiusura (dal Lunedì al Venerdì).");
         }
 
         List<String> tipi = (tipologie != null) ? tipologie : new ArrayList<>();
@@ -65,6 +66,47 @@ public class GestoreSale {
         if (tipi.size() != posti.size()) {
             throw new IllegalArgumentException("Dati delle aree incoerenti (tipologie e postazioni non corrispondono)");
         }
+        int sommaAree = getSommaAree(numeroPostazioni, tipi, posti);
+
+        SalaStudio sala = new SalaStudio(nome, descrizione, numeroPostazioni);
+
+        Map<String, FasciaOraria> slotUnivoci = new HashMap<>();
+
+        for (int i = 0; i < 5; i++) {
+            LocalTime apertura = parseOrario(orariApertura.get(i));
+            LocalTime chiusura = parseOrario(orariChiusura.get(i));
+
+            if (!apertura.isBefore(chiusura)) {
+                throw new IllegalArgumentException("L'orario di apertura deve precedere la chiusura per il giorno " + (i+1));
+            }
+
+            // Indice 0 = Lunedì, Indice 1 = Martedì ... Indice 4 = Venerdì
+            sala.addOrarioLavorativo(new FasciaOraria(apertura, chiusura));
+
+            // Generiamo i micro-slot per il giorno corrente
+            List<FasciaOraria> slotGiorno = generaSlot(apertura, chiusura, granaMinuti);
+            for (FasciaOraria f : slotGiorno) {
+                String key = f.getEtichetta(); // Es. "09:00-09:30"
+                if (!slotUnivoci.containsKey(key)) {
+                    slotUnivoci.put(key, f);
+                    sala.addFascia(f); // Aggiunge alla lista slotOrario della sala
+                }
+            }
+        }
+
+        // Aree specifiche indicate dal bibliotecario.
+        for (int i = 0; i < tipi.size(); i++) {
+            sala.aggiungiArea(tipi.get(i).trim(), posti.get(i));
+        }
+        int rimanenti = numeroPostazioni - sommaAree;
+        sala.creaAreaDefault(rimanenti);
+
+        // 5. Persistenza
+        registroSale.salvaSala(sala);
+        return toDTO(sala);
+    }
+
+    private static int getSommaAree(int numeroPostazioni, List<String> tipi, List<Integer> posti) {
         int sommaAree = 0;
         for (int i = 0; i < tipi.size(); i++) {
             if (tipi.get(i) == null || tipi.get(i).trim().isEmpty()) {
@@ -78,36 +120,13 @@ public class GestoreSale {
             }
             sommaAree += posti.get(i);
         }
-        // L'area "comune" di default è SEMPRE presente (V19) e, come ogni area, deve avere
-        // almeno una postazione (V04): le aree specifiche non possono occuparle tutte.
+
         if (sommaAree >= numeroPostazioni) {
             throw new IllegalArgumentException("Le aree specifiche (" + sommaAree
                     + " postazioni) devono lasciarne almeno una all'area comune (totale sala "
                     + numeroPostazioni + ")");
         }
-
-        SalaStudio sala = new SalaStudio(nome, descrizione, numeroPostazioni);
-
-        // Slot prenotabili dall'apertura alla chiusura, passo = grana (V05).
-        List<FasciaOraria> slot = generaSlot(sala, apertura, chiusura, granaMinuti);
-        if (slot.isEmpty()) {
-            throw new IllegalArgumentException("La grana di suddivisione non genera alcuna fascia oraria valida");
-        }
-        for (FasciaOraria f : slot) {
-            sala.addFascia(f);
-        }
-
-        // Aree specifiche indicate dal bibliotecario.
-        for (int i = 0; i < tipi.size(); i++) {
-            sala.aggiungiArea(tipi.get(i).trim(), posti.get(i));
-        }
-        // Area di default "comune" con le postazioni rimanenti: SEMPRE creata (V19), >= 1 (V04).
-        int rimanenti = numeroPostazioni - sommaAree;
-        sala.creaAreaDefault(rimanenti);
-
-        // Persistenza dell'intero aggregato (cascade da SalaStudio).
-        registroSale.salvaSalaStudio(sala);
-        return toDTO(sala);
+        return sommaAree;
     }
 
     // ------------------------------------------------------------------ UC4
@@ -137,6 +156,14 @@ public class GestoreSale {
             registroPrenotazioni.elimina(p.getId());
         }
         sala.eliminaAree();
+
+        if (sala.getOrarioLavorativo() != null) {
+            for(FasciaOraria f: new  ArrayList<>(sala.getOrarioLavorativo())) {
+                registroSale.eliminaFascia(f.getId());
+            }
+            sala.getOrarioLavorativo().clear();
+        }
+
         for (FasciaOraria f : registroSale.getFascePerSala(idSalaStudio)) {
             registroSale.eliminaFascia(f.getId());
         }
@@ -152,20 +179,34 @@ public class GestoreSale {
         return risultato;
     }
 
-    /** Fasce orarie prenotabili di una sala per la data, con posti liberi (wizard step 2). */
     public List<Object> getFasceDisponibili(Long idSala, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null) {
             throw new IllegalArgumentException("Sala studio non trovata");
         }
+
         List<Object> risultato = new ArrayList<>();
         if (!sala.verificaDataInGiorniApertura(data)) {
-            return risultato; // sala chiusa quel giorno (V06)
+            return risultato; // sala chiusa nei weekend
         }
-        for (FasciaOraria f : registroSale.getFascePerSala(idSala)) {
-            int posti = contaPostiDisponibili(idSala, data, f);
-            risultato.add(new FasciaDisponibileDTO(f.getId(), f.getEtichetta(), posti));
+
+        // DayOfWeek va da 1 (Lunedì) a 7 (Domenica).
+        // Sottraendo 1, mappiamo Lunedì all'indice 0, Martedì a 1, ecc.
+        int indiceGiorno = data.getDayOfWeek().getValue() - 1;
+
+        // Recuperiamo l'orario specifico di QUEL giorno della settimana
+        FasciaOraria orarioDelGiorno = sala.getOrarioLavorativo().get(indiceGiorno);
+        LocalTime aperturaGiorno = orarioDelGiorno.getOraInizio();
+        LocalTime chiusuraGiorno = orarioDelGiorno.getOraFine();
+
+        for (FasciaOraria f : sala.getSlotOrario()) {
+            // Mostriamo lo slot SOLO SE è compreso nell'orario lavorativo del giorno richiesto
+            if (!f.getOraInizio().isBefore(aperturaGiorno) && !f.getOraFine().isAfter(chiusuraGiorno)) {
+                int posti = contaPostiDisponibili(idSala, data, f);
+                risultato.add(new FasciaDisponibileDTO(f.getId(), f.getEtichetta(), posti));
+            }
         }
+
         return risultato;
     }
 
@@ -280,14 +321,13 @@ public class GestoreSale {
         }
     }
 
-    private List<FasciaOraria> generaSlot(SalaStudio sala, LocalTime apertura, LocalTime chiusura, int grana) {
+    private List<FasciaOraria> generaSlot(LocalTime apertura, LocalTime chiusura, int grana) {
         List<FasciaOraria> slot = new ArrayList<>();
         LocalTime inizio = apertura;
         LocalTime fine = inizio.plusMinutes(grana);
-        // fine.isAfter(inizio) impedisce il loop infinito quando lo slot scavalca la
-        // mezzanotte (LocalTime è ciclico): in tal caso fine "torna indietro" e si esce.
         while (fine.isAfter(inizio) && !fine.isAfter(chiusura)) {
-            slot.add(new FasciaOraria(inizio, fine, sala));
+            // Rimosso il parametro 'sala', ora usiamo il costruttore corretto di FasciaOraria
+            slot.add(new FasciaOraria(inizio, fine));
             inizio = fine;
             fine = inizio.plusMinutes(grana);
         }
