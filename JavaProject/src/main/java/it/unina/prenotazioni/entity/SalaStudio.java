@@ -169,6 +169,14 @@ public class SalaStudio {
         return area.getPostazioniDisponibili(data, fascia);
     }
 
+    public boolean verificaValiditaDati() {
+        if (nome == null || nome.isEmpty() || numeroPostazioniTotali <= 0) {
+            return false;
+        }
+        // Il vincolo di dominio impone massimo 5 orari lavorativi
+        return !(orarioLavorativo != null && orarioLavorativo.size() > 5);
+    }
+
     /**
      * Elimina tutte le aree della sala e, tramite ciascuna, le relative postazioni
      * (UC4 EliminaSalaStudio). Le prenotazioni che insistono sulle postazioni devono
