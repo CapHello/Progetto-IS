@@ -1,0 +1,385 @@
+/* Dashboard Studente specific */
+.user-profile-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.user-profile-header h2 {
+    font-size: 1.5rem;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+.user-profile-header p {
+    color: var(--text-muted);
+}
+
+.sort-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.sort-control select {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    outline: none;
+}
+
+.prenotazioni-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.prenotazione-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+}
+
+.prenotazione-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.prenotazione-card h4 {
+    font-size: 1.1rem;
+    color: var(--text-main);
+}
+
+.badge-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-status.attiva { background-color: #ebf4ff; color: #3182ce; }
+.badge-status.confermata { background-color: #c6f6d5; color: #38a169; }
+.badge-status.scaduta { background-color: #e2e8f0; color: #4a5568; }
+.badge-status.annullata { background-color: #fed7d7; color: #e53e3e; }
+.badge-status.conclusa { background-color: #e2e8f0; color: #4a5568; }
+
+.prenotazione-card .card-body p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.prenotazione-card .card-actions {
+    margin-top: auto;
+    padding-top: 1.25rem;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-sm {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.btn-success {
+    background-color: #48bb78;
+    color: white;
+}
+.btn-success:hover { background-color: #38a169; }
+
+.btn-outline-danger {
+    background-color: transparent;
+    color: #e53e3e;
+    border-color: #e53e3e;
+}
+.btn-outline-danger:hover {
+    background-color: #fff5f5;
+}
+
+/* Wizard Shared */
+.wizard-progress {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem 0 2.5rem 0;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.wizard-step {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.wizard-step.active {
+    color: var(--text-main);
+}
+
+.step-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.wizard-step.active .step-number {
+    border-color: #ecc94b;
+    background-color: #ecc94b;
+    color: white;
+}
+
+.wizard-step.completed .step-number {
+    border-color: var(--primary);
+    background-color: var(--primary);
+    color: white;
+}
+
+.step-line {
+    width: 30px;
+    height: 1px;
+    background-color: var(--border-color);
+}
+
+/* Layouts */
+.wizard-split-layout {
+    display: flex;
+    gap: 1.5rem;
+    align-items: stretch;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .wizard-split-layout {
+        flex-direction: column;
+    }
+}
+
+.wizard-panel {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.wizard-panel h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-main);
+}
+
+.wizard-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+/* UI Elements */
+.radio-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.radio-card {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.radio-card:hover {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+}
+
+.radio-card input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.radio-card.selected {
+    background-color: #edf2fe;
+    border-color: var(--primary);
+}
+
+.radio-card-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.radio-card-content strong {
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.radio-card-content span {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Calendar */
+.calendar-widget {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.calendar-header button {
+    background: #e2e8f0;
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.75rem;
+    cursor: pointer;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+    text-align: center;
+}
+
+.calendar-day-header {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding-bottom: 0.5rem;
+}
+
+.calendar-cell {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.calendar-cell:hover:not(.disabled) {
+    background-color: #f1f5f9;
+}
+
+.calendar-cell.disabled {
+    background-color: #e2e8f0;
+    color: #a0aec0;
+    cursor: not-allowed;
+}
+
+.calendar-cell.today {
+    background-color: #fbd38d; /* orange */
+    border-color: #f6ad55;
+}
+
+.calendar-cell.selected {
+    background-color: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+}
+
+.calendar-legend {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+/* Grid Selections (Area and Postazione) */
+.selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.selection-grid-small {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.seat-cell {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.seat-cell.libera { background-color: #48bb78; }
+.seat-cell.occupata { background-color: #f56565; cursor: not-allowed; }
+.seat-cell.selezionata { background-color: var(--primary); }
+
+.seat-cell svg {
+    width: 16px;
+    height: 16px;
+    fill: white;
+    margin-bottom: 4px;
+}
