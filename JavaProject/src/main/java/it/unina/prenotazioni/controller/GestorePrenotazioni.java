@@ -39,6 +39,9 @@ public class GestorePrenotazioni {
     private static GestorePrenotazioni instance;
 
     private final RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
+    private final RegistroSale registroSale = RegistroSale.getInstance();
+    private final RegistroUtenti registroUtenti = RegistroUtenti.getInstance();
+    private StrategiaAssegnazione strategiaAssegnazione;
 
     private final StrategiaAssegnazione strategia;
 
@@ -47,47 +50,144 @@ public class GestorePrenotazioni {
     }
 
     public static GestorePrenotazioni getInstance() {
-        if (instance == null) {
-            instance = new GestorePrenotazioni();
+        if (istanza == null) {
+            istanza = new GestorePrenotazioni();
+            istanza.setStrategiaAssegnazione(new AssegnazionePrimaLibera());
         }
         return instance;
+    }
+
+
+    public void setStrategiaAssegnazione(StrategiaAssegnazione strategiaAssegnazione){
+        this.strategiaAssegnazione = strategiaAssegnazione;
+    }
+
+    private void verificaValiditaDati(Long idSala, Long idArea, Long idPostazione,
+                                      LocalDate data, Long idFascia, Long idStudente){
+        Studente studente = registroUtenti.trovaStudentePerId(idStudente);
+
+        if (studente == null) {
+            throw new IllegalArgumentException("Studente non trovato");
+        }
+        SalaStudio sala = registroSale.cercaSalaPerId(idSala);
+        if (sala == null) {
+            throw new IllegalArgumentException("Sala studio non trovata");
+        }
+        if (!sala.verificaDataInGiorniApertura(data)) {
+            throw new IllegalArgumentException("La sala è chiusa nella data selezionata (giorni feriali)");
+        }
+
+        // verifico se la Area si trovi effettivamente all'inteno nella Sala selezionata
+        List<Area> aree = registroSale.getAreePerSala(idSala);
+        boolean areaNonPresenteNellaSala = true;
+        int i = 0;
+        while (i < aree.size() && areaNonPresenteNellaSala){
+            Area a = aree.get(i);
+            if (a.getId().equals(idArea)) {
+                areaNonPresenteNellaSala = false;
+            }else
+                i++;
+
+        }
+        if(areaNonPresenteNellaSala){
+            throw new IllegalArgumentException("L'area non è presente all'inteno della sala selezionata");
+        }
+
+
+
+        // devo verificare se la postazione faccia parte dell'area selezionata
+        if(!idPostazione.equals(0L)){
+            List<Postazione> postazioni = registroSale.getPostazioniPerArea(idArea);
+            boolean postazioneNonPresenteNellArea = true;
+            i = 0;
+            while (i < postazioni.size() && postazioneNonPresenteNellArea) {
+                Postazione p = postazioni.get(i);
+                if (p.getId().equals(idPostazione)) {
+                    postazioneNonPresenteNellArea = false;
+                } else
+                    i++;
+
+            }
+            if (postazioneNonPresenteNellArea) {
+                throw new IllegalArgumentException("La Postazione Selezionata non è presente nell'arae");
+            }
+        }
+
+
+
+        // devo verificare se la fascia fa parte degli slotOrari della sala
+        List<FasciaOraria> slotOrari = registroSale.getFascePerSala(idSala);
+        boolean slotOrarioNonPresenteNellaSala = true;
+        i = 0;
+        while (i < slotOrari.size() && slotOrarioNonPresenteNellaSala) {
+            FasciaOraria f = slotOrari.get(i);
+            if (f.getId().equals(idFascia)) {
+                slotOrarioNonPresenteNellaSala = false;
+            } else
+                i++;
+
+        }
+        if (slotOrarioNonPresenteNellaSala) {
+            throw new IllegalArgumentException("Lo slot orario selezionato non è ammesso");
+        }
+
     }
 
     // ------------------------------------------------------------------ UC7
     public Object effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
                                        LocalDate data, Long idFascia, Long idStudente) {
         // 1. Validità e coerenza dei dati.
-        Studente studente = RegistroUtenti.getInstance().trovaStudentePerId(idStudente);
-        SalaStudio sala = RegistroSale.getInstance().cercaSalaPerId(idSala);
-        verificaValiditaDati(studente, sala, data);
-        FasciaOraria fascia = risolviFasciaDellaSala(idSala, idFascia); // vincolo fascia ∈ sala
+        Studente studente = registroUtenti.trovaStudentePerId(idStudente);
 
-        // 2. Vincolo di unicità (V18).
-        if (studente.verificaPrenotazioneAttivaOConfermataInDataFascia(data, fascia.getEtichetta())) {
-            throw new IllegalStateException(
-                    "Esiste già una tua prenotazione attiva o confermata in questa data e fascia oraria");
+        // verifico la correttezza e la coerenza dei parametri in ingresso per quanto riguarda sala, area, postazione, idFascia
+        verificaValiditaDati(idSala, idArea, idPostazione, data, idFascia, idStudente);
+
+        FasciaOraria fascia = risolviFasciaDellaSala(idSala, idFascia);
+
+        // aggiunto il blocco synchronized per gestire la concorrenza tra accessi multipli
+        // in tal modo due studenti sono impossibilitati di avere la stessa postazione prenotata per lo stesso giorno e data
+        synchronized (this){
+            // 2. Vincolo di unicità (V18).
+            if (studente.verificaPrenotazioneAttivaOConfermataInDataFascia(data, fascia.getEtichetta())) {
+                throw new IllegalStateException(
+                        "Esiste già una tua prenotazione attiva o confermata in questa data e fascia oraria");
+            }
+
+
+
+            // 3-4. Insieme delle postazioni disponibili (per area specifica o per l'intera sala).
+            List<Postazione> disponibili = postazioniDisponibili(idSala, idArea, data, idFascia);
+            if (disponibili.isEmpty()){
+                throw new IllegalStateException(
+                        "Non sono presenti delle postazioni disponibili per l'area selezionata");
+            }
+
+
+
+
+
+            // 5. Selezione postazione (specifica o automatica via Strategy).
+            Postazione postazione = selezionaPostazione(idSala, idPostazione, data, fascia, disponibili);
+
+            // 6. Creazione della prenotazione in stato ATTIVA.
+            Prenotazione prenotazione = new Prenotazione();
+            prenotazione.setData(data);
+            prenotazione.setFasciaOraria(fascia);
+            prenotazione.setPostazione(postazione);
+            prenotazione.setStudente(studente);          // aggiorna il profilo (associazione effettua)
+            prenotazione.setStato(StatoAttiva.getInstance());
+            boolean esito = registroPrenotazioni.salvaPrenotazione(prenotazione);
+
+
+            // 7 dovrei notificare gli utenti, ma questo comportamento è già modellato all'interno di setStato() di prenotazione
+            if (esito){
+                return toDTO(prenotazione);
+            }
+            else{
+                throw new RuntimeException("Errore Lato Server: non è stato possibile salvare la prenotazione, riprova");
+            }
         }
 
-        // 3-4. Insieme delle postazioni disponibili (per area specifica o per l'intera sala).
-        List<Postazione> disponibili = postazioniDisponibili(idSala, idArea, data, fascia);
-
-        // 5. Selezione postazione (specifica o automatica via Strategy).
-        Postazione postazione = selezionaPostazione(idSala, idPostazione, data, fascia, disponibili);
-
-        // 6. Creazione della prenotazione in stato ATTIVA.
-        Prenotazione prenotazione = new Prenotazione();
-        prenotazione.setData(data);
-        prenotazione.setFasciaOraria(fascia);
-        prenotazione.setPostazione(postazione);
-        prenotazione.setStudente(studente);          // aggiorna il profilo (associazione effettua)
-        prenotazione.setStato(StatoAttiva.getInstance());
-        RegistroPrenotazioni.getInstance().salvaPrenotazione(prenotazione);
-
-        // 7. InvioNotifica di conferma (esplicita, con id assegnato). Fallimento non bloccante.
-        GestoreNotifiche.getInstance().inviaNotifica(List.of(toUtenteDTO(studente)),
-                "La prenotazione #" + prenotazione.getId() + " è stata registrata (stato ATTIVA).");
-
-        return toDTO(prenotazione);
     }
 
     // ------------------------------------------------------------------ UC9
@@ -277,31 +377,38 @@ public class GestorePrenotazioni {
         throw new IllegalArgumentException("Fascia oraria non valida per la sala selezionata");
     }
 
-    private List<Postazione> postazioniDisponibili(Long idSala, Long idArea, LocalDate data, FasciaOraria fascia) {
-        RegistroSale registroSale = RegistroSale.getInstance();
+    private List<Postazione> postazioniDisponibili(Long idSala, Long idArea, LocalDate data, Long idFascia) {
+        // Possiamo direttamente eliminare il metodo getPostazioniDisponibili(area,data,fasciaOraria)
         List<Postazione> disponibili = new ArrayList<>();
-        if (idArea != null && idArea > 0) {
+        if (idArea > 0) {
             Area area = registroSale.trovaAreaPerId(idArea);
             if (area == null || !idSala.equals(area.getSalaStudio().getId())) {
                 throw new IllegalArgumentException("Area non valida per la sala selezionata");
             }
-            disponibili.addAll(area.getPostazioniDisponibili(data, fascia));
+
+            disponibili.addAll(registroSale.getPostazioniDisponibili(idArea,data,idFascia));
         } else {
-            for (Area area : registroSale.getAreePerSala(idSala)) {
-                disponibili.addAll(area.getPostazioniDisponibili(data, fascia));
+            // devo prendere tutte le postazioni che fanno parte dell'area con tipologia comune
+            List<Area> areePerSala = registroSale.getAreePerSala(idSala);
+            Area areaComune = null;
+            for(Area a: areePerSala){
+                if(a.getTipologia().equalsIgnoreCase("Comune")){
+                    areaComune = a;
+                }
             }
+            if(areaComune == null){
+                throw new IllegalArgumentException("Area non valida per la sala selezionata");
+            }
+            disponibili.addAll(registroSale.getPostazioniDisponibili(areaComune.getId(),data,idFascia));
         }
         return disponibili;
     }
 
-    private Postazione selezionaPostazione(Long idSala, Long idPostazione, LocalDate data,
+    private  Postazione selezionaPostazione(Long idSala, Long idPostazione, LocalDate data,
                                            FasciaOraria fascia, List<Postazione> disponibili) {
         if (idPostazione != null && idPostazione > 0) {
             // Postazione scelta esplicitamente dallo studente.
-            Postazione scelta = RegistroSale.getInstance().trovaPostazionePerId(idPostazione);
-            if (scelta == null || !idSala.equals(scelta.getSalaStudio().getId())) {
-                throw new IllegalArgumentException("Postazione non valida per la sala selezionata");
-            }
+            Postazione scelta = registroSale.trovaPostazionePerId(idPostazione);
             if (!scelta.disponibilita(data, fascia)) {
                 throw new IllegalStateException("La postazione selezionata non è più disponibile");
             }
