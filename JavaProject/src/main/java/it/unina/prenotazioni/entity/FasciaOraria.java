@@ -28,6 +28,7 @@ public class FasciaOraria {
     public LocalTime getOraFine() { return oraFine; }
     public void setOraFine(LocalTime oraFine) { this.oraFine = oraFine; }
 
+    // utilizzato per sfruttora l'equals già implementato e standard dell'ogetto String nativo di Java
     public String getEtichetta() {
         return String.format("%02d:%02d-%02d:%02d",
                 oraInizio.getHour(), oraInizio.getMinute(),
