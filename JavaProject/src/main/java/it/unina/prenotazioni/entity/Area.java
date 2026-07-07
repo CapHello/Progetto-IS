@@ -40,10 +40,6 @@ public class Area {
     public List<Postazione> getPostazioni() { return postazioni; }
     public void setPostazioni(List<Postazione> postazioni) { this.postazioni = postazioni; }
 
-    public void addPostazione(Postazione postazione) {
-        postazioni.add(postazione);
-        postazione.setArea(this);
-    }
 
     /**
      * Postazioni libere dell'area per (data, fascia). Itera sulle proprie postazioni
@@ -59,6 +55,16 @@ public class Area {
             }
         }
         return disponibili;
+    }
+
+    /**
+     * Genera e associa le postazioni all'area.
+     */
+    public void creaPostazioni(int numeroPostazioni) {
+        for (int i = 0; i < numeroPostazioni; i++) {
+            Postazione p = new Postazione(this);
+            this.postazioni.add(p);
+        }
     }
 
     /** Elimina tutte le postazioni dell'area (invocato durante EliminaSalaStudio, UC4). */

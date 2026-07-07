@@ -107,11 +107,10 @@ public class SalaStudio {
 
         Area area = new Area(tipologia, this);
 
+        area.creaPostazioni(numPostazioni);
+
         aree.add(area);
-        for (int i = 0; i < numPostazioni; i++) {
-            Postazione p = new Postazione(area);
-            area.addPostazione(p);
-        }
+
         return area;
     }
 
