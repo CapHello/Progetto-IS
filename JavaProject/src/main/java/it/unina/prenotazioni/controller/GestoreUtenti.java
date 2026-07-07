@@ -30,9 +30,8 @@ public class GestoreUtenti {
         return istanza;
     }
 
-    // ------------------------------------------------------------------ UC1
-    public Object registrazione(String ruolo, String nome, String cognome,
-                                String email, String password, String identificativo) {
+    private void verificaValidita(String ruolo, String nome, String password)
+    {
         // Controlli con i messaggi attesi dai test di unità (non modificarne le sottostringhe).
         if (ruolo == null || ruolo.isEmpty() || !verificaRuolo(ruolo)) {
             throw new IllegalArgumentException("Il ruolo è obbligatorio e valido.");
@@ -46,6 +45,12 @@ public class GestoreUtenti {
         if (password.length() > 32) {
             throw new IllegalArgumentException("La password non può superare i 32 caratteri.");
         }
+    }
+
+    // ------------------------------------------------------------------ UC1
+    public Object registrazione(String ruolo, String nome, String cognome,
+                                String email, String password, String identificativo) {
+        verificaValidita(ruolo, nome, password);
 
         // Validazioni di formato (V12-V14, V20) specifiche per ruolo.
         boolean studente = "Studente".equalsIgnoreCase(ruolo);
