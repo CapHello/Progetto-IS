@@ -18,7 +18,7 @@ import java.util.List;
 public class GestoreNotifiche implements Observer {
 
     private static GestoreNotifiche istanza;
-
+    private final RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
     // Iniettato dal boundary (ConfigurazioneNotifiche) → nessuna dipendenza controller→boundary.
     private ServizioNotifiche servizioNotifiche;
 
@@ -63,8 +63,7 @@ public class GestoreNotifiche implements Observer {
 
     /** UC14: promemoria agli studenti con prenotazione ATTIVA nella giornata corrente. */
     public void inviaPromemoria() {
-        RegistroPrenotazioni registro = new RegistroPrenotazioni();
-        for (Prenotazione p : registro.getPrenotazioniInScadenza()) {
+        for (Prenotazione p : registroPrenotazioni.getPrenotazioniInScadenza()) {
             if (p.getStato().getStatoEnum() == StatoEnum.ATTIVA && LocalDate.now().equals(p.getData())) {
                 Studente s = p.getStudente();
                 if (s != null) {

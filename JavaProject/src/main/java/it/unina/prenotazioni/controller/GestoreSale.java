@@ -137,9 +137,8 @@ public class GestoreSale {
         }
 
         List<Prenotazione> prenotazioniSala = registroPrenotazioni.cercaTuttePerSala(idSalaStudio);
-
-        // Annulla (forzato) le prenotazioni attive/confermate e raccoglie i destinatari.
         List<UtenteDTO> destinatari = new ArrayList<>();
+
         for (Prenotazione p : prenotazioniSala) {
             if (RegistroPrenotazioni.occupaSlot(p)) {
                 p.criticalAnnullaPrenotazione();
@@ -148,26 +147,27 @@ public class GestoreSale {
                 }
             }
         }
+
         GestoreNotifiche.getInstance().inviaNotifica(destinatari,
                 "La sala '" + sala.getNome() + "' è stata eliminata: le prenotazioni attive/confermate sono annullate.");
 
-        // Rimozione in ordine di integrità referenziale: prenotazioni → postazioni/aree → fasce → sala.
         for (Prenotazione p : prenotazioniSala) {
             registroPrenotazioni.elimina(p.getId());
         }
+
         sala.eliminaAree();
 
-        if (sala.getOrarioLavorativo() != null) {
-            for(FasciaOraria f: new  ArrayList<>(sala.getOrarioLavorativo())) {
-                registroSale.eliminaFascia(f.getId());
-            }
-            sala.getOrarioLavorativo().clear();
-        }
+        List<FasciaOraria> orariLavDaEliminare = registroSale.getOrariLavorativiPerSala(idSalaStudio);
+        List<FasciaOraria> slotDaEliminare = registroSale.getFascePerSala(idSalaStudio);
 
-        for (FasciaOraria f : registroSale.getFascePerSala(idSalaStudio)) {
+        registroSale.eliminaSala(idSalaStudio);
+
+        for (FasciaOraria f : orariLavDaEliminare) {
             registroSale.eliminaFascia(f.getId());
         }
-        registroSale.eliminaSala(idSalaStudio);
+        for (FasciaOraria f : slotDaEliminare) {
+            registroSale.eliminaFascia(f.getId());
+        }
     }
 
     // ------------------------------------------------------------------ UC6
@@ -184,29 +184,30 @@ public class GestoreSale {
         if (sala == null) {
             throw new IllegalArgumentException("Sala studio non trovata");
         }
-
         List<Object> risultato = new ArrayList<>();
         if (!sala.verificaDataInGiorniApertura(data)) {
-            return risultato; // sala chiusa nei weekend
+            return risultato;
         }
 
-        // DayOfWeek va da 1 (Lunedì) a 7 (Domenica).
-        // Sottraendo 1, mappiamo Lunedì all'indice 0, Martedì a 1, ecc.
         int indiceGiorno = data.getDayOfWeek().getValue() - 1;
 
-        // Recuperiamo l'orario specifico di QUEL giorno della settimana
-        FasciaOraria orarioDelGiorno = sala.getOrarioLavorativo().get(indiceGiorno);
+        List<FasciaOraria> orariLavorativi = registroSale.getOrariLavorativiPerSala(idSala);
+        if (orariLavorativi.isEmpty() || orariLavorativi.size() <= indiceGiorno) {
+            return risultato;
+        }
+
+        FasciaOraria orarioDelGiorno = orariLavorativi.get(indiceGiorno);
         LocalTime aperturaGiorno = orarioDelGiorno.getOraInizio();
         LocalTime chiusuraGiorno = orarioDelGiorno.getOraFine();
 
-        for (FasciaOraria f : sala.getSlotOrario()) {
-            // Mostriamo lo slot SOLO SE è compreso nell'orario lavorativo del giorno richiesto
+        List<FasciaOraria> slotOrario = registroSale.getFascePerSala(idSala);
+
+        for (FasciaOraria f : slotOrario) {
             if (!f.getOraInizio().isBefore(aperturaGiorno) && !f.getOraFine().isAfter(chiusuraGiorno)) {
                 int posti = contaPostiDisponibili(idSala, data, f);
                 risultato.add(new FasciaDisponibileDTO(f.getId(), f.getEtichetta(), posti));
             }
         }
-
         return risultato;
     }
 
@@ -340,11 +341,19 @@ public class GestoreSale {
         dto.setNome(sala.getNome());
         dto.setDescrizione(sala.getDescrizione());
         dto.setNumeroPostazioniTotali(sala.getNumeroPostazioniTotali());
+
+        // Peschiamo dal DB in modo sicuro
         List<String> fasce = new ArrayList<>();
         for (FasciaOraria f : registroSale.getFascePerSala(sala.getId())) {
             fasce.add(f.getEtichetta());
         }
         dto.setFasceOrarie(fasce);
+
+        List<String> orariLavorativi = new ArrayList<>();
+        for (FasciaOraria ol : registroSale.getOrariLavorativiPerSala(sala.getId())) {
+            orariLavorativi.add(ol.getEtichetta());
+        }
+
         return dto;
     }
 

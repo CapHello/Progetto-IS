@@ -1,7 +1,5 @@
 package it.unina.prenotazioni.database;
 
-
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 
@@ -20,7 +18,7 @@ public class GestorePersistenza {
      * L'oggetto passato deve però essere una Entity, cioè una classe
      * annotata con @Entity.
      */
-    //public void salva(Object oggetto) {
+    // public void salva(Object oggetto) {
     public boolean salva(Object oggetto) {
         EntityManager em = JpaUtil.getInstance().getEntityManager();
 
@@ -56,7 +54,7 @@ public class GestorePersistenza {
                 em.getTransaction().rollback();
             }
 
-            //throw e;
+            // throw e;
             e.printStackTrace();
             return false;
 
@@ -79,7 +77,7 @@ public class GestorePersistenza {
      * Usare una sola transazione è importante: o vengono salvati tutti
      * gli oggetti, oppure, in caso di errore, non viene salvato nessuno.
      */
-    //public void salvaTutti(Object... oggetti) {
+    // public void salvaTutti(Object... oggetti) {
     public boolean salvaTutti(Object... oggetti) {
         EntityManager em = JpaUtil.getInstance().getEntityManager();
 
@@ -99,7 +97,7 @@ public class GestorePersistenza {
                 em.getTransaction().rollback();
             }
 
-            //throw e;
+            // throw e;
             e.printStackTrace();
             return false;
 
@@ -137,13 +135,12 @@ public class GestorePersistenza {
      * per cui un campo ha un determinato valore.
      */
     public <T> List<T> cercaPerCampo(Class<T> classe,
-                                     String nomeCampo,
-                                     Object valore) {
+            String nomeCampo,
+            Object valore) {
 
         return cercaPerCampi(
                 classe,
-                Map.of(nomeCampo, valore)
-        );
+                Map.of(nomeCampo, valore));
     }
 
     /*
@@ -152,7 +149,7 @@ public class GestorePersistenza {
      * La query JPQL viene costruita nel livello database.
      */
     public <T> List<T> cercaPerCampi(Class<T> classe,
-                                     Map<String, Object> campi) {
+            Map<String, Object> campi) {
 
         EntityManager em = JpaUtil.getInstance().getEntityManager();
 
@@ -186,12 +183,35 @@ public class GestorePersistenza {
 
             TypedQuery<T> query = em.createQuery(
                     jpql.toString(),
-                    classe
-            );
+                    classe);
 
             for (String nomeCampo : campi.keySet()) {
                 String nomeParametro = nomeCampo.replace(".", "_");
                 query.setParameter(nomeParametro, campi.get(nomeCampo));
+            }
+
+            return query.getResultList();
+
+        } finally {
+            em.close();
+        }
+    }
+
+    /*
+     * Esegue una query JPQL personalizzata (utile per JOIN o query complesse)
+     * e restituisce una lista di risultati tipizzati.
+     */
+    public <T> List<T> eseguiQueryCustom(String jpql, Class<T> classeRisultato, Map<String, Object> parametri) {
+
+        EntityManager em = JpaUtil.getInstance().getEntityManager();
+
+        try {
+            TypedQuery<T> query = em.createQuery(jpql, classeRisultato);
+
+            if (parametri != null && !parametri.isEmpty()) {
+                for (Map.Entry<String, Object> parametro : parametri.entrySet()) {
+                    query.setParameter(parametro.getKey(), parametro.getValue());
+                }
             }
 
             return query.getResultList();
@@ -207,7 +227,7 @@ public class GestorePersistenza {
      * Se non trova nessun risultato, restituisce null.
      */
     public <T> T cercaPrimoPerCampi(Class<T> classe,
-                                    Map<String, Object> campi) {
+            Map<String, Object> campi) {
 
         List<T> risultati = cercaPerCampi(classe, campi);
 
@@ -217,7 +237,6 @@ public class GestorePersistenza {
 
         return risultati.get(0);
     }
-
 
     public <T> T aggiorna(T oggetto) {
 
@@ -259,7 +278,7 @@ public class GestorePersistenza {
 
             T oggetto = em.find(classe, id);
 
-            //se l'oggetto esiste, lo eliminiamo
+            // se l'oggetto esiste, lo eliminiamo
             if (oggetto != null) {
                 em.remove(oggetto);
                 em.getTransaction().commit();

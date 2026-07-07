@@ -48,12 +48,12 @@ public class RegistroSale {
         return gestorePersistenza.elimina(SalaStudio.class, id);
     }
 
-    //Serve per eliminaAree() di Sala Studio
+    // Serve per eliminaAree() di Sala Studio
     public boolean eliminaArea(Long id) {
         return gestorePersistenza.elimina(Area.class, id);
     }
 
-    //Serve per eliminaPostazioni() di Area
+    // Serve per eliminaPostazioni() di Area
     public boolean eliminaPostazione(Long id) {
         return gestorePersistenza.elimina(Postazione.class, id);
     }
@@ -66,7 +66,10 @@ public class RegistroSale {
         return gestorePersistenza.cercaPerCampi(SalaStudio.class, Map.of());
     }
 
-    /** Sale visibili/prenotabili in una certa data: quelle aperte (giorni feriali, V06). */
+    /**
+     * Sale visibili/prenotabili in una certa data: quelle aperte (giorni feriali,
+     * V06).
+     */
     public List<SalaStudio> getSaleDisponibili(LocalDate data) {
         List<SalaStudio> risultato = new ArrayList<>();
         for (SalaStudio s : getTutteLeSale()) {
@@ -107,7 +110,10 @@ public class RegistroSale {
         return gestorePersistenza.trovaPerId(Postazione.class, idPostazione);
     }
 
-    /** Postazioni libere di un'area per (data, fascia): delega alla logica di dominio dell'Area. */
+    /**
+     * Postazioni libere di un'area per (data, fascia): delega alla logica di
+     * dominio dell'Area.
+     */
     public List<Postazione> getPostazioniDisponibili(Long idArea, LocalDate data, Long idFascia) {
         Area area = trovaAreaPerId(idArea);
         FasciaOraria fascia = trovaFasciaPerId(idFascia);
@@ -122,7 +128,18 @@ public class RegistroSale {
         return gestorePersistenza.trovaPerId(FasciaOraria.class, id);
     }
 
+    public List<FasciaOraria> getOrariLavorativiPerSala(Long idSala) {
+        String jpql = "SELECT f FROM SalaStudio s JOIN s.orarioLavorativo f WHERE s.id = :idSala";
+        return gestorePersistenza.eseguiQueryCustom(
+                jpql,
+                FasciaOraria.class,
+                Map.of("idSala", idSala)
+        );
+    }
+
     public List<FasciaOraria> getFascePerSala(Long idSala) {
-        return gestorePersistenza.cercaPerCampo(FasciaOraria.class, "salaStudio.id", idSala);
+        String jpql = "SELECT f FROM SalaStudio s JOIN s.slotOrario f WHERE s.id = :idSala";
+
+        return gestorePersistenza.eseguiQueryCustom(jpql, FasciaOraria.class, Map.of("idSala", idSala));
     }
 }

@@ -39,13 +39,35 @@
             <div id="areeContainer"></div>
             <div id="riepilogoAree" style="font-size:0.85rem; margin:-0.25rem 0 1rem 0.25rem; color:#718096;"></div>
 
-            <div class="form-group" style="position: relative;">
-                <label for="orarioApertura" style="position: absolute; font-size: 0.75rem; color: #718096; top: 0.25rem; left: 1.25rem;">Orario apertura</label>
-                <input type="time" id="orarioApertura" class="form-control" style="padding-top: 1.25rem; padding-bottom: 0.5rem;" value="08:30" required>
-            </div>
-            <div class="form-group" style="position: relative;">
-                <label for="orarioChiusura" style="position: absolute; font-size: 0.75rem; color: #718096; top: 0.25rem; left: 1.25rem;">Orario chiusura</label>
-                <input type="time" id="orarioChiusura" class="form-control" style="padding-top: 1.25rem; padding-bottom: 0.5rem;" value="18:30" required>
+            <div style="margin-top: 1.5rem; margin-bottom: 1rem;">
+                <h4 style="margin-bottom: 0.5rem; color: #2d3748; font-size: 1rem;">Orari della settimana (Lun-Ven)</h4>
+                <div id="orariContainer" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <span style="flex: 1; font-size: 0.9rem; color: #4a5568;">Lunedì</span>
+                        <input type="time" class="form-control orario-apertura" value="08:30" required style="flex: 2;">
+                        <input type="time" class="form-control orario-chiusura" value="18:30" required style="flex: 2;">
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <span style="flex: 1; font-size: 0.9rem; color: #4a5568;">Martedì</span>
+                        <input type="time" class="form-control orario-apertura" value="08:30" required style="flex: 2;">
+                        <input type="time" class="form-control orario-chiusura" value="18:30" required style="flex: 2;">
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <span style="flex: 1; font-size: 0.9rem; color: #4a5568;">Mercoledì</span>
+                        <input type="time" class="form-control orario-apertura" value="08:30" required style="flex: 2;">
+                        <input type="time" class="form-control orario-chiusura" value="18:30" required style="flex: 2;">
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <span style="flex: 1; font-size: 0.9rem; color: #4a5568;">Giovedì</span>
+                        <input type="time" class="form-control orario-apertura" value="08:30" required style="flex: 2;">
+                        <input type="time" class="form-control orario-chiusura" value="18:30" required style="flex: 2;">
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <span style="flex: 1; font-size: 0.9rem; color: #4a5568;">Venerdì</span>
+                        <input type="time" class="form-control orario-apertura" value="08:30" required style="flex: 2;">
+                        <input type="time" class="form-control orario-chiusura" value="18:30" required style="flex: 2;">
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <input type="text" id="grana" class="form-control" placeholder="grana suddivisioni (es. 30m, 1h)" value="2h" required>
@@ -147,13 +169,16 @@
                 return;
             }
 
+            const orariApertura = [...document.querySelectorAll('.orario-apertura')].map(i => i.value);
+            const orariChiusura = [...document.querySelectorAll('.orario-chiusura')].map(i => i.value);
+
             try {
                 await api('POST', '/sale/crea', {
                     nome: document.getElementById('nome').value.trim(),
                     descrizione: document.getElementById('descrizione').value.trim(),
                     numeroPostazioni: totale,
-                    orarioApertura: document.getElementById('orarioApertura').value,
-                    orarioChiusura: document.getElementById('orarioChiusura').value,
+                    orariApertura: orariApertura,
+                    orariChiusura: orariChiusura,
                     granaMinuti: granaMinuti,
                     tipologie: tipologie,
                     postazioniAree: postazioniAree
