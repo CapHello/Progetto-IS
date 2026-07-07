@@ -133,6 +133,14 @@ public class GestorePrenotazioni {
 
     }
 
+    private void verificaDataFasciaFutura(LocalDate data, FasciaOraria fascia) {
+        LocalDateTime inizioSlot = LocalDateTime.of(data, fascia.getOraInizio());
+        if (!inizioSlot.isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException(
+                    "Non è possibile prenotare una fascia oraria già iniziata o passata");
+        }
+    }
+
     // ------------------------------------------------------------------ UC7
     public Object effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
                                        LocalDate data, Long idFascia, Long idStudente) {
@@ -143,6 +151,8 @@ public class GestorePrenotazioni {
         verificaValiditaDati(idSala, idArea, idPostazione, data, idFascia, idStudente);
 
         FasciaOraria fascia = risolviFasciaDellaSala(idSala, idFascia);
+
+        verificaDataFasciaFutura(data, fascia);
 
         // aggiunto il blocco synchronized per gestire la concorrenza tra accessi multipli
         // in tal modo due studenti sono impossibilitati di avere la stessa postazione prenotata per lo stesso giorno e data
