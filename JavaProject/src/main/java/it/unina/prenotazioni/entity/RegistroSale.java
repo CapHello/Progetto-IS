@@ -128,9 +128,22 @@ public class RegistroSale {
         );
     }
 
+    /**
+     * Recupera le fasce orarie prestabilite di una sala per una specifica data.
+     * Restituisce una lista vuota se la sala è chiusa in quel giorno.
+     */
     public List<FasciaOraria> getFascePerSala(Long idSala) {
         String jpql = "SELECT f FROM SalaStudio s JOIN s.slotOrario f WHERE s.id = :idSala";
-
         return gestorePersistenza.eseguiQueryCustom(jpql, FasciaOraria.class, Map.of("idSala", idSala));
+    }
+
+    public List<FasciaOraria> getFascePerSala(Long idSala, LocalDate data) {
+        SalaStudio sala = cercaSalaPerId(idSala);
+
+        if (sala == null || !sala.verificaDataInGiorniApertura(data)) {
+            return new ArrayList<>(); // Ritorna lista vuota se la sala è chiusa
+        }
+
+        return getFascePerSala(idSala);
     }
 }
