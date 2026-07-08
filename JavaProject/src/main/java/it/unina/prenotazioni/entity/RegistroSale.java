@@ -80,7 +80,7 @@ public class RegistroSale {
      */
     public List<SalaStudio> getSaleDisponibili(LocalDate data) {
         List<SalaStudio> risultato = new ArrayList<>();
-        for (SalaStudio s : getTutteLeSale()) {
+        for (SalaStudio s : getSaleAttive()) {
             if (s.verificaDataInGiorniApertura(data)) {
                 risultato.add(s);
             }

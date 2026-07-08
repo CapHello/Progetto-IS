@@ -166,7 +166,7 @@ public class GestoreSale {
     // ------------------------------------------------------------------ UC6
     public List<Object> consultazioneSaleDisponibili(LocalDate data) {
         List<Object> risultato = new ArrayList<>();
-        for (SalaStudio sala : registroSale.getSaleAttive()) {
+        for (SalaStudio sala : registroSale.getSaleDisponibili(data)) {
             risultato.add(toDTO(sala));
         }
         return risultato;
