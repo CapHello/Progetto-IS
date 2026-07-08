@@ -139,12 +139,19 @@ public class GestoreSale {
             throw new IllegalArgumentException("Sala studio non trovata");
         }
 
+        sala.setAttiva(false);
+
+        registroSale.aggiornaSala(sala);
+
         List<Prenotazione> prenotazioniSala = registroPrenotazioni.cercaTuttePerSala(idSalaStudio);
         List<UtenteDTO> destinatari = new ArrayList<>();
 
         for (Prenotazione p : prenotazioniSala) {
             if (RegistroPrenotazioni.occupaSlot(p)) {
+
                 p.criticalAnnullaPrenotazione();
+                registroPrenotazioni.aggiornaPrenotazione(p);
+
                 if (p.getStudente() != null) {
                     destinatari.add(toUtenteDTO(p.getStudente()));
                 }
@@ -152,31 +159,14 @@ public class GestoreSale {
         }
 
         GestoreNotifiche.getInstance().inviaNotifica(destinatari,
-                "La sala '" + sala.getNome() + "' è stata eliminata: le prenotazioni attive/confermate sono annullate.");
-
-        for (Prenotazione p : prenotazioniSala) {
-            registroPrenotazioni.elimina(p.getId());
-        }
-
-        sala.eliminaAree();
-
-        List<FasciaOraria> orariLavDaEliminare = registroSale.getOrariLavorativiPerSala(idSalaStudio);
-        List<FasciaOraria> slotDaEliminare = registroSale.getFascePerSala(idSalaStudio);
-
-        registroSale.eliminaSala(idSalaStudio);
-
-        for (FasciaOraria f : orariLavDaEliminare) {
-            registroSale.eliminaFascia(f.getId());
-        }
-        for (FasciaOraria f : slotDaEliminare) {
-            registroSale.eliminaFascia(f.getId());
-        }
+                "La sala '" + sala.getNome() + "' è stata chiusa o rimossa definitivamente. " +
+                        "Le tue prenotazioni ancora attive sono state annullate automaticamente.");
     }
 
     // ------------------------------------------------------------------ UC6
     public List<Object> consultazioneSaleDisponibili(LocalDate data) {
         List<Object> risultato = new ArrayList<>();
-        for (SalaStudio sala : registroSale.getSaleDisponibili(data)) {
+        for (SalaStudio sala : registroSale.getSaleAttive()) {
             risultato.add(toDTO(sala));
         }
         return risultato;
@@ -275,6 +265,7 @@ public class GestoreSale {
             SalaMonitoraggioDTO dto = new SalaMonitoraggioDTO();
             dto.setIdSala(sala.getId());
             dto.setNomeSala(sala.getNome());
+            dto.setAttiva(sala.isAttiva());
             int liberi = 0, attivi = 0, confermati = 0;
             for (Area area : registroSale.getAreePerSala(sala.getId())) {
                 dto.getAree().add(area.getTipologia());
@@ -344,6 +335,7 @@ public class GestoreSale {
         dto.setNome(sala.getNome());
         dto.setDescrizione(sala.getDescrizione());
         dto.setNumeroPostazioniTotali(sala.getNumeroPostazioniTotali());
+        dto.setAttiva(sala.isAttiva());
 
         // Peschiamo dal DB in modo sicuro
         List<String> fasce = new ArrayList<>();

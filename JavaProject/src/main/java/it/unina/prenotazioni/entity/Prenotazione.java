@@ -104,7 +104,8 @@ public class Prenotazione extends Subject {
      * stato, senza applicare il vincolo temporale dell'annullamento volontario.
      */
     public void criticalAnnullaPrenotazione() {
-        setStato(StatoAnnullata.getInstance());
+        this.stato = StatoAnnullata.getInstance();
+        this.nomeStato = this.stato.getStatoEnum().name();
     }
 
     /** UC10: il check-in richiede prenotazione ATTIVA e riferita alla giornata corrente. */

@@ -8,6 +8,7 @@ public class SalaStudioDTO {
     private String descrizione;
     private int numeroPostazioniTotali;
     private List<String> fasceOrarie;
+    private boolean attiva;
 
     public SalaStudioDTO() {}
 
@@ -21,4 +22,6 @@ public class SalaStudioDTO {
     public void setNumeroPostazioniTotali(int numeroPostazioniTotali) { this.numeroPostazioniTotali = numeroPostazioniTotali; }
     public List<String> getFasceOrarie() { return fasceOrarie; }
     public void setFasceOrarie(List<String> fasceOrarie) { this.fasceOrarie = fasceOrarie; }
+    public boolean isAttiva() {return attiva;}
+    public void setAttiva(boolean attiva) {this.attiva = attiva;}
 }

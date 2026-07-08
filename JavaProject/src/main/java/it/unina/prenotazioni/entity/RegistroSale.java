@@ -66,6 +66,14 @@ public class RegistroSale {
         return gestorePersistenza.cercaPerCampi(SalaStudio.class, Map.of());
     }
 
+    public List<SalaStudio> getSaleAttive() {
+        return gestorePersistenza.eseguiQueryCustom(
+                "SELECT s FROM SalaStudio s WHERE s.attiva = true",
+                SalaStudio.class,
+                null
+        );
+    }
+
     /**
      * Sale visibili/prenotabili in una certa data: quelle aperte (giorni feriali,
      * V06).

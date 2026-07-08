@@ -16,6 +16,9 @@ public class SalaStudio {
     private String descrizione;
     private int numeroPostazioniTotali;
 
+    @Column(name = "attiva", nullable = false)
+    private boolean attiva = true;
+
     @OneToMany(mappedBy = "salaStudio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Area> aree = new ArrayList<>();
 
@@ -56,6 +59,9 @@ public class SalaStudio {
 
     public int getNumeroPostazioniTotali() { return numeroPostazioniTotali; }
     public void setNumeroPostazioniTotali(int numeroPostazioniTotali) { this.numeroPostazioniTotali = numeroPostazioniTotali; }
+
+    public boolean isAttiva() { return attiva; }
+    public void setAttiva(boolean attiva) { this.attiva = attiva; }
 
     public List<Area> getAree() { return aree; }
     public void setAree(List<Area> aree) { this.aree = aree; }

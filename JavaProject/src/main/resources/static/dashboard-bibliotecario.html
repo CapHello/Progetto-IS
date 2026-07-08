@@ -72,16 +72,38 @@
                     const pills = sala.aree.map(a => `<span class="area-pill">${a}</span>`).join('');
                     const card = document.createElement('div');
                     card.className = 'sala-card';
+
+                    // 1. Modifica lo stile se la sala è eliminata (soft delete)
+                    if (!sala.attiva) {
+                        card.style.opacity = '0.55';
+                        card.style.backgroundColor = '#fdfdfd';
+                        card.style.border = '1px dashed #ccc';
+                    }
+
+                    // 2. Etichetta "(Eliminata)" accanto al titolo
+                    let nomeHtml = sala.nomeSala;
+                    if (!sala.attiva) {
+                        nomeHtml += ' <span style="color: #e53e3e; font-size: 0.75rem; margin-left: 8px; font-weight: bold;">(Eliminata)</span>';
+                    }
+
+                    // 3. Nascondi il bottone di eliminazione se è già stata eliminata
+                    let bottoniHtml = '';
+                    if (sala.attiva) {
+                        bottoniHtml = `<button class="btn-sm btn-outline-danger" onclick="elimina(${sala.idSala}, '${(sala.nomeSala || '').replace(/'/g, '')}')">Elimina sala</button>`;
+                    } else {
+                        bottoniHtml = `<span style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">Rimossa dall'elenco pubblico</span>`;
+                    }
+
                     card.innerHTML = `
-                        <h3 class="sala-title">${sala.nomeSala}</h3>
-                        <div class="sala-stats">
+                        <h3 class="sala-title">${nomeHtml}</h3>
+                        <div class="sala-stats" ${!sala.attiva ? 'style="filter: grayscale(100%);"' : ''}>
                             <span class="badge badge-success" title="Posti liberi">${sala.postiLiberi}</span>
                             <span class="badge badge-warning" title="Attive (non confermate)">${sala.postiAttivi}</span>
                             <span class="badge badge-danger" title="Confermate (presenti)">${sala.postiConfermati}</span>
                         </div>
                         <div class="sala-areas">${pills || '<span class="area-pill">nessuna area</span>'}</div>
                         <div style="text-align:center; margin-top:1rem;">
-                            <button class="btn-sm btn-outline-danger" onclick="elimina(${sala.idSala}, '${(sala.nomeSala || '').replace(/'/g, '')}')">Elimina sala</button>
+                            ${bottoniHtml}
                         </div>`;
                     cont.appendChild(card);
                 });
