@@ -90,7 +90,7 @@ public class GestorePrenotazioni {
         List<Area> aree = registroSale.getAreePerSala(idSala);
         boolean areaNonPresenteNellaSala = true;
         int i = 0;
-        while (aree != null && i < aree.size() && areaNonPresenteNellaSala && !aree.isEmpty()){
+        while (aree != null && i < aree.size() && areaNonPresenteNellaSala){
             Area a = aree.get(i);
             if (a.getId().equals(idArea)) {
                 areaNonPresenteNellaSala = false;
