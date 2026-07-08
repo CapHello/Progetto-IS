@@ -1,5 +1,13 @@
 package it.unina.prenotazioni.controller;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import it.unina.prenotazioni.controller.strategy.AssegnazionePrimaLibera;
 import it.unina.prenotazioni.controller.strategy.StrategiaAssegnazione;
 import it.unina.prenotazioni.dto.PrenotazioneDTO;
@@ -16,14 +24,6 @@ import it.unina.prenotazioni.entity.SalaStudio;
 import it.unina.prenotazioni.entity.StatoEnum;
 import it.unina.prenotazioni.entity.Studente;
 import it.unina.prenotazioni.entity.state.StatoAttiva;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Gestore (Singleton) delle prenotazioni: EffettuaPrenotazione (UC7), AnnullaPrenotazione
@@ -62,8 +62,8 @@ public class GestorePrenotazioni {
         this.strategiaAssegnazione = strategiaAssegnazione;
     }
 
-    private void verificaValiditaDati(Long idSala, Long idArea, Long idPostazione,
-                                      LocalDate data, Long idFascia, Long idStudente){
+    private Studente verificaValiditaDati(Long idSala, Long idArea, Long idPostazione,
+                                      LocalDate data, Long idStudente){
         Studente studente = registroUtenti.trovaStudentePerId(idStudente);
 
         if (studente == null) {
@@ -90,27 +90,9 @@ public class GestorePrenotazioni {
         // devo verificare se la postazione faccia parte dell'area selezionata
         verificaSuPostazione(idArea, idPostazione);
 
+        return studente;
 
-        // devo verificare se la fascia fa parte degli slotOrari della sala
-        verificaFasciaInSlot(idSala, idFascia);
 
-    }
-
-    private void verificaFasciaInSlot(Long idSala, Long idFascia) {
-        List<FasciaOraria> slotOrari = registroSale.getFascePerSala(idSala);
-        boolean slotOrarioNonPresenteNellaSala = true;
-        int i = 0;
-        while (i < slotOrari.size() && slotOrarioNonPresenteNellaSala) {
-            FasciaOraria f = slotOrari.get(i);
-            if (f.getId().equals(idFascia)) {
-                slotOrarioNonPresenteNellaSala = false;
-            } else
-                i++;
-
-        }
-        if (slotOrarioNonPresenteNellaSala) {
-            throw new IllegalArgumentException("Lo slot orario selezionato non è ammesso");
-        }
     }
 
     private void verificaSuPostazione(Long idArea, Long idPostazione) {
@@ -144,10 +126,10 @@ public class GestorePrenotazioni {
     public Object effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
                                        LocalDate data, Long idFascia, Long idStudente) {
         // 1. Validità e coerenza dei dati.
-        Studente studente = registroUtenti.trovaStudentePerId(idStudente);
+
 
         // verifico la correttezza e la coerenza dei parametri in ingresso per quanto riguarda sala, area, postazione, idFascia
-        verificaValiditaDati(idSala, idArea, idPostazione, data, idFascia, idStudente);
+        Studente studente = verificaValiditaDati(idSala, idArea, idPostazione, data, idStudente);
 
         FasciaOraria fascia = risolviFasciaDellaSala(idSala, idFascia);
 
@@ -164,8 +146,8 @@ public class GestorePrenotazioni {
 
 
 
-            // 3-4. Insieme delle postazioni disponibili (per area specifica o per l'intera sala).
-            List<Postazione> disponibili = postazioniDisponibili(idSala, idArea, data, idFascia);
+            // 3-4. Insieme delle postazioni disponibili (per area specifica o per l'intera sala (area comune)).
+            List<Postazione> disponibili = registroSale.getPostazioniDisponibili(idArea, data, fascia.getId());
             if (disponibili.isEmpty()){
                 throw new IllegalStateException(
                         "Non sono presenti delle postazioni disponibili per l'area selezionata");
@@ -176,7 +158,7 @@ public class GestorePrenotazioni {
 
 
             // 5. Selezione postazione (specifica o automatica via Strategy).
-            Postazione postazione = selezionaPostazione(idSala, idPostazione, data, fascia, disponibili);
+            Postazione postazione = selezionaPostazione(idPostazione, data, fascia, disponibili);
 
             // 6. Creazione della prenotazione in stato ATTIVA.
             Prenotazione prenotazione = new Prenotazione();
@@ -184,7 +166,9 @@ public class GestorePrenotazioni {
             prenotazione.setFasciaOraria(fascia);
             prenotazione.setPostazione(postazione);
             prenotazione.setStudente(studente);          // aggiorna il profilo (associazione effettua)
+            prenotazione.attach(GestoreNotifiche.getInstance());
             prenotazione.setStato(StatoAttiva.getInstance());
+
             boolean esito = registroPrenotazioni.salvaPrenotazione(prenotazione);
 
 
@@ -253,6 +237,9 @@ public class GestorePrenotazioni {
         if (prenotazione == null) {
             throw new IllegalArgumentException("Prenotazione non trovata");
         }
+
+        // attach del GestoreNotifiche per permettere di ricevere a questo gli update
+        prenotazione.attach(GestoreNotifiche.getInstance());
 
         // verificaPrenotazioneAttivaInDataCorrente() →  flagAttivaInDataCorrente
         //      (l'esito negativo è comunicato dall'entity tramite eccezione).
@@ -371,37 +358,11 @@ public class GestorePrenotazioni {
                 return f;
             }
         }
-        throw new IllegalArgumentException("Fascia oraria non valida per la sala selezionata");
+        throw new IllegalArgumentException("Lo slot orario selezionato non è ammesso");
     }
 
-    private List<Postazione> postazioniDisponibili(Long idSala, Long idArea, LocalDate data, Long idFascia) {
-        // Possiamo direttamente eliminare il metodo getPostazioniDisponibili(area,data,fasciaOraria)
-        List<Postazione> disponibili = new ArrayList<>();
-        if (idArea > 0) {
-            Area area = registroSale.trovaAreaPerId(idArea);
-            if (area == null || !idSala.equals(area.getSalaStudio().getId())) {
-                throw new IllegalArgumentException("Area non valida per la sala selezionata");
-            }
 
-            disponibili.addAll(registroSale.getPostazioniDisponibili(idArea,data,idFascia));
-        } else {
-            // devo prendere tutte le postazioni che fanno parte dell'area con tipologia comune
-            List<Area> areePerSala = registroSale.getAreePerSala(idSala);
-            Area areaComune = null;
-            for(Area a: areePerSala){
-                if(a.getTipologia().equalsIgnoreCase("Comune")){
-                    areaComune = a;
-                }
-            }
-            if(areaComune == null){
-                throw new IllegalArgumentException("Area non valida per la sala selezionata");
-            }
-            disponibili.addAll(registroSale.getPostazioniDisponibili(areaComune.getId(),data,idFascia));
-        }
-        return disponibili;
-    }
-
-    private  Postazione selezionaPostazione(Long idSala, Long idPostazione, LocalDate data,
+    private  Postazione selezionaPostazione(Long idPostazione, LocalDate data,
                                            FasciaOraria fascia, List<Postazione> disponibili) {
         if (idPostazione != null && idPostazione > 0) {
             // Postazione scelta esplicitamente dallo studente.
