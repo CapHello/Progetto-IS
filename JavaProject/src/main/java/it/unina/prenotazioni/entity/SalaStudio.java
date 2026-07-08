@@ -131,12 +131,45 @@ public class SalaStudio {
         return !giorno.equals(DayOfWeek.SATURDAY) && !giorno.equals(DayOfWeek.SUNDAY);
     }
 
-    /** Fasce orarie prenotabili per la data indicata (vuoto se la sala è chiusa quel giorno). */
-    public List<FasciaOraria> getFasceOrariePrestabilite(LocalDate data) {
+    /**
+     * Recupera l'orario lavorativo (apertura e chiusura) per una specifica data.
+     * Sfrutta l'indice della lista per mappare i giorni feriali (Lunedì = 0, Venerdì = 4).
+     */
+    public FasciaOraria getOrarioLavorativoPerData(LocalDate data) {
         if (!verificaDataInGiorniApertura(data)) {
+            return null; // Chiuso nel weekend
+        }
+
+        int indiceGiorno = data.getDayOfWeek().getValue() - 1;
+
+        if (orarioLavorativo != null && indiceGiorno < orarioLavorativo.size()) {
+            return orarioLavorativo.get(indiceGiorno);
+        }
+        return null;
+    }
+
+    /** * V06: Fasce orarie prenotabili per la data indicata.
+     * Filtra gli slot generici della sala facendoli combaciare con l'orario del giorno.
+     */
+    public List<FasciaOraria> getFasceOrariePrestabilite(LocalDate data) {
+        FasciaOraria orarioDelGiorno = getOrarioLavorativoPerData(data);
+
+        if (orarioDelGiorno == null) {
             return new ArrayList<>();
         }
-        return RegistroSale.getInstance().getFascePerSala(this.id, data);
+
+        List<FasciaOraria> slotDisponibiliOggi = new ArrayList<>();
+
+        for (FasciaOraria slot : slotOrario) {
+            boolean iniziaDopoApertura = !slot.getOraInizio().isBefore(orarioDelGiorno.getOraInizio());
+            boolean finiscePrimaChiusura = !slot.getOraFine().isAfter(orarioDelGiorno.getOraFine());
+
+            if (iniziaDopoApertura && finiscePrimaChiusura) {
+                slotDisponibiliOggi.add(slot);
+            }
+        }
+
+        return slotDisponibiliOggi;
     }
 
     /** True se esiste almeno una postazione libera nella sala per (data, fascia). */
