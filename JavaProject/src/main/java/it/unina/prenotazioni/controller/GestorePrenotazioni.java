@@ -84,50 +84,22 @@ public class GestorePrenotazioni {
             throw new IllegalArgumentException("Area non specificata");
         }
 
-        // verifico se la Area si trovi effettivamente all'inteno nella Sala selezionata
-        // La lista non è mai vuota essendo che non è possibile creare una Sala con nessun'area presente.
-        // è almeno sempre presente un'area o l'area di default
-        List<Area> aree = registroSale.getAreePerSala(idSala);
-        boolean areaNonPresenteNellaSala = true;
-        int i = 0;
-        while (aree != null && i < aree.size() && areaNonPresenteNellaSala){
-            Area a = aree.get(i);
-            if (a.getId().equals(idArea)) {
-                areaNonPresenteNellaSala = false;
-            }else
-                i++;
 
-        }
-        if(areaNonPresenteNellaSala){
-            throw new IllegalArgumentException("L'area non è presente all'inteno della sala selezionata");
-        }
-
-
+        verificaSuArea(idSala, idArea);
 
         // devo verificare se la postazione faccia parte dell'area selezionata
-        if(idPostazione != null && !idPostazione.equals(0L)){
-            List<Postazione> postazioni = registroSale.getPostazioniPerArea(idArea);
-            boolean postazioneNonPresenteNellArea = true;
-            i = 0;
-            while (i < postazioni.size() && postazioneNonPresenteNellArea) {
-                Postazione p = postazioni.get(i);
-                if (p.getId().equals(idPostazione)) {
-                    postazioneNonPresenteNellArea = false;
-                } else
-                    i++;
-
-            }
-            if (postazioneNonPresenteNellArea) {
-                throw new IllegalArgumentException("La Postazione Selezionata non è presente nell'arae");
-            }
-        }
-
+        verificaSuPostazione(idArea, idPostazione);
 
 
         // devo verificare se la fascia fa parte degli slotOrari della sala
+        verificaFasciaInSlot(idSala, idFascia);
+
+    }
+
+    private void verificaFasciaInSlot(Long idSala, Long idFascia) {
         List<FasciaOraria> slotOrari = registroSale.getFascePerSala(idSala);
         boolean slotOrarioNonPresenteNellaSala = true;
-        i = 0;
+        int i = 0;
         while (i < slotOrari.size() && slotOrarioNonPresenteNellaSala) {
             FasciaOraria f = slotOrari.get(i);
             if (f.getId().equals(idFascia)) {
@@ -139,7 +111,25 @@ public class GestorePrenotazioni {
         if (slotOrarioNonPresenteNellaSala) {
             throw new IllegalArgumentException("Lo slot orario selezionato non è ammesso");
         }
+    }
 
+    private void verificaSuPostazione(Long idArea, Long idPostazione) {
+        if(idPostazione != null && !idPostazione.equals(0L)){
+            Postazione p = registroSale.trovaPostazionePerId(idPostazione);
+            if(p == null || !p.getArea().getId().equals(idArea)){
+                throw new IllegalArgumentException("La postazione selezionata non è presente nell'area");
+            }
+        }
+    }
+
+    private void verificaSuArea(Long idSala, Long idArea) {
+        // verifico se la Area si trovi effettivamente all'inteno nella Sala selezionata
+        // La lista non è mai vuota essendo che non è possibile creare una Sala con nessun'area presente.
+        // è almeno sempre presente un'area o l'area di default
+        Area area = registroSale.trovaAreaPerId(idArea);
+        if(area == null || !area.getSalaStudio().getId().equals(idSala)){
+            throw new IllegalArgumentException("L'area non è presente all'interno della sala selezionata");
+        }
     }
 
     private void verificaDataFasciaFutura(LocalDate data, FasciaOraria fascia) {
