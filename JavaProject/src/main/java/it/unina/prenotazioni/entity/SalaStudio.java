@@ -63,20 +63,6 @@ public class SalaStudio {
     public boolean isAttiva() { return attiva; }
     public void setAttiva(boolean attiva) { this.attiva = attiva; }
 
-    public List<Area> getAree() { return aree; }
-    public void setAree(List<Area> aree) { this.aree = aree; }
-
-    public List<FasciaOraria> getOrarioLavorativo() { return orarioLavorativo; }
-    public void setOrarioLavorativo(List<FasciaOraria> orarioLavorativo) {
-        if (orarioLavorativo != null && orarioLavorativo.size() > 5) {
-            throw new IllegalArgumentException("Una sala non può avere più di 5 orari lavorativi.");
-        }
-        this.orarioLavorativo = orarioLavorativo;
-    }
-
-    public List<FasciaOraria> getSlotOrario() { return slotOrario; }
-    public void setSlotOrari(List<FasciaOraria> slotOrario) { this.slotOrario = slotOrario; }
-
     // --- Costruzione in memoria (usata in CreaSalaStudio, prima della persistenza) ---
 
     /** Aggiunge una fascia oraria (slot prenotabile) all'orario della sala. */
@@ -141,7 +127,7 @@ public class SalaStudio {
     /** V06: la sala è aperta nei giorni feriali (lunedì-venerdì). */
     public boolean verificaDataInGiorniApertura(LocalDate data) {
         DayOfWeek giorno = data.getDayOfWeek();
-        return giorno != DayOfWeek.SATURDAY && giorno != DayOfWeek.SUNDAY;
+        return !giorno.equals(DayOfWeek.SATURDAY) && !giorno.equals(DayOfWeek.SUNDAY);
     }
 
     /** Fasce orarie prenotabili per la data indicata (vuoto se la sala è chiusa quel giorno). */
@@ -161,31 +147,5 @@ public class SalaStudio {
             }
         }
         return false;
-    }
-
-    /** Postazioni libere di una specifica area per (data, fascia). */
-    public List<Postazione> getPostazioniDisponibili(Area area, LocalDate data, FasciaOraria fascia) {
-        return area.getPostazioniDisponibili(data, fascia);
-    }
-
-    public boolean verificaValiditaDati() {
-        if (nome == null || nome.isEmpty() || numeroPostazioniTotali <= 0) {
-            return false;
-        }
-        // Il vincolo di dominio impone massimo 5 orari lavorativi
-        return !(orarioLavorativo != null && orarioLavorativo.size() > 5);
-    }
-
-    /**
-     * Elimina tutte le aree della sala e, tramite ciascuna, le relative postazioni
-     * (UC4 EliminaSalaStudio). Le prenotazioni che insistono sulle postazioni devono
-     * essere già state rimosse dal GestoreSale per rispettare i vincoli di integrità.
-     */
-    public void eliminaAree() {
-        RegistroSale registro = RegistroSale.getInstance();
-        for (Area area : registro.getAreePerSala(id)) {
-            area.eliminaPostazioni();
-            registro.eliminaArea(area.getId());
-        }
     }
 }

@@ -27,21 +27,12 @@ public class RegistroPrenotazioni {
         return istance;
     }
 
-    // Permette l'injection nei test.
-    public RegistroPrenotazioni(GestorePersistenza gestorePersistenza) {
-        this.gestorePersistenza = gestorePersistenza;
-    }
-
     public boolean salvaPrenotazione(Prenotazione prenotazione) {
         return gestorePersistenza.salva(prenotazione);
     }
 
     public Prenotazione aggiorna(Prenotazione prenotazione) {
         return gestorePersistenza.aggiorna(prenotazione);
-    }
-
-    public boolean elimina(Long id) {
-        return gestorePersistenza.elimina(Prenotazione.class, id);
     }
 
     public Prenotazione trovaPerId(Long id) {

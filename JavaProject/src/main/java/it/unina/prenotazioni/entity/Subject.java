@@ -13,6 +13,7 @@ public abstract class Subject {
         }
     }
 
+    //Messo per rispettare il pattern observer, non viene mai chiamato.
     public void detach(Observer observer) {
         observers.remove(observer);
     }
