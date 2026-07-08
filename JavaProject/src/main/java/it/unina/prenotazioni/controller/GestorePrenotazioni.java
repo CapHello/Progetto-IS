@@ -43,10 +43,9 @@ public class GestorePrenotazioni {
     private final RegistroUtenti registroUtenti = RegistroUtenti.getInstance();
     private StrategiaAssegnazione strategiaAssegnazione;
 
-    private final StrategiaAssegnazione strategia;
 
     private GestorePrenotazioni() {
-        this.strategia = new AssegnazionePrimaLibera(); // la parte è creata dal tutto (composizione)
+        this.strategiaAssegnazione = new AssegnazionePrimaLibera(); // la parte è creata dal tutto (composizione)
     }
 
     public static GestorePrenotazioni getInstance() {
@@ -96,6 +95,9 @@ public class GestorePrenotazioni {
     }
 
     private void verificaSuPostazione(Long idArea, Long idPostazione) {
+        // idPostazione == 0 è il valore sentinella per "assegnazione automatica".
+        // Sicuro perché gli id reali sono assegnati solo da MySQL AUTO_INCREMENT (partono da 1) e
+        // nessun punto del codice imposta manualmente l'id di una Postazione prima del persist.
         if(idPostazione != null && !idPostazione.equals(0L)){
             Postazione p = registroSale.trovaPostazionePerId(idPostazione);
             if(p == null || !p.getArea().getId().equals(idArea)){
@@ -361,9 +363,11 @@ public class GestorePrenotazioni {
         throw new IllegalArgumentException("Lo slot orario selezionato non è ammesso");
     }
 
-
     private  Postazione selezionaPostazione(Long idPostazione, LocalDate data,
                                            FasciaOraria fascia, List<Postazione> disponibili) {
+        // idPostazione == 0 è il sentinel per "assegnazione automatica" (scelto dal front-end).
+        // Sicuro perché gli id reali sono assegnati solo da MySQL AUTO_INCREMENT (parte da 1) e
+        // nessun punto del codice imposta manualmente l'id di una Postazione prima del persist.
         if (idPostazione != null && idPostazione > 0) {
             // Postazione scelta esplicitamente dallo studente.
             Postazione scelta = registroSale.trovaPostazionePerId(idPostazione);
@@ -376,7 +380,7 @@ public class GestorePrenotazioni {
         if (disponibili.isEmpty()) {
             throw new IllegalStateException("Nessuna postazione disponibile per l'area e la fascia selezionate");
         }
-        return strategia.selezionaPostazione(disponibili);
+        return strategiaAssegnazione.selezionaPostazione(disponibili);
     }
 
     private PrenotazioneDTO toDTO(Prenotazione p) {
