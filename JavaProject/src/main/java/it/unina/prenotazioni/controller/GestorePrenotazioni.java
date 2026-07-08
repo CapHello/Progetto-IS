@@ -62,8 +62,8 @@ public class GestorePrenotazioni {
         this.strategiaAssegnazione = strategiaAssegnazione;
     }
 
-    private Studente verificaValiditaDati(Long idSala, Long idArea, Long idPostazione,
-                                      LocalDate data, Long idStudente){
+    private Studente risolviStudente(Long idSala, Long idArea, Long idPostazione,
+                                     LocalDate data, Long idStudente){
         Studente studente = registroUtenti.trovaStudentePerId(idStudente);
 
         if (studente == null) {
@@ -125,11 +125,11 @@ public class GestorePrenotazioni {
     // ------------------------------------------------------------------ UC7
     public Object effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
                                        LocalDate data, Long idFascia, Long idStudente) {
+
+
         // 1. Validità e coerenza dei dati.
-
-
         // verifico la correttezza e la coerenza dei parametri in ingresso per quanto riguarda sala, area, postazione, idFascia
-        Studente studente = verificaValiditaDati(idSala, idArea, idPostazione, data, idStudente);
+        Studente studente = risolviStudente(idSala, idArea, idPostazione, data, idStudente);
 
         FasciaOraria fascia = risolviFasciaDellaSala(idSala, idFascia);
 
