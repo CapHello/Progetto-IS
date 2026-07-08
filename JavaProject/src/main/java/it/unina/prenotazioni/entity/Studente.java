@@ -28,15 +28,6 @@ public class Studente extends Utente{
     public List<Prenotazione> getPrenotazioni() { return prenotazioni; }
     public void setPrenotazioni(List<Prenotazione> prenotazioni) { this.prenotazioni = prenotazioni; }
 
-    public void addPrenotazione(Prenotazione prenotazione) {
-        prenotazioni.add(prenotazione);
-        prenotazione.setStudente(this);
-    }
-
-    public void removePrenotazione(Prenotazione prenotazione) {
-        prenotazioni.remove(prenotazione);
-        prenotazione.setStudente(null);
-    }
 
     /**
      * Vincolo di unicità (V18): true se lo studente possiede già una prenotazione in

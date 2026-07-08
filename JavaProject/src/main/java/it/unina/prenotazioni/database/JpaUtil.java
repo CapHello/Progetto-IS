@@ -21,7 +21,7 @@ public class JpaUtil {
      * costoso da inizializzare: legge la persistence unit dal file
      * persistence.xml e prepara Hibernate per comunicare con il database.
      */
-    private EntityManagerFactory emf;
+    private final EntityManagerFactory emf;
 
     /*
      * Costruttore privato.
@@ -38,6 +38,7 @@ public class JpaUtil {
          * definita nel file persistence.xml.
          */
         emf = Persistence.createEntityManagerFactory("prenotazioniPU");
+        Runtime.getRuntime().addShutdownHook(new Thread(this::chiudi));
     }
 
     /*

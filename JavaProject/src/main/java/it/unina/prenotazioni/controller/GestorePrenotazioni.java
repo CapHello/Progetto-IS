@@ -258,6 +258,10 @@ public class GestorePrenotazioni {
             //     → setStato("confermata") → prenotazioneConfermata → persistenza.
             prenotazione.effettuaCheckin();
             registroPrenotazioni.aggiorna(prenotazione);
+
+            Studente s = prenotazione.getStudente();
+            s.setNumeroTotaleAccessi(s.getNumeroTotaleAccessi() + 1);
+            registroUtenti.aggiorna(s);
             //checkInEffettuato (ritorno regolare).
         } else {
             // alt [Prenotazione non attiva nella data corrente] checkInNonConsentito.
