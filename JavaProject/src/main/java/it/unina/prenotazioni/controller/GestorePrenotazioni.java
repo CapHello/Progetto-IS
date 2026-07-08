@@ -73,15 +73,24 @@ public class GestorePrenotazioni {
         if (sala == null) {
             throw new IllegalArgumentException("Sala studio non trovata");
         }
+        if (!sala.isAttiva()){
+            throw new IllegalArgumentException("La sala non è attiva, non sarà più disponibile");
+        }
         if (!sala.verificaDataInGiorniApertura(data)) {
             throw new IllegalArgumentException("La sala è chiusa nella data selezionata (giorni feriali)");
         }
+        // per robustezza perché non potrà mai presentarsi essendo che il front-end non permette di non selezionare alcuna area
+        if (idArea == null) {
+            throw new IllegalArgumentException("Area non specificata");
+        }
 
         // verifico se la Area si trovi effettivamente all'inteno nella Sala selezionata
+        // La lista non è mai vuota essendo che non è possibile creare una Sala con nessun'area presente.
+        // è almeno sempre presente un'area o l'area di default
         List<Area> aree = registroSale.getAreePerSala(idSala);
         boolean areaNonPresenteNellaSala = true;
         int i = 0;
-        while (i < aree.size() && areaNonPresenteNellaSala){
+        while (aree != null && i < aree.size() && areaNonPresenteNellaSala){
             Area a = aree.get(i);
             if (a.getId().equals(idArea)) {
                 areaNonPresenteNellaSala = false;
@@ -96,7 +105,7 @@ public class GestorePrenotazioni {
 
 
         // devo verificare se la postazione faccia parte dell'area selezionata
-        if(!idPostazione.equals(0L)){
+        if(idPostazione != null && !idPostazione.equals(0L)){
             List<Postazione> postazioni = registroSale.getPostazioniPerArea(idArea);
             boolean postazioneNonPresenteNellArea = true;
             i = 0;
@@ -365,18 +374,6 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ helper
-    /** Validità e coerenza dei dati della richiesta di prenotazione (UC7, passo 1). */
-    private void verificaValiditaDati(Studente studente, SalaStudio sala, LocalDate data) {
-        if (studente == null) {
-            throw new IllegalArgumentException("Studente non trovato");
-        }
-        if (sala == null) {
-            throw new IllegalArgumentException("Sala studio non trovata");
-        }
-        if (!sala.verificaDataInGiorniApertura(data)) {
-            throw new IllegalArgumentException("La sala è chiusa nella data selezionata (giorni feriali)");
-        }
-    }
 
     private FasciaOraria risolviFasciaDellaSala(Long idSala, Long idFascia) {
         for (FasciaOraria f : RegistroSale.getInstance().getFascePerSala(idSala)) {
