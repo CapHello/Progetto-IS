@@ -133,7 +133,7 @@ public class GestorePrenotazioni {
         // verifico la correttezza e la coerenza dei parametri in ingresso per quanto riguarda sala, area, postazione, idFascia
         Studente studente = risolviStudente(idSala, idArea, idPostazione, data, idStudente);
 
-        FasciaOraria fascia = risolviFasciaDellaSala(idSala, idFascia);
+        FasciaOraria fascia = risolviFasciaDellaSala(idSala, idFascia, data);
 
         verificaDataFasciaFutura(data, fascia);
 
@@ -356,10 +356,14 @@ public class GestorePrenotazioni {
         return dto;
     }
 
-    // ------------------------------------------------------------------ helper
 
-    private FasciaOraria risolviFasciaDellaSala(Long idSala, Long idFascia) {
-        for (FasciaOraria f : RegistroSale.getInstance().getFascePerSala(idSala)) {
+
+    private FasciaOraria risolviFasciaDellaSala(Long idSala, Long idFascia, LocalDate data) {
+        SalaStudio sala = registroSale.cercaSalaPerId(idSala);
+        if (sala == null){
+            throw new IllegalArgumentException("Sala studio non trovata");
+        }
+        for (FasciaOraria f : sala.getFasceOrariePrestabilite(data)) {
             if (f.getId().equals(idFascia)) {
                 return f;
             }
