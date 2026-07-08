@@ -212,7 +212,7 @@ public class GestoreSale {
         }
         FasciaOraria fascia = registroSale.trovaFasciaPerId(idFascia);
         if (fascia == null) {
-            throw new IllegalArgumentException("Fascia oraria non valida per la sala selezionata");
+            throw new IllegalArgumentException("Fascia oraria inesistente.");
         }
 
         DettaglioSalaDTO dto = new DettaglioSalaDTO();
@@ -343,13 +343,6 @@ public class GestoreSale {
             fasce.add(f.getEtichetta());
         }
         dto.setFasceOrarie(fasce);
-
-        /* Se serve verrà riaggiunto
-        List<String> orariLavorativi = new ArrayList<>();
-        for (FasciaOraria ol: registroSale.getOrariLavorativiPerSala(sala.getId())) {
-            orariLavorativi.add(ol.getEtichetta());
-        }
-        */
 
         return dto;
     }
