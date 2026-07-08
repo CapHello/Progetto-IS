@@ -37,6 +37,7 @@ public class SalaStudio {
             joinColumns = @JoinColumn(name = "sala_id"),
             inverseJoinColumns = @JoinColumn(name = "fascia_id")
     )
+    @OrderColumn(name = "giorno_settimana")
     private List<FasciaOraria> orarioLavorativo = new ArrayList<>();
 
     public SalaStudio() {}
@@ -135,7 +136,7 @@ public class SalaStudio {
         if (!verificaDataInGiorniApertura(data)) {
             return new ArrayList<>();
         }
-        return RegistroSale.getInstance().getFascePerSala(id);
+        return RegistroSale.getInstance().getFascePerSala(this.id, data);
     }
 
     /** True se esiste almeno una postazione libera nella sala per (data, fascia). */
