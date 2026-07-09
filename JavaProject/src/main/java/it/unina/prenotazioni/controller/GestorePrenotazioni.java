@@ -32,7 +32,6 @@ import it.unina.prenotazioni.entity.state.StatoAttiva;
  * Come da diagramma delle classi, gli unici attributi sono l'istanza Singleton
  * {@code instance} e la strategia di assegnazione {@code strategia} (composizione 1-1,
  * pattern Strategy); le dipendenze d'uso verso i registri del livello entity e verso
- * GestoreNotifiche non sono attributi e vengono risolte localmente nei metodi.
  */
 public class GestorePrenotazioni {
 
@@ -170,8 +169,6 @@ public class GestorePrenotazioni {
 
             boolean esito = registroPrenotazioni.salvaPrenotazione(prenotazione);
 
-
-            // 7 dovrei notificare gli utenti, ma questo comportamento è già modellato all'interno di setStato() di prenotazione
             if (esito){
                 prenotazione.attach(GestoreNotifiche.getInstance());
                 prenotazione.notifyObservers();
@@ -302,7 +299,7 @@ public class GestorePrenotazioni {
             LocalDateTime inizio = LocalDateTime.of(p.getData(), p.getFasciaOraria().getOraInizio());
             LocalDateTime fine = LocalDateTime.of(p.getData(), p.getFasciaOraria().getOraFine());
 
-            if (stato == StatoEnum.ATTIVA && adesso.isAfter(inizio.plusMinutes(10))) { // tolleranza check-in (V08)
+            if (stato == StatoEnum.ATTIVA && adesso.isAfter(inizio.plusMinutes(Prenotazione.TOLLERANZA_CHECKIN_MINUTI))) { // tolleranza check-in (V08)
                 // Check-in non effettuato entro la tolleranza → SCADUTA (RF18).
                 p.attach(GestoreNotifiche.getInstance());
                 p.gestisciTermine();

@@ -25,10 +25,6 @@ public class Studente extends Utente{
     public int getNumeroTotaleAccessi() { return numeroTotaleAccessi; }
     public void setNumeroTotaleAccessi(int numeroTotaleAccessi) { this.numeroTotaleAccessi = numeroTotaleAccessi; }
 
-    public List<Prenotazione> getPrenotazioni() { return prenotazioni; }
-    public void setPrenotazioni(List<Prenotazione> prenotazioni) { this.prenotazioni = prenotazioni; }
-
-
     /**
      * Vincolo di unicità (V18): true se lo studente possiede già una prenotazione in
      * stato ATTIVA o CONFERMATA nella stessa data e fascia oraria (qualsiasi sala).

@@ -57,19 +57,17 @@ public class GestoreNotifiche implements Observer {
         }
     }
 
-    public void inviaPromemoria(List<UtenteDTO> destinatari, String messaggio) {
-        inviaNotifica(destinatari, messaggio);
-    }
-
     /** UC14: promemoria agli studenti con prenotazione ATTIVA nella giornata corrente. */
     public void inviaPromemoria() {
         for (Prenotazione p : registroPrenotazioni.getPrenotazioniInScadenza()) {
-            if (p.getStato().getStatoEnum() == StatoEnum.ATTIVA && LocalDate.now().equals(p.getData())) {
+            if (p.getStato().getStatoEnum() == StatoEnum.ATTIVA && LocalDate.now().equals(p.getData()) && !p.isPromemoriaInviato()) {
                 Studente s = p.getStudente();
                 if (s != null) {
                     inviaNotifica(List.of(toDTO(s)),
                             "Promemoria: prenotazione #" + p.getId() + " oggi nella fascia "
                                     + p.getFasciaOraria().getEtichetta());
+                    p.setPromemoriaInviato(true);
+                    registroPrenotazioni.aggiorna(p);
                 }
             }
         }

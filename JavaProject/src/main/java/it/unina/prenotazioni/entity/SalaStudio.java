@@ -22,7 +22,7 @@ public class SalaStudio {
     @OneToMany(mappedBy = "salaStudio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Area> aree = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "sala_slot_prenotabili",
             joinColumns = @JoinColumn(name = "sala_id"),
@@ -31,7 +31,7 @@ public class SalaStudio {
     private List<FasciaOraria> slotOrario = new ArrayList<>();
 
     // Associazione Molti-A-Molti per l'orario lavorativo
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "sala_orari_lavorativi",
             joinColumns = @JoinColumn(name = "sala_id"),
