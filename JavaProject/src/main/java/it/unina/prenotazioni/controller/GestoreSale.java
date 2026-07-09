@@ -264,40 +264,68 @@ public class GestoreSale {
     public List<Object> monitoraSale() {
         LocalDate oggi = LocalDate.now();
         List<Object> risultato = new ArrayList<>();
+
         for (SalaStudio sala : registroSale.getTutteLeSale()) {
-            // Stato per postazione oggi: 'C' = confermata (presenza), 'A' = attiva non confermata.
-            Map<Long, Character> statoPostazione = new HashMap<>();
-            for (Prenotazione p : registroPrenotazioni.cercaPrenotazioniPerSalaEData(sala.getId(), oggi)) {
-                if (p.getPostazione() == null) continue;
-                Long pid = p.getPostazione().getId();
-                if (p.getStato().getStatoEnum() == StatoEnum.CONFERMATA) {
-                    statoPostazione.put(pid, 'C');
-                } else if (statoPostazione.get(pid) == null) {
-                    statoPostazione.put(pid, 'A');
-                }
-            }
-            SalaMonitoraggioDTO dto = new SalaMonitoraggioDTO();
-            dto.setIdSala(sala.getId());
-            dto.setNomeSala(sala.getNome());
-            dto.setAttiva(sala.isAttiva());
-            int liberi = 0, attivi = 0, confermati = 0;
-            for (Area area : registroSale.getAreePerSala(sala.getId())) {
-                dto.getAree().add(area.getTipologia());
-                for (Postazione p : registroSale.getPostazioniPerArea(area.getId())) {
-                    Character st = statoPostazione.get(p.getId());
-                    if (st == null) liberi++;
-                    else if (st == 'C') confermati++;
-                    else attivi++;
-                }
-            }
-            dto.setPostiLiberi(liberi);
-            dto.setPostiAttivi(attivi);
-            dto.setPostiConfermati(confermati);
+            Map<Long, Character> statoPostazione = creaMappaStatoPostazioni(sala.getId(), oggi);
+
+            SalaMonitoraggioDTO dto = calcolaStatisticheSala(sala, statoPostazione);
+
             risultato.add(dto);
         }
+
         return risultato;
     }
 
+    // ------------------------------------------------------------------ helper per UC11
+    private Map<Long, Character> creaMappaStatoPostazioni(Long idSala, LocalDate data) {
+        Map<Long, Character> statoPostazione = new HashMap<>();
+
+        for (Prenotazione p : registroPrenotazioni.cercaPrenotazioniPerSalaEData(idSala, data)) {
+            if (p.getPostazione() == null) continue;
+
+            Long pid = p.getPostazione().getId();
+
+            if (p.getStato().getStatoEnum() == StatoEnum.CONFERMATA) {
+                statoPostazione.put(pid, 'C');
+            } else if (!statoPostazione.containsKey(pid)) {
+                statoPostazione.put(pid, 'A');
+            }
+        }
+        return statoPostazione;
+    }
+
+    private SalaMonitoraggioDTO calcolaStatisticheSala(SalaStudio sala, Map<Long, Character> statoPostazione) {
+        SalaMonitoraggioDTO dto = new SalaMonitoraggioDTO();
+        dto.setIdSala(sala.getId());
+        dto.setNomeSala(sala.getNome());
+        dto.setAttiva(sala.isAttiva());
+
+        int liberi = 0;
+        int attivi = 0;
+        int confermati = 0;
+
+        for (Area area : registroSale.getAreePerSala(sala.getId())) {
+            dto.getAree().add(area.getTipologia());
+
+            for (Postazione p : registroSale.getPostazioniPerArea(area.getId())) {
+                Character st = statoPostazione.get(p.getId());
+
+                if (st == null) {
+                    liberi++;
+                } else if (st == 'C') {
+                    confermati++;
+                } else {
+                    attivi++;
+                }
+            }
+        }
+
+        dto.setPostiLiberi(liberi);
+        dto.setPostiAttivi(attivi);
+        dto.setPostiConfermati(confermati);
+
+        return dto;
+    }
     // ------------------------------------------------------------------ helper
     private int contaPostiDisponibili(Long idSala, LocalDate data, FasciaOraria fascia) {
         int posti = 0;
