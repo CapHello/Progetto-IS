@@ -29,10 +29,17 @@ Lo stato di avanzamento è tracciato su GitHub Projects:
 - **Issues aperte**: [Lista task](https://github.com/CapHello/progetto-is/issues)
 
 <!-- MILESTONES:START -->
+
 ## 🧗🏼‍♂️ Milestones
 
 ### M3 - Progettazione · scadenza 2026-07-07
 `[█████░░░░░░░░░░░░░░░] 27%`  (4/15 issue chiuse)
+
+### M2 - Piano di test funzionale · scadenza 2026-05-26
+`[████████████████████] 100%`  (7/7 issue chiuse)
+
+### M3 - Progettazione · scadenza 2026-07-07
+`[███████░░░░░░░░░░░░░] 33%`  (5/15 issue chiuse)
 
 ### M4 - Implementazione · scadenza 2026-07-12
 `[███████████████████░] 94%`  (15/16 issue chiuse)
