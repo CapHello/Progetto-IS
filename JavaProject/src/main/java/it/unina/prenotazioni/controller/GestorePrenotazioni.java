@@ -206,30 +206,18 @@ public class GestorePrenotazioni {
         // AnnullaPrenotazione() sull'entity → verificaIntervalloAnnullamentoPrenotazione(),
         //      setStato("annullata") → flagIntervalloAnnullamentoPrenotazione
         //      (l'esito negativo è comunicato dall'entity tramite eccezione).
-        boolean flagIntervalloAnnullamentoPrenotazione;
-        String motivoNonValido = null;
         try {
             prenotazione.annullaPrenotazione();
-            flagIntervalloAnnullamentoPrenotazione = true;
         } catch (IllegalStateException e) {
-            flagIntervalloAnnullamentoPrenotazione = false;
-            motivoNonValido = e.getMessage();
+            throw new IllegalStateException(e.getMessage());
         }
+        registroPrenotazioni.aggiorna(prenotazione);
 
-        if (flagIntervalloAnnullamentoPrenotazione) {
-            // alt [AnnullamentoPrenotazioneValido] annullamentoConfermato → persistenza.
-            registroPrenotazioni.aggiorna(prenotazione);
-
-            // inviaNotifica(destinatari, messaggio);
-            Studente destinatario = prenotazione.getStudente();
-            if (destinatario != null) {
-                GestoreNotifiche.getInstance().inviaNotifica(List.of(toUtenteDTO(destinatario)),
+        // inviaNotifica(destinatari, messaggio);
+        Studente destinatario = prenotazione.getStudente();
+        if (destinatario != null) {
+            GestoreNotifiche.getInstance().inviaNotifica(List.of(toUtenteDTO(destinatario)),
                         "La prenotazione #" + prenotazione.getId() + " è stata annullata.");
-            }
-            //annullamentoPrenotazioneConfermato (ritorno regolare).
-        } else {
-            // alt [AnnullamentoPrenotazioneNonValido] limiteTemporaleAnnullamentoPrenotazioneSuperato.
-            throw new IllegalStateException(motivoNonValido);
         }
     }
 
