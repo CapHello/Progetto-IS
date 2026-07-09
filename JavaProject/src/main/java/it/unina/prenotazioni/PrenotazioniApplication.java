@@ -1,4 +1,4 @@
-package it.unina.prenotazioni.eseguibile;
+package it.unina.prenotazioni;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
