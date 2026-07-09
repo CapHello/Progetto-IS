@@ -6,34 +6,45 @@ const API = '/api';
  * form url-encoded (POST/PUT). In caso di errore lancia un'eccezione con il messaggio
  * restituito dal backend ({"errore": "..."}).
  */
-async function api(method, path, params) {
+async function api(method, path, params, isJson = false) {
   const opts = { method, headers: {} };
   let url = API + path;
+
   if (params) {
-    const usp = new URLSearchParams();
-    Object.entries(params).forEach(([k, v]) => {
-      if (v === undefined || v === null || v === '') return;
-      if (Array.isArray(v)) {
-        // Liste (es. tipologie[], postazioniAree[]) → parametri ripetuti, ordine preservato.
-        v.forEach(item => { if (item !== undefined && item !== null && item !== '') usp.append(k, item); });
+    if (isJson && (method !== 'GET' && method !== 'DELETE')) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(params);
+    }
+    else {
+      const usp = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => {
+        if (v === undefined || v === null || v === '') return;
+        if (Array.isArray(v)) {
+          // Liste (es. tipologie[], postazioniAree[]) → parametri ripetuti, ordine preservato.
+          v.forEach(item => { if (item !== undefined && item !== null && item !== '') usp.append(k, item); });
+        } else {
+          usp.append(k, v);
+        }
+      });
+
+      if (method === 'GET' || method === 'DELETE') {
+        const qs = usp.toString();
+        if (qs) url += '?' + qs;
       } else {
-        usp.append(k, v);
+        opts.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        opts.body = usp.toString();
       }
-    });
-    if (method === 'GET' || method === 'DELETE') {
-      const qs = usp.toString();
-      if (qs) url += '?' + qs;
-    } else {
-      opts.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-      opts.body = usp.toString();
     }
   }
+
   const res = await fetch(url, opts);
   const testo = await res.text();
   const dati = testo ? JSON.parse(testo) : null;
+
   if (!res.ok) {
     throw new Error(dati && dati.errore ? dati.errore : ('Errore ' + res.status));
   }
+
   return dati;
 }
 
