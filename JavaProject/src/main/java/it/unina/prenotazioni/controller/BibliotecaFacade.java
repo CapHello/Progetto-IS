@@ -1,6 +1,7 @@
 package it.unina.prenotazioni.controller;
 
 import it.unina.prenotazioni.dto.CreazioneSalaDTO;
+import it.unina.prenotazioni.dto.SalaStudioDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -38,7 +39,7 @@ public class BibliotecaFacade {
     }
 
     // --- GestoreSale (UC3, UC4, UC6, UC11 + Aggiungi Area) ---
-    public Object creaSalaStudio(CreazioneSalaDTO richiesta) {
+    public SalaStudioDTO creaSalaStudio(CreazioneSalaDTO richiesta) {
         return GestoreSale.getInstance().creaSalaStudio(richiesta);
     }
 

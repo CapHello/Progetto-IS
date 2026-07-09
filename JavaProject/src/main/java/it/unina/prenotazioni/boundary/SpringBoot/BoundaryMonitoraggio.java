@@ -1,4 +1,4 @@
-package it.unina.prenotazioni.boundary;
+package it.unina.prenotazioni.boundary.SpringBoot;
 
 import it.unina.prenotazioni.controller.BibliotecaFacade;
 import it.unina.prenotazioni.dto.StatisticheDTO;
