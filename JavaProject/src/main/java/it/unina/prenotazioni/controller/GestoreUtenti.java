@@ -71,12 +71,12 @@ public class GestoreUtenti {
         Utente nuovoUtente;
         if (studente) {
             if (registroUtenti.cercaStudentePerMatricola(identificativo) != null) {
-                throw new IllegalArgumentException("Matricola già in uso.");
+                throw new IllegalArgumentException("Identificativo già in uso nel sistema.");
             }
             nuovoUtente = new StudenteFactory().creaUtente(nome, cognome, email, password, identificativo);
         } else {
             if (registroUtenti.cercaBibliotecarioPerCodice(identificativo) != null) {
-                throw new IllegalArgumentException("Codice identificativo già in uso.");
+                throw new IllegalArgumentException("Identificativo già in uso nel sistema.");
             }
             nuovoUtente = new BibliotecarioFactory().creaUtente(nome, cognome, email, password, identificativo);
         }
@@ -158,8 +158,8 @@ public class GestoreUtenti {
         if (email == null || email.isEmpty()) {
             throw new IllegalArgumentException("L'email è obbligatoria.");
         }
-        if (email.length() > 35) {
-            throw new IllegalArgumentException("Email troppo lunga (max 35 caratteri).");
+        if (email.length() > 255) {
+            throw new IllegalArgumentException("Email troppo lunga (max 255 caratteri).");
         }
         if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
             throw new IllegalArgumentException("Formato email non valido.");
