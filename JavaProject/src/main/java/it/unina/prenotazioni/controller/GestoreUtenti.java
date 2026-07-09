@@ -30,21 +30,18 @@ public class GestoreUtenti {
         return istanza;
     }
 
-    private void verificaValidita(String ruolo, String nome, String password)
-    {
+    private void richiedi(boolean condizione, String messaggio) {
+        if (!condizione) {
+            throw new IllegalArgumentException(messaggio);
+        }
+    }
+
+    private void verificaValidita(String ruolo, String nome, String password) {
         // Controlli con i messaggi attesi dai test di unità (non modificarne le sottostringhe).
-        if (ruolo == null || ruolo.isEmpty() || !verificaRuolo(ruolo)) {
-            throw new IllegalArgumentException("Il ruolo è obbligatorio e valido.");
-        }
-        if (nome == null || nome.isEmpty()) {
-            throw new IllegalArgumentException("Il nome è obbligatorio.");
-        }
-        if (password == null || password.length() < 8) {
-            throw new IllegalArgumentException("La password deve contenere almeno 8 caratteri.");
-        }
-        if (password.length() > 32) {
-            throw new IllegalArgumentException("La password non può superare i 32 caratteri.");
-        }
+        richiedi(ruolo != null && !ruolo.isEmpty() && verificaRuolo(ruolo), "Il ruolo è obbligatorio e valido.");
+        richiedi(nome != null && !nome.isEmpty(), "Il nome è obbligatorio.");
+        richiedi(password != null && password.length() >= 8, "La password deve contenere almeno 8 caratteri.");
+        richiedi(password.length() <= 32, "La password non può superare i 32 caratteri.");
     }
 
     // ------------------------------------------------------------------ UC1
