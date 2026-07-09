@@ -45,7 +45,7 @@ public class GestoreUtenti {
     }
 
     // ------------------------------------------------------------------ UC1
-    public Object registrazione(String ruolo, String nome, String cognome,
+    public UtenteDTO registrazione(String ruolo, String nome, String cognome,
                                 String email, String password, String identificativo) {
         verificaValidita(ruolo, nome, password);
 
@@ -80,7 +80,7 @@ public class GestoreUtenti {
     }
 
     // ------------------------------------------------------------------ UC2
-    public Object autenticazione(String email, String password) {
+    public UtenteDTO autenticazione(String email, String password) {
         Utente utente = registroUtenti.cercaUtentePerEmail(email);
 
         if (utente == null) {
@@ -105,7 +105,7 @@ public class GestoreUtenti {
     }
 
     // -------------------------------------------------------------- UC8 (profilo)
-    public Object visualizzaProfilo(Long idStudente) {
+    public UtenteDTO visualizzaProfilo(Long idStudente) {
         Studente studente = registroUtenti.trovaStudentePerId(idStudente);
         if (studente == null) {
             throw new IllegalArgumentException("Studente non trovato");
