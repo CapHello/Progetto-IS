@@ -11,17 +11,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class SchedulerNotifiche {
 
-    /** Sollecitazione periodica (ogni 60s dopo un ritardo iniziale). */
+    /** Tick periodico (ogni 60s, dopo 60s dall'avvio): prima le scadenze, poi i promemoria. */
     @Scheduled(initialDelay = 60000, fixedDelay = 60000)
     public void esegui() {
         invioNotifica();
         invioPromemoria();
     }
 
+    /** UC16: transizioni automatiche SCADUTA/CONCLUSA con relativa notifica. */
     public void invioNotifica() {
         BibliotecaFacade.getInstance().gestisciTerminePrenotazioni();
     }
 
+    /** UC14: promemoria delle prenotazioni ATTIVE odierne. */
     public void invioPromemoria() {
         BibliotecaFacade.getInstance().inviaPromemoria();
     }

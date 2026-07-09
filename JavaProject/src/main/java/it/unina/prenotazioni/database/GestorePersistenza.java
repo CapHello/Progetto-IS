@@ -6,78 +6,43 @@ import jakarta.persistence.TypedQuery;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * <<database>> Accesso generico alla persistenza (CRUD + query JPQL): lavora per
+ * Class&lt;T&gt; e non conosce le classi di dominio, quindi il layer database non
+ * dipende da nessun altro layer. Ogni operazione apre un proprio EntityManager
+ * (chiuso nel finally) e una propria transazione; sugli errori di scrittura
+ * salva/salvaTutti/elimina fanno rollback e restituiscono false, aggiorna propaga.
+ */
 public class GestorePersistenza {
 
-    /*
-     * Salva nel database un oggetto persistente.
-     *
-     * Il parametro è di tipo Object perché il gestore della persistenza
-     * deve rimanere generico: non deve conoscere direttamente le classi
-     * specifiche del dominio, come Proprietario o Imbarcazione.
-     *
-     * L'oggetto passato deve però essere una Entity, cioè una classe
-     * annotata con @Entity.
-     */
-    // public void salva(Object oggetto) {
+    /** Rende persistente una nuova entity (e le associate via cascade); false se la transazione fallisce. */
     public boolean salva(Object oggetto) {
         EntityManager em = JpaUtil.getInstance().getEntityManager();
 
         try {
-            /*
-             * Ogni operazione che modifica il database deve essere eseguita
-             * all'interno di una transazione.
-             */
             em.getTransaction().begin();
 
-            /*
-             * persist rende l'oggetto gestito da Hibernate.
-             * Al commit della transazione, Hibernate tradurrà l'oggetto
-             * in una riga della tabella corrispondente.
-             */
             em.persist(oggetto);
 
-            /*
-             * Conferma la transazione.
-             * Da questo momento le modifiche diventano effettive nel database.
-             */
             em.getTransaction().commit();
 
             return true;
 
         } catch (RuntimeException e) {
 
-            /*
-             * Se qualcosa va storto durante l'operazione, annulliamo
-             * la transazione per evitare modifiche parziali al database.
-             */
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
 
-            // throw e;
             e.printStackTrace();
             return false;
 
         } finally {
-            /*
-             * L'EntityManager deve essere chiuso dopo l'operazione.
-             * La EntityManagerFactory resta invece aperta e viene chiusa
-             * solo alla fine dell'applicazione.
-             */
             em.close();
         }
     }
 
-    /*
-     * Salva più oggetti nella stessa transazione.
-     *
-     * Questo metodo è utile quando vogliamo rendere persistenti oggetti
-     * collegati tra loro, ad esempio un Proprietario e una o più Imbarcazione.
-     *
-     * Usare una sola transazione è importante: o vengono salvati tutti
-     * gli oggetti, oppure, in caso di errore, non viene salvato nessuno.
-     */
-    // public void salvaTutti(Object... oggetti) {
+    /** Salva più entity in un'unica transazione: o tutte o nessuna. */
     public boolean salvaTutti(Object... oggetti) {
         EntityManager em = JpaUtil.getInstance().getEntityManager();
 
@@ -97,7 +62,6 @@ public class GestorePersistenza {
                 em.getTransaction().rollback();
             }
 
-            // throw e;
             e.printStackTrace();
             return false;
 
@@ -106,23 +70,12 @@ public class GestorePersistenza {
         }
     }
 
-    /*
-     * Cerca un oggetto persistente a partire dalla sua classe e dal suo id.
-     *
-     * Il metodo è generico: può essere usato con qualunque Entity.
-     *
-     * Esempio:
-     * Proprietario p = cercaSalaPerId(Proprietario.class, 1L);
-     */
+    /** Ricerca per chiave primaria; null se non esiste. */
     public <T> T trovaPerId(Class<T> classe, Long id) {
 
         EntityManager em = JpaUtil.getInstance().getEntityManager();
 
         try {
-            /*
-             * find cerca nel database una riga della tabella associata
-             * alla classe indicata, usando l'id come chiave primaria.
-             */
             return em.find(classe, id);
 
         } finally {
@@ -130,10 +83,7 @@ public class GestorePersistenza {
         }
     }
 
-    /*
-     * Cerca tutti gli oggetti persistenti di una certa classe
-     * per cui un campo ha un determinato valore.
-     */
+    /** Entity della classe con campo = valore; il campo supporta percorsi annidati (es. "area.salaStudio.id"). */
     public <T> List<T> cercaPerCampo(Class<T> classe,
             String nomeCampo,
             Object valore) {
@@ -143,10 +93,9 @@ public class GestorePersistenza {
                 Map.of(nomeCampo, valore));
     }
 
-    /*
-     * Cerca tutti gli oggetti persistenti che soddisfano un insieme di condizioni.
-     *
-     * La query JPQL viene costruita nel livello database.
+    /**
+     * Ricerca con più condizioni in AND. La JPQL è costruita dinamicamente ma i valori
+     * sono sempre bindati come parametri (mai concatenati nella stringa).
      */
     public <T> List<T> cercaPerCampi(Class<T> classe,
             Map<String, Object> campi) {
@@ -170,6 +119,7 @@ public class GestorePersistenza {
                         jpql.append(" AND ");
                     }
 
+                    // I punti dei percorsi annidati non sono ammessi nei nomi dei parametri JPQL.
                     String nomeParametro = nomeCampo.replace(".", "_");
 
                     jpql.append("e.")
@@ -197,10 +147,7 @@ public class GestorePersistenza {
         }
     }
 
-    /*
-     * Esegue una query JPQL personalizzata (utile per JOIN o query complesse)
-     * e restituisce una lista di risultati tipizzati.
-     */
+    /** Esegue una JPQL arbitraria (JOIN e query non esprimibili con cercaPerCampi). */
     public <T> List<T> eseguiQueryCustom(String jpql, Class<T> classeRisultato, Map<String, Object> parametri) {
 
         EntityManager em = JpaUtil.getInstance().getEntityManager();
@@ -221,11 +168,7 @@ public class GestorePersistenza {
         }
     }
 
-    /*
-     * Cerca il primo oggetto persistente che soddisfa un insieme di condizioni.
-     *
-     * Se non trova nessun risultato, restituisce null.
-     */
+    /** Primo risultato di cercaPerCampi; null se non ce ne sono. */
     public <T> T cercaPrimoPerCampi(Class<T> classe,
             Map<String, Object> campi) {
 
@@ -238,6 +181,7 @@ public class GestorePersistenza {
         return risultati.get(0);
     }
 
+    /** Aggiorna un'entity esistente (merge); in caso di errore fa rollback e propaga l'eccezione. */
     public <T> T aggiorna(T oggetto) {
 
         EntityManager em = JpaUtil.getInstance().getEntityManager();
@@ -264,6 +208,7 @@ public class GestorePersistenza {
         }
     }
 
+    /** Elimina per chiave primaria; false se l'entity non esiste o la transazione fallisce. */
     public <T> boolean elimina(Class<T> classe, Long id) {
 
         EntityManager em = JpaUtil.getInstance().getEntityManager();
@@ -271,14 +216,8 @@ public class GestorePersistenza {
         try {
             em.getTransaction().begin();
 
-            /*
-             * Cerchiamo nel database l'oggetto da eliminare,
-             * usando la sua classe e il suo id.
-             */
-
             T oggetto = em.find(classe, id);
 
-            // se l'oggetto esiste, lo eliminiamo
             if (oggetto != null) {
                 em.remove(oggetto);
                 em.getTransaction().commit();

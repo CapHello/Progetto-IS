@@ -5,6 +5,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * <<entity>> Zona tipizzata di una sala (es. "silenziosa", "comune") che raggruppa
+ * le postazioni; ogni sala ha sempre almeno l'area di default "comune" (V19).
+ */
 @Entity
 public class Area {
     @Id
@@ -57,9 +61,7 @@ public class Area {
         return disponibili;
     }
 
-    /**
-     * Genera e associa le postazioni all'area.
-     */
+    /** Genera in memoria le postazioni dell'area; la persistenza avviene a cascata (UC3). */
     public void creaPostazioni(int numeroPostazioni) {
         for (int i = 0; i < numeroPostazioni; i++) {
             Postazione p = new Postazione(this);

@@ -11,9 +11,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Gestore (Singleton) delle notifiche. Realizza Observer (entity): a ogni cambio di
- * stato della Prenotazione riceve update() e inoltra il recapito a ServizioNotifiche.
- * Il fornitore concreto (AdapterServizioNotifiche) è iniettato dal boundary.
+ * <<control>> Gestore (Singleton) delle notifiche. Realizza Observer (entity): a ogni
+ * cambio di stato della Prenotazione riceve update() e inoltra il recapito a
+ * ServizioNotifiche. Il fornitore concreto (AdapterServizioNotifiche) è iniettato dal boundary.
  */
 public class GestoreNotifiche implements Observer {
 
@@ -31,6 +31,7 @@ public class GestoreNotifiche implements Observer {
         return istanza;
     }
 
+    /** Iniettato all'avvio da ConfigurazioneNotifiche (boundary): il controller conosce solo l'interfaccia. */
     public void setServizioNotifiche(ServizioNotifiche servizioNotifiche) {
         this.servizioNotifiche = servizioNotifiche;
     }
@@ -57,7 +58,11 @@ public class GestoreNotifiche implements Observer {
         }
     }
 
-    /** UC14: promemoria agli studenti con prenotazione ATTIVA nella giornata corrente. */
+    /**
+     * UC14: promemoria agli studenti con prenotazione ATTIVA nella giornata corrente.
+     * Il flag persistito promemoriaInviato garantisce un solo invio per prenotazione,
+     * anche se lo scheduler richiama il metodo ogni 60 secondi.
+     */
     public void inviaPromemoria() {
         for (Prenotazione p : registroPrenotazioni.getPrenotazioniInScadenza()) {
             if (p.getStato().getStatoEnum() == StatoEnum.ATTIVA && LocalDate.now().equals(p.getData()) && !p.isPromemoriaInviato()) {
@@ -73,6 +78,7 @@ public class GestoreNotifiche implements Observer {
         }
     }
 
+    /** Testo della notifica in funzione dello stato raggiunto dalla prenotazione. */
     private String messaggioPerStato(Prenotazione p) {
         return switch (p.getStato().getStatoEnum()) {
             case ATTIVA -> "La prenotazione #" + p.getId() + " è stata registrata (stato ATTIVA).";
@@ -83,6 +89,7 @@ public class GestoreNotifiche implements Observer {
         };
     }
 
+    /** Converte lo studente nel DTO destinatario delle notifiche. */
     private UtenteDTO toDTO(Studente s) {
         UtenteDTO dto = new UtenteDTO();
         dto.setId(s.getId());

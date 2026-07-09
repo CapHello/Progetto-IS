@@ -2,6 +2,11 @@ package it.unina.prenotazioni.dto;
 
 import java.util.List;
 
+/**
+ * Parameter object di UC3: raccoglie l'intera richiesta di creazione sala (JSON del
+ * front-end, mappato da Spring via @RequestBody). tipologie[i] e postazioniAree[i]
+ * descrivono l'i-esima area; orariApertura/Chiusura coprono i 5 giorni Lunedì-Venerdì.
+ */
 public class CreazioneSalaDTO {
     private String nome;
     private String descrizione;

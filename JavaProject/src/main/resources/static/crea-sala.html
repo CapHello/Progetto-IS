@@ -79,6 +79,8 @@
 
     <script src="app.js"></script>
     <script>
+        // Creazione sala (UC3): form con orari per i 5 giorni e aree dinamiche.
+        // L'invio è in JSON (api(..., true)) perché l'endpoint riceve CreazioneSalaDTO via @RequestBody.
         richiediRuolo('Bibliotecario');
 
         // Converte una grana testuale ("30m", "1h", "1h30m", "90") in minuti.

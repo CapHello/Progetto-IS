@@ -1,5 +1,6 @@
 package it.unina.prenotazioni.dto;
 
+/** Utente per le boundary e per le notifiche: ruolo e identificativo unificano Studente e Bibliotecario. */
 public class UtenteDTO {
     private Long id;
     private String nome;

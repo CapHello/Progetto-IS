@@ -4,51 +4,24 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+/**
+ * <<database>> <<Singleton>> Incapsula l'EntityManagerFactory, oggetto costoso creato
+ * una sola volta dalla persistence unit "prenotazioniPU" (persistence.xml).
+ * Gli EntityManager, al contrario, sono usa-e-getta: uno nuovo per ogni operazione.
+ */
 public class JpaUtil {
 
-    /*
-     * Istanza unica di JpaUtil.
-     *
-     * Questa variabile realizza il cuore del pattern Singleton:
-     * la classe mantiene internamente l'unica istanza disponibile.
-     */
     private static JpaUtil instance;
 
-    /*
-     * EntityManagerFactory condivisa.
-     *
-     * La factory viene creata una sola volta, perché è un oggetto
-     * costoso da inizializzare: legge la persistence unit dal file
-     * persistence.xml e prepara Hibernate per comunicare con il database.
-     */
-    private final EntityManagerFactory emf;
+    private EntityManagerFactory emf;
 
-    /*
-     * Costruttore privato.
-     *
-     * Questo impedisce al resto dell'applicazione di creare oggetti
-     * JpaUtil usando new JpaUtil().
-     *
-     * L'unico modo per ottenere JpaUtil sarà passare dal metodo
-     * statico getInstance().
-     */
     private JpaUtil() {
-        /*
-         * Creiamo la EntityManagerFactory usando la persistence unit
-         * definita nel file persistence.xml.
-         */
         emf = Persistence.createEntityManagerFactory("prenotazioniPU");
+        // Shutdown hook: chiusura pulita della factory alla terminazione della JVM,
+        // registrato qui perché scatti solo se la factory è stata davvero creata.
         Runtime.getRuntime().addShutdownHook(new Thread(this::chiudi));
     }
 
-    /*
-     * Punto di accesso globale all'unica istanza di JpaUtil.
-     *
-     * Se l'istanza non esiste ancora, viene creata.
-     * Se è già stata creata, viene semplicemente restituita.
-     *
-     * Questo metodo completa l'applicazione del pattern Singleton.
-     */
     public static JpaUtil getInstance() {
         if (instance == null) {
             instance = new JpaUtil();
@@ -57,24 +30,12 @@ public class JpaUtil {
         return instance;
     }
 
-    /*
-     * Crea un nuovo EntityManager.
-     *
-     * Attenzione: l'EntityManager non è Singleton.
-     * Ogni operazione di persistenza deve usare un proprio EntityManager,
-     * perché l'EntityManager mantiene lo stato della singola sessione
-     * di lavoro con il database.
-     */
+    /** Nuovo EntityManager: rappresenta la singola sessione di lavoro col database, va chiuso da chi lo usa. */
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
 
-    /*
-     * Chiude la EntityManagerFactory.
-     *
-     * Questo metodo va chiamato alla fine dell'applicazione,
-     * quando non sono più necessarie operazioni di persistenza.
-     */
+    /** Chiude la factory; invocato automaticamente dallo shutdown hook. */
     public void chiudi() {
         emf.close();
     }

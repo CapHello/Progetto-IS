@@ -27,6 +27,7 @@ public class RegistroPrenotazioni {
         return istance;
     }
 
+    /** Salva una nuova prenotazione; false se il salvataggio fallisce. */
     public boolean salvaPrenotazione(Prenotazione prenotazione) {
         return gestorePersistenza.salva(prenotazione);
     }
@@ -36,6 +37,7 @@ public class RegistroPrenotazioni {
         return gestorePersistenza.aggiorna(prenotazione);
     }
 
+    /** Carica una prenotazione per id; null se non esiste. */
     public Prenotazione trovaPerId(Long id) {
         return gestorePersistenza.trovaPerId(Prenotazione.class, id);
     }

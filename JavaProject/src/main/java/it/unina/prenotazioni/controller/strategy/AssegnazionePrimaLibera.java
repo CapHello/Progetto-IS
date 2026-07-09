@@ -4,19 +4,18 @@ import it.unina.prenotazioni.entity.Postazione;
 
 import java.util.List;
 
+/** Strategia concreta: assegna la prima postazione della lista dei posti liberi. */
 public class AssegnazionePrimaLibera implements StrategiaAssegnazione {
+
+    /**
+     * La lista ricevuta è già verificata come libera al momento della chiamata
+     * (GestorePrenotazioni la ricalcola dentro il blocco synchronized di UC7).
+     */
     @Override
     public Postazione selezionaPostazione(List<Postazione> postazioniDisponibili) {
-        /**
-         * @param postazioniDisponibili lista di postazioni GIA' verificate come libere
-         *        nell'istante della chiamata;
-         *        (in GestorePrenotazioni ciò avviene ricalcolandola dentro il blocco synchronized).
-         *        Non è thread-safe
-         */
         if (postazioniDisponibili == null || postazioniDisponibili.isEmpty()) {
             return null;
         }
-        // Restituisce la prima postazione libera che incontra nell'elenco
         return postazioniDisponibili.getFirst();
     }
 }

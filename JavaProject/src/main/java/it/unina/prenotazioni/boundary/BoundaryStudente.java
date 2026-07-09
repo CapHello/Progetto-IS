@@ -14,11 +14,13 @@ import java.util.List;
 @RequestMapping("/api/studente")
 public class BoundaryStudente {
 
+    /** UC8: profilo personale dello studente. */
     @GetMapping("/{idStudente}/profilo")
     public UtenteDTO visualizzaProfiloPersonale(@PathVariable("idStudente") Long idStudente) {
         return BibliotecaFacade.getInstance().visualizzaProfiloPersonale(idStudente);
     }
 
+    /** UC12: storico completo delle prenotazioni dello studente. */
     @GetMapping("/{idStudente}/storico")
     public List<PrenotazioneDTO> consultaStoricoPrenotazioni(@PathVariable("idStudente") Long idStudente) {
         return BibliotecaFacade.getInstance().consultaStoricoPrenotazioni(idStudente);

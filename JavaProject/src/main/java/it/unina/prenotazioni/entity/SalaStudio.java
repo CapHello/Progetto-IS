@@ -6,6 +6,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * <<entity>> Radice dell'aggregato Sala Studio (Aree, Postazioni, Fasce orarie).
+ * L'eliminazione (UC4) è un soft delete tramite il flag {@code attiva}, per
+ * preservare lo storico delle prenotazioni.
+ */
 @Entity
 public class SalaStudio {
     @Id
@@ -22,6 +27,8 @@ public class SalaStudio {
     @OneToMany(mappedBy = "salaStudio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Area> aree = new ArrayList<>();
 
+    // Slot prenotabili (unione di tutti i giorni). EAGER: le sale sono usate detached
+    // in UC6/UC7; il cascade PERSIST salva le fasce insieme alla sala in un'unica transazione.
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "sala_slot_prenotabili",
@@ -30,7 +37,8 @@ public class SalaStudio {
     )
     private List<FasciaOraria> slotOrario = new ArrayList<>();
 
-    // Associazione Molti-A-Molti per l'orario lavorativo
+    // Orario di apertura/chiusura per giorno. @OrderColumn rende la lista indicizzata:
+    // l'ordine di inserimento è garantito anche dopo il reload (0 = Lunedì … 4 = Venerdì).
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "sala_orari_lavorativi",
@@ -71,6 +79,7 @@ public class SalaStudio {
         slotOrario.add(fascia);
     }
 
+    /** Aggiunge l'orario lavorativo del giorno successivo (max 5, Lunedì-Venerdì). */
     public void addOrarioLavorativo(FasciaOraria fascia) {
         if (this.orarioLavorativo.size() >= 5) {
             throw new IllegalStateException("Impossibile aggiungere un altro orario: limite massimo di 5 orari lavorativi raggiunto per questa sala.");
@@ -79,13 +88,10 @@ public class SalaStudio {
     }
 
     /**
-     * Aggiunge alla sala (in memoria) una nuova Area con la tipologia indicata e
-     * numPostazioni postazioni, collegate sia all'area sia alla sala (per il cascade in
-     * creazione). Usata nel ciclo di CreaSalaStudio, una chiamata per ogni area indicata
-     * dal bibliotecario. Verifica che l'area abbia almeno una postazione (V04) e che il
-     * totale assegnato non superi la capienza della sala.
+     * Aggiunge (in memoria) una nuova Area con le sue postazioni; la persistenza avviene
+     * a cascata col salvataggio della sala (UC3). Verifica V04 (almeno una postazione)
+     * e che il totale assegnato non superi la capienza della sala.
      */
-
     public Area aggiungiArea(String tipologia, int numPostazioni) {
         if (numPostazioni < 1) {
             throw new IllegalArgumentException("Ogni area deve contenere almeno una postazione (V04)");
@@ -148,8 +154,9 @@ public class SalaStudio {
         return null;
     }
 
-    /** * V06: Fasce orarie prenotabili per la data indicata.
-     * Filtra gli slot generici della sala facendoli combaciare con l'orario del giorno.
+    /**
+     * Fasce prenotabili per la data indicata (V06): filtra gli slot della sala
+     * tenendo solo quelli interni all'orario lavorativo del giorno specifico.
      */
     public List<FasciaOraria> getFasceOrariePrestabilite(LocalDate data) {
         FasciaOraria orarioDelGiorno = getOrarioLavorativoPerData(data);

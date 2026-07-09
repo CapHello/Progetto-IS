@@ -1,5 +1,6 @@
 package it.unina.prenotazioni.dto;
 
+/** Postazione nel dettaglio sala: posizione nell'area e disponibilità per la (data, fascia) richiesta. */
 public class PostazioneDTO {
     private Long id;
     private int numero;          // numero d'ordine del posto nell'area (1..N), per la GUI

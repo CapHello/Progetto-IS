@@ -2,6 +2,7 @@ package it.unina.prenotazioni.entity.state;
 
 import it.unina.prenotazioni.entity.Prenotazione;
 
+/** Stato terminale (Singleton): prenotazione annullata, nessuna transizione ammessa. */
 public class StatoAnnullata implements StatoPrenotazione {
 
     private static StatoAnnullata istanza;

@@ -3,6 +3,10 @@ package it.unina.prenotazioni.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * <<entity>> Generalizzazione degli attori registrati (Studente, Bibliotecario).
+ * Strategia JOINED: una tabella per la superclasse e una per ogni sottoclasse.
+ */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Utente{
@@ -22,7 +26,7 @@ public abstract class Utente{
     private int tentativiFalliti;
     private LocalDateTime bloccatoFinoA;
 
-    protected Utente() {/* Vuoto perché utilizziamo il Factory Method @Antonio Cacciatore*/}
+    protected Utente() { /* Costruttore vuoto richiesto da JPA: l'istanza nasce dalle Factory (UC1). */ }
 
     // Getters and Setters
     public Long getId() { return id; }

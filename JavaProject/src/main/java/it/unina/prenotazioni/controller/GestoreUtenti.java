@@ -8,9 +8,9 @@ import it.unina.prenotazioni.entity.*;
 import java.time.LocalDateTime;
 
 /**
- * Gestore (Singleton) responsabile di Registrazione (UC1) e Autenticazione (UC2).
- * Usa le Factory per creare la sottoclasse corretta di Utente e RegistroUtenti per la
- * persistenza. Gestisce inoltre tentativi falliti e blocco temporaneo (V21).
+ * <<control>> Gestore (Singleton) di Registrazione (UC1), Autenticazione (UC2) e
+ * profilo personale (UC8). Usa le Factory per creare la sottoclasse corretta di
+ * Utente e gestisce tentativi falliti e blocco temporaneo dell'account (V21).
  */
 public class GestoreUtenti {
 
@@ -30,14 +30,16 @@ public class GestoreUtenti {
         return istanza;
     }
 
+    /** Guardia di validazione: lancia IllegalArgumentException col messaggio dato se la condizione è falsa. */
     private void richiedi(boolean condizione, String messaggio) {
         if (!condizione) {
             throw new IllegalArgumentException(messaggio);
         }
     }
 
+    /** Controlli comuni a entrambi i ruoli: ruolo ammesso, nome presente, password 8-32 caratteri. */
     private void verificaValidita(String ruolo, String nome, String password) {
-        // Controlli con i messaggi attesi dai test di unità (non modificarne le sottostringhe).
+        // I messaggi sono attesi dai test di unità: non modificarne le sottostringhe.
         richiedi(ruolo != null && !ruolo.isEmpty() && verificaRuolo(ruolo), "Il ruolo è obbligatorio e valido.");
         richiedi(nome != null && !nome.isEmpty(), "Il nome è obbligatorio.");
         richiedi(password != null && password.length() >= 8, "La password deve contenere almeno 8 caratteri.");
@@ -45,6 +47,10 @@ public class GestoreUtenti {
     }
 
     // ------------------------------------------------------------------ UC1
+    /**
+     * Valida i dati (V12-V14, V20), verifica l'unicità di email e identificativo,
+     * crea l'utente tramite la Factory del ruolo e lo persiste.
+     */
     public UtenteDTO registrazione(String ruolo, String nome, String cognome,
                                 String email, String password, String identificativo) {
         verificaValidita(ruolo, nome, password);
@@ -80,6 +86,11 @@ public class GestoreUtenti {
     }
 
     // ------------------------------------------------------------------ UC2
+    /**
+     * Verifica le credenziali; dopo 5 tentativi falliti blocca temporaneamente
+     * l'account per 15 minuti (V21). L'errore è sempre generico ("Credenziali errate")
+     * per non rivelare quali email sono registrate.
+     */
     public UtenteDTO autenticazione(String email, String password) {
         Utente utente = registroUtenti.cercaUtentePerEmail(email);
 
@@ -105,6 +116,7 @@ public class GestoreUtenti {
     }
 
     // -------------------------------------------------------------- UC8 (profilo)
+    /** Profilo personale dello studente (dati anagrafici e totale accessi). */
     public UtenteDTO visualizzaProfilo(Long idStudente) {
         Studente studente = registroUtenti.trovaStudentePerId(idStudente);
         if (studente == null) {
@@ -181,6 +193,7 @@ public class GestoreUtenti {
         utente.setBloccatoFinoA(null);
     }
 
+    /** Converte l'entity nel DTO, ricavando ruolo e identificativo dalla sottoclasse concreta. */
     private UtenteDTO toDTO(Utente utente) {
         UtenteDTO dto = new UtenteDTO();
         dto.setId(utente.getId());
