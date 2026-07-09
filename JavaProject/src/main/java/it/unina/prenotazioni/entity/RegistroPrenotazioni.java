@@ -31,6 +31,7 @@ public class RegistroPrenotazioni {
         return gestorePersistenza.salva(prenotazione);
     }
 
+    /** Aggiorna i dati di una Prenotazione esistente nel database. */
     public Prenotazione aggiorna(Prenotazione prenotazione) {
         return gestorePersistenza.aggiorna(prenotazione);
     }
@@ -77,11 +78,6 @@ public class RegistroPrenotazioni {
             }
         }
         return risultato;
-    }
-
-    /** Aggiorna i dati di una Prenotazione esistente nel database. */
-    public void aggiornaPrenotazione(Prenotazione prenotazione) {
-        gestorePersistenza.aggiorna(prenotazione);
     }
 
     /** Tutte le prenotazioni (qualsiasi stato) che insistono su postazioni di una sala. */

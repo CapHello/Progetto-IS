@@ -155,7 +155,7 @@ public class GestoreSale {
             if (RegistroPrenotazioni.occupaSlot(p)) {
 
                 p.criticalAnnullaPrenotazione();
-                registroPrenotazioni.aggiornaPrenotazione(p);
+                registroPrenotazioni.aggiorna(p);
 
                 if (p.getStudente() != null) {
                     destinatari.add(toUtenteDTO(p.getStudente()));
