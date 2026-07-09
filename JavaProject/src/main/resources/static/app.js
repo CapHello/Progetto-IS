@@ -1,10 +1,11 @@
-// Helper condivisi per il dialogo con l'API REST e la gestione della sessione.
+// Helper condivisi da tutte le pagine: dialogo con l'API REST e "sessione" lato client.
 const API = '/api';
 
 /**
- * Chiamata REST generica. I parametri sono inviati come query (GET/DELETE) o come
- * form url-encoded (POST/PUT). In caso di errore lancia un'eccezione con il messaggio
- * restituito dal backend ({"errore": "..."}).
+ * Chiamata REST generica. I parametri viaggiano come query string (GET/DELETE),
+ * come form url-encoded (POST/PUT) o, con isJson = true, come corpo JSON
+ * (usato da /sale/crea, il cui endpoint riceve un DTO via @RequestBody).
+ * In caso di errore lancia un'eccezione col messaggio del backend ({"errore": "..."}).
  */
 async function api(method, path, params, isJson = false) {
   const opts = { method, headers: {} };
@@ -48,7 +49,8 @@ async function api(method, path, params, isJson = false) {
   return dati;
 }
 
-// --- Sessione (lato client) ---
+// --- "Sessione" lato client: l'utente loggato vive in sessionStorage (per scheda,
+// --- svuotato alla chiusura); il backend resta stateless, senza sessioni server.
 function salvaUtente(u) { sessionStorage.setItem('utente', JSON.stringify(u)); }
 function getUtente() {
   const s = sessionStorage.getItem('utente');
@@ -63,6 +65,7 @@ function richiediRuolo(ruolo) {
   return u;
 }
 
+/** Scrive (o azzera, se il messaggio è vuoto) il testo d'errore nell'elemento indicato. */
 function mostraErrore(id, messaggio) {
   const el = document.getElementById(id);
   if (el) el.textContent = messaggio || '';

@@ -2,6 +2,10 @@ package it.unina.prenotazioni.entity.state;
 
 import it.unina.prenotazioni.entity.Prenotazione;
 
+/**
+ * Check-in effettuato (Singleton): non è più annullabile né riconfermabile;
+ * a fine fascia gestisciTermine la porta in CONCLUSA.
+ */
 public class StatoConfermata implements StatoPrenotazione {
 
     private static StatoConfermata istanza;

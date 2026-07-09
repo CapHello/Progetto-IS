@@ -2,6 +2,7 @@ package it.unina.prenotazioni.entity.state;
 
 import it.unina.prenotazioni.entity.Prenotazione;
 
+/** Stato terminale (Singleton): fascia terminata dopo il check-in, nessuna transizione ammessa. */
 public class StatoConclusa implements StatoPrenotazione {
 
     private static StatoConclusa istanza;

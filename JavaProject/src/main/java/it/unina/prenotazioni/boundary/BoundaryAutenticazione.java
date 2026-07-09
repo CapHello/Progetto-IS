@@ -13,17 +13,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class BoundaryAutenticazione {
 
+    /** UC1: registrazione di uno Studente o Bibliotecario (parametri form url-encoded). */
     @PostMapping("/registrazione")
     public UtenteDTO registrazione(@RequestParam("ruolo") String ruolo,
                                    @RequestParam("nome") String nome,
                                    @RequestParam("cognome") String cognome,
-                                   @RequestParam("email") String email, //@RequestParam è risultato necessario per rendere l'applicazione più portabile
+                                   @RequestParam("email") String email,
                                    @RequestParam("password") String password,
                                    @RequestParam("identificativo") String identificativo) {
         return BibliotecaFacade.getInstance()
                 .registrazione(ruolo, nome, cognome, email, password, identificativo);
     }
 
+    /** UC2: login con email istituzionale e password. */
     @PostMapping("/login")
     public UtenteDTO autenticazione(@RequestParam("email") String email,
                                     @RequestParam("password") String password) {

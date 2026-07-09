@@ -4,6 +4,7 @@ import it.unina.prenotazioni.entity.Bibliotecario;
 import it.unina.prenotazioni.entity.Utente;
 
 
+/** Creator concreto del Factory Method: costruisce e popola un Bibliotecario (identificativo = codice interno). */
 public class BibliotecarioFactory implements UtenteFactory {
     @Override
     public Utente creaUtente(String nome, String cognome, String email, String password, String identificativo) {

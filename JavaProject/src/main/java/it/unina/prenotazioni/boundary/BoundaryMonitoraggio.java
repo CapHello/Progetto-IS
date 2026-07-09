@@ -17,16 +17,19 @@ import java.util.List;
 @RequestMapping("/api/monitoraggio")
 public class BoundaryMonitoraggio {
 
+    /** UC11: stato in tempo reale di tutte le sale. */
     @GetMapping("/sale")
     public List<SalaMonitoraggioDTO> monitoraSale() {
         return BibliotecaFacade.getInstance().monitoraSale();
     }
 
+    /** UC5: prenotazioni occupanti della giornata per la sala indicata. */
     @GetMapping("/prenotazioni/{idSalaStudio}")
     public List<PrenotazioneDTO> monitoraPrenotazioni(@PathVariable("idSalaStudio") Long idSalaStudio) {
         return BibliotecaFacade.getInstance().monitoraPrenotazioni(idSalaStudio);
     }
 
+    /** UC13: statistiche di servizio della giornata. */
     @GetMapping("/statistiche")
     public StatisticheDTO monitoraStatisticheServizio() {
         return BibliotecaFacade.getInstance().monitoraStatisticheServizio();

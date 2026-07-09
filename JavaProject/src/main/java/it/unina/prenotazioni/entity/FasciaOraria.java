@@ -3,6 +3,10 @@ package it.unina.prenotazioni.entity;
 import jakarta.persistence.*;
 import java.time.LocalTime;
 
+/**
+ * <<entity>> Intervallo orario riusabile: rappresenta sia gli slot prenotabili
+ * sia gli orari lavorativi giornalieri delle sale (associazioni molti-a-molti).
+ */
 @Entity
 public class FasciaOraria {
     @Id
@@ -28,7 +32,7 @@ public class FasciaOraria {
     public LocalTime getOraFine() { return oraFine; }
     public void setOraFine(LocalTime oraFine) { this.oraFine = oraFine; }
 
-    // utilizzato per sfruttora l'equals già implementato e standard dell'ogetto String nativo di Java
+    /** Etichetta "HH:mm-HH:mm": chiave testuale per confronti tra fasce (equals di String) e per la GUI. */
     public String getEtichetta() {
         return String.format("%02d:%02d-%02d:%02d",
                 oraInizio.getHour(), oraInizio.getMinute(),

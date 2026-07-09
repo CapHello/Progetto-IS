@@ -3,6 +3,10 @@ package it.unina.prenotazioni.entity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+/**
+ * <<entity>> Singolo posto a sedere prenotabile; appartiene a un'Area e non ha
+ * stato proprio: la sua disponibilità è derivata dalle prenotazioni che la impegnano.
+ */
 @Entity
 public class Postazione {
     @Id
@@ -28,6 +32,7 @@ public class Postazione {
     public void setArea(Area area) { this.area = area; }
 
 
+    /** Sala di appartenenza, raggiunta navigando l'area. */
     public SalaStudio getSalaStudio() {
         if (this.area != null) {
             return this.area.getSalaStudio();

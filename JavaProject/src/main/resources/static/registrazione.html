@@ -48,6 +48,8 @@
 
     <script src="app.js"></script>
     <script>
+        // Registrazione (UC1): raccoglie i campi del form e li invia al backend;
+        // la validazione vera è lato server (GestoreUtenti), qui si mostra solo l'esito.
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             mostraErrore('errore', '');

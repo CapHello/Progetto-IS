@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Gestore (Singleton) delle Sale Studio: creazione (UC3), eliminazione (UC4),
+ * <<control>> Gestore (Singleton) delle Sale Studio: creazione (UC3), eliminazione (UC4),
  * consultazione disponibilità (UC6), dettaglio postazioni e monitoraggio sale (UC11).
  */
 public class GestoreSale {
@@ -42,9 +42,11 @@ public class GestoreSale {
     }
 
     // ------------------------------------------------------------------ UC3
-    // La creazione della sala include la definizione delle aree (ciclo dello scenario
-    // CreaSalaStudio): tipologie[i] + postazioniAree[i] descrivono le aree; le postazioni
-    // non assegnate confluiscono nell'area di default "comune".
+    /**
+     * Crea la sala col suo intero aggregato: orari lavorativi, slot prenotabili e aree
+     * (tipologie[i] + postazioniAree[i]; le postazioni non assegnate confluiscono
+     * nell'area di default "comune"). Il salvataggio è unico e a cascata.
+     */
     public SalaStudioDTO creaSalaStudio(CreazioneSalaDTO richiestaCreazione) {
 
         //verifica input
@@ -70,6 +72,8 @@ public class GestoreSale {
     }
 
     // ------------------------------------------------------------------ helper per UC3
+
+    /** Le liste orari devono coprire esattamente i 5 giorni lavorativi (Lunedì-Venerdì). */
     private void verificaValiditaListeOrari(List<String> orariApertura, List<String> orariChiusura) {
         if (orariApertura == null || orariChiusura == null ||
                 orariApertura.size() != 5 || orariChiusura.size() != 5) {
@@ -77,6 +81,10 @@ public class GestoreSale {
         }
     }
 
+    /**
+     * Registra i 5 orari lavorativi (l'ordine di inserimento definisce il giorno: 0=Lunedì…4=Venerdì)
+     * e genera gli slot prenotabili, deduplicati per etichetta tra i giorni.
+     */
     private void configuraOrariESlot(List<String> orariApertura, List<String> orariChiusura, int granaMinuti, SalaStudio sala) {
         Map<String, FasciaOraria> slotUnivoci = new HashMap<>();
 
@@ -101,6 +109,7 @@ public class GestoreSale {
         }
     }
 
+    /** Crea le aree richieste e l'area "comune" con le postazioni rimanenti (V19). */
     private static void configuraAree(int numeroPostazioni, List<String> tipi, List<Integer> posti, SalaStudio sala) {
         // Aree specifiche indicate dal bibliotecario.
         int sommaAree = getSommaAree(numeroPostazioni, tipi, posti);
@@ -114,6 +123,7 @@ public class GestoreSale {
         }
     }
 
+    /** Valida le aree richieste (nome obbligatorio, "comune" riservato, V04) e ne somma le postazioni. */
     private static int getSommaAree(int numeroPostazioni, List<String> tipi, List<Integer> posti) {
         int sommaAree = 0;
         for (int i = 0; i < tipi.size(); i++) {
@@ -138,6 +148,10 @@ public class GestoreSale {
     }
 
     // ------------------------------------------------------------------ UC4
+    /**
+     * Soft delete: disattiva la sala (lo storico resta), annulla forzatamente le
+     * prenotazioni che occupano slot e notifica gli studenti coinvolti.
+     */
     public void eliminaSalaStudio(Long idSalaStudio) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSalaStudio);
         if (sala == null) {
@@ -169,6 +183,7 @@ public class GestoreSale {
     }
 
     // ------------------------------------------------------------------ UC6
+    /** Sale attive, aperte nella data e con almeno un posto libero. */
     public List<SalaStudioDTO> consultazioneSaleDisponibili(LocalDate data) {
         List<SalaStudioDTO> risultato = new ArrayList<>();
         for (SalaStudio sala : registroSale.getSaleDisponibili(data)) {
@@ -177,6 +192,7 @@ public class GestoreSale {
         return risultato;
     }
 
+    /** Fasce prenotabili nella data con conteggio dei posti liberi (wizard di prenotazione, step 2). */
     public List<FasciaDisponibileDTO> getFasceDisponibili(Long idSala, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null) {
@@ -318,6 +334,8 @@ public class GestoreSale {
         return dto;
     }
     // ------------------------------------------------------------------ helper
+
+    /** Somma i posti liberi di tutte le aree della sala per (data, fascia). */
     private int contaPostiDisponibili(Long idSala, LocalDate data, FasciaOraria fascia) {
         int posti = 0;
         for (Area area : registroSale.getAreePerSala(idSala)) {
@@ -326,6 +344,7 @@ public class GestoreSale {
         return posti;
     }
 
+    /** Validazioni di formato per la creazione: nome, descrizione, capienza e grana degli slot. */
     private void verificaValiditaDati(String nome, String descrizione, int numeroPostazioni, int granaMinuti) {
         if (nome == null || !nome.matches("[\\p{L}0-9 ]{1,50}")) {
             throw new IllegalArgumentException("Nome sala non valido (1-50 caratteri, senza simboli speciali)");
@@ -341,6 +360,7 @@ public class GestoreSale {
         }
     }
 
+    /** Converte "HH:mm" in LocalTime traducendo gli errori di formato in messaggi per la GUI. */
     private LocalTime parseOrario(String orario) {
         try {
             return LocalTime.parse(orario);
@@ -349,12 +369,16 @@ public class GestoreSale {
         }
     }
 
+    /**
+     * Divide l'orario di apertura in slot consecutivi di grana fissa; l'eventuale resto
+     * finale viene scartato. La condizione fine.isAfter(inizio) ferma il ciclo se
+     * l'aggiunta dei minuti supera la mezzanotte (LocalTime è circolare).
+     */
     private List<FasciaOraria> generaSlot(LocalTime apertura, LocalTime chiusura, int grana) {
         List<FasciaOraria> slot = new ArrayList<>();
         LocalTime inizio = apertura;
         LocalTime fine = inizio.plusMinutes(grana);
         while (fine.isAfter(inizio) && !fine.isAfter(chiusura)) {
-            // Rimosso il parametro 'sala', ora usiamo il costruttore corretto di FasciaOraria
             slot.add(new FasciaOraria(inizio, fine));
             inizio = fine;
             fine = inizio.plusMinutes(grana);
@@ -362,6 +386,7 @@ public class GestoreSale {
         return slot;
     }
 
+    /** Converte l'entity nel DTO per le boundary (nessun tipo entity attraversa il confine). */
     private SalaStudioDTO toDTO(SalaStudio sala) {
         SalaStudioDTO dto = new SalaStudioDTO();
         dto.setId(sala.getId());
@@ -370,7 +395,7 @@ public class GestoreSale {
         dto.setNumeroPostazioniTotali(sala.getNumeroPostazioniTotali());
         dto.setAttiva(sala.isAttiva());
 
-        // Peschiamo dal DB in modo sicuro
+        // Le fasce si rileggono dal registro: si espongono solo quelle effettivamente persistite.
         List<String> fasce = new ArrayList<>();
         for (FasciaOraria f : registroSale.getFascePerSala(sala.getId())) {
             fasce.add(f.getEtichetta());
@@ -380,6 +405,7 @@ public class GestoreSale {
         return dto;
     }
 
+    /** DTO di una postazione per il dettaglio sala; il numero è la posizione (1..N) nell'area. */
     private PostazioneDTO toPostazioneDTO(Postazione p, String tipologiaArea, boolean disponibile, int numero) {
         PostazioneDTO dto = new PostazioneDTO();
         dto.setId(p.getId());
@@ -389,6 +415,7 @@ public class GestoreSale {
         return dto;
     }
 
+    /** Converte lo studente nel DTO destinatario delle notifiche. */
     private UtenteDTO toUtenteDTO(Studente s) {
         UtenteDTO dto = new UtenteDTO();
         dto.setId(s.getId());

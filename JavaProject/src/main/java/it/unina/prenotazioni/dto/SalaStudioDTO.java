@@ -2,6 +2,7 @@ package it.unina.prenotazioni.dto;
 
 import java.util.List;
 
+/** Rappresentazione di una sala per le boundary (UC3, UC6): dati anagrafici e fasce prenotabili. */
 public class SalaStudioDTO {
     private Long id;
     private String nome;
