@@ -54,12 +54,9 @@ public class GestoreSale {
                                  List<String> orariApertura, List<String> orariChiusura, int granaMinuti,
                                  List<String> tipologie, List<Integer> postazioniAree) {
 
+        //verifica input
         verificaValiditaDati(nome, descrizione, numeroPostazioni, granaMinuti);
-
-        if (orariApertura == null || orariChiusura == null ||
-                orariApertura.size() != 5 || orariChiusura.size() != 5) {
-            throw new IllegalArgumentException("Devi fornire esattamente 5 orari di apertura e chiusura (dal Lunedì al Venerdì).");
-        }
+        verificaValiditaListeOrari(orariApertura, orariChiusura);
 
         List<String> tipi = (tipologie != null) ? tipologie : new ArrayList<>();
         List<Integer> posti = (postazioniAree != null) ? postazioniAree : new ArrayList<>();
@@ -67,8 +64,27 @@ public class GestoreSale {
             throw new IllegalArgumentException("Dati delle aree incoerenti (tipologie e postazioni non corrispondono)");
         }
 
+        //Instanziazione
         SalaStudio sala = new SalaStudio(nome, descrizione, numeroPostazioni);
 
+        //configurazione
+        configuraOrariESlot(orariApertura, orariChiusura, granaMinuti, sala);
+        configuraAree(numeroPostazioni, tipi, posti, sala);
+
+        //Persistenza
+        registroSale.salvaSala(sala);
+        return toDTO(sala);
+    }
+
+    // ------------------------------------------------------------------ helper per UC3
+    private void verificaValiditaListeOrari(List<String> orariApertura, List<String> orariChiusura) {
+        if (orariApertura == null || orariChiusura == null ||
+                orariApertura.size() != 5 || orariChiusura.size() != 5) {
+            throw new IllegalArgumentException("Devi fornire esattamente 5 orari di apertura e chiusura (dal Lunedì al Venerdì).");
+        }
+    }
+
+    private void configuraOrariESlot(List<String> orariApertura, List<String> orariChiusura, int granaMinuti, SalaStudio sala) {
         Map<String, FasciaOraria> slotUnivoci = new HashMap<>();
 
         for (int i = 0; i < 5; i++) {
@@ -92,7 +108,9 @@ public class GestoreSale {
                 }
             }
         }
+    }
 
+    private static void configuraAree(int numeroPostazioni, List<String> tipi, List<Integer> posti, SalaStudio sala) {
         // Aree specifiche indicate dal bibliotecario.
         int sommaAree = getSommaAree(numeroPostazioni, tipi, posti);
 
@@ -103,10 +121,6 @@ public class GestoreSale {
         if (rimanenti > 0) {
             sala.creaAreaDefault(rimanenti);
         }
-
-        //Persistenza
-        registroSale.salvaSala(sala);
-        return toDTO(sala);
     }
 
     private static int getSommaAree(int numeroPostazioni, List<String> tipi, List<Integer> posti) {
