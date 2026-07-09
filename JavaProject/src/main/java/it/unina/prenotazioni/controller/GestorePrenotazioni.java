@@ -44,9 +44,7 @@ public class GestorePrenotazioni {
     private StrategiaAssegnazione strategiaAssegnazione;
 
 
-    private GestorePrenotazioni() {
-        this.strategiaAssegnazione = new AssegnazionePrimaLibera(); // la parte è creata dal tutto (composizione)
-    }
+    private GestorePrenotazioni() {}
 
     public static GestorePrenotazioni getInstance() {
         if (istanza == null) {
@@ -168,7 +166,6 @@ public class GestorePrenotazioni {
             prenotazione.setFasciaOraria(fascia);
             prenotazione.setPostazione(postazione);
             prenotazione.setStudente(studente);          // aggiorna il profilo (associazione effettua)
-            prenotazione.attach(GestoreNotifiche.getInstance());
             prenotazione.setStato(StatoAttiva.getInstance());
 
             boolean esito = registroPrenotazioni.salvaPrenotazione(prenotazione);
@@ -176,6 +173,8 @@ public class GestorePrenotazioni {
 
             // 7 dovrei notificare gli utenti, ma questo comportamento è già modellato all'interno di setStato() di prenotazione
             if (esito){
+                prenotazione.attach(GestoreNotifiche.getInstance());
+                prenotazione.notifyObservers();
                 return toDTO(prenotazione);
             }
             else{
@@ -384,9 +383,6 @@ public class GestorePrenotazioni {
             return scelta;
         }
         // Assegnazione automatica (Strategy: prima libera).
-        if (disponibili.isEmpty()) {
-            throw new IllegalStateException("Nessuna postazione disponibile per l'area e la fascia selezionate");
-        }
         return strategiaAssegnazione.selezionaPostazione(disponibili);
     }
 
