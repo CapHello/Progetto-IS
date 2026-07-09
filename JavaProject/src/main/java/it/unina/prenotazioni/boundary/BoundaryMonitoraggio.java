@@ -1,6 +1,8 @@
 package it.unina.prenotazioni.boundary;
 
 import it.unina.prenotazioni.controller.BibliotecaFacade;
+import it.unina.prenotazioni.dto.PrenotazioneDTO;
+import it.unina.prenotazioni.dto.SalaMonitoraggioDTO;
 import it.unina.prenotazioni.dto.StatisticheDTO;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,17 +18,17 @@ import java.util.List;
 public class BoundaryMonitoraggio {
 
     @GetMapping("/sale")
-    public List<Object> monitoraSale() {
+    public List<SalaMonitoraggioDTO> monitoraSale() {
         return BibliotecaFacade.getInstance().monitoraSale();
     }
 
     @GetMapping("/prenotazioni/{idSalaStudio}")
-    public List<Object> monitoraPrenotazioni(@PathVariable("idSalaStudio") Long idSalaStudio) {
+    public List<PrenotazioneDTO> monitoraPrenotazioni(@PathVariable("idSalaStudio") Long idSalaStudio) {
         return BibliotecaFacade.getInstance().monitoraPrenotazioni(idSalaStudio);
     }
 
     @GetMapping("/statistiche")
     public StatisticheDTO monitoraStatisticheServizio() {
-        return (StatisticheDTO) BibliotecaFacade.getInstance().monitoraStatisticheServizio();
+        return BibliotecaFacade.getInstance().monitoraStatisticheServizio();
     }
 }

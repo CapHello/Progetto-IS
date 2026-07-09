@@ -20,13 +20,13 @@ public class BoundaryAutenticazione {
                                    @RequestParam("email") String email, //@RequestParam è risultato necessario per rendere l'applicazione più portabile
                                    @RequestParam("password") String password,
                                    @RequestParam("identificativo") String identificativo) {
-        return (UtenteDTO) BibliotecaFacade.getInstance()
+        return BibliotecaFacade.getInstance()
                 .registrazione(ruolo, nome, cognome, email, password, identificativo);
     }
 
     @PostMapping("/login")
     public UtenteDTO autenticazione(@RequestParam("email") String email,
                                     @RequestParam("password") String password) {
-        return (UtenteDTO) BibliotecaFacade.getInstance().autenticazione(email, password);
+        return BibliotecaFacade.getInstance().autenticazione(email, password);
     }
 }

@@ -169,20 +169,20 @@ public class GestoreSale {
     }
 
     // ------------------------------------------------------------------ UC6
-    public List<Object> consultazioneSaleDisponibili(LocalDate data) {
-        List<Object> risultato = new ArrayList<>();
+    public List<SalaStudioDTO> consultazioneSaleDisponibili(LocalDate data) {
+        List<SalaStudioDTO> risultato = new ArrayList<>();
         for (SalaStudio sala : registroSale.getSaleDisponibili(data)) {
             risultato.add(toDTO(sala));
         }
         return risultato;
     }
 
-    public List<Object> getFasceDisponibili(Long idSala, LocalDate data) {
+    public List<FasciaDisponibileDTO> getFasceDisponibili(Long idSala, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null) {
             throw new IllegalArgumentException("Sala studio non trovata");
         }
-        List<Object> risultato = new ArrayList<>();
+        List<FasciaDisponibileDTO> risultato = new ArrayList<>();
         if (!sala.verificaDataInGiorniApertura(data)) {
             return risultato;
         }
@@ -210,7 +210,7 @@ public class GestoreSale {
     }
 
     /** Dettaglio aree/postazioni di una sala per (data, fascia) (wizard step 3-4). */
-    public Object selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
+    public DettaglioSalaDTO selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null) {
             throw new IllegalArgumentException("Sala studio non trovata");
@@ -252,9 +252,9 @@ public class GestoreSale {
      * da prenotazioni ATTIVE (non confermate) e CONFERMATE nella giornata corrente, più le
      * tipologie di area presenti.
      */
-    public List<Object> monitoraSale() {
+    public List<SalaMonitoraggioDTO> monitoraSale() {
         LocalDate oggi = LocalDate.now(ZoneId.of("Europe/Rome"));
-        List<Object> risultato = new ArrayList<>();
+        List<SalaMonitoraggioDTO> risultato = new ArrayList<>();
 
         for (SalaStudio sala : registroSale.getTutteLeSale()) {
             Map<Long, Character> statoPostazione = creaMappaStatoPostazioni(sala.getId(), oggi);

@@ -122,7 +122,7 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ UC7
-    public Object effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
+    public PrenotazioneDTO effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
                                        LocalDate data, Long idFascia, Long idStudente) {
 
 
@@ -268,8 +268,8 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ UC5
-    public List<Object> monitoraPrenotazioni(Long idSalaStudio) {
-        List<Object> risultato = new ArrayList<>();
+    public List<PrenotazioneDTO> monitoraPrenotazioni(Long idSalaStudio) {
+        List<PrenotazioneDTO> risultato = new ArrayList<>();
         for (Prenotazione p : RegistroPrenotazioni.getInstance()
                 .cercaPrenotazioniPerSalaEData(idSalaStudio, LocalDate.now())) {
             risultato.add(toDTO(p));
@@ -278,12 +278,12 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ UC12
-    public List<Object> consultaStoricoPrenotazioni(Long idStudente) {
+    public List<PrenotazioneDTO> consultaStoricoPrenotazioni(Long idStudente) {
         Studente studente = RegistroUtenti.getInstance().trovaStudentePerId(idStudente);
         if (studente == null) {
             throw new IllegalArgumentException("Studente non trovato");
         }
-        List<Object> risultato = new ArrayList<>();
+        List<PrenotazioneDTO> risultato = new ArrayList<>();
         for (Prenotazione p : RegistroPrenotazioni.getInstance()
                 .cercaPrenotazioniPerStudente(studente.getMatricola())) {
             risultato.add(toDTO(p));
@@ -314,7 +314,7 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ UC13
-    public Object monitoraStatisticheServizio() {
+    public StatisticheDTO monitoraStatisticheServizio() {
         LocalDate oggi = LocalDate.now();
         List<Prenotazione> tutte = RegistroPrenotazioni.getInstance().getTutte();
 

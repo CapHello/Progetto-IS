@@ -22,7 +22,7 @@ public class BoundaryPrenotazione {
             @RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data,
             @RequestParam("idFascia") Long idFascia,
             @RequestParam("idStudente") Long idStudente) {
-        return (PrenotazioneDTO) BibliotecaFacade.getInstance()
+        return BibliotecaFacade.getInstance()
                 .effettuaPrenotazione(idSala, idArea, idPostazione, data, idFascia, idStudente);
     }
 
