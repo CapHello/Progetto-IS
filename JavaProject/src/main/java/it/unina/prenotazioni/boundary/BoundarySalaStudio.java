@@ -1,6 +1,7 @@
 package it.unina.prenotazioni.boundary;
 
 import it.unina.prenotazioni.controller.BibliotecaFacade;
+import it.unina.prenotazioni.dto.CreazioneSalaDTO;
 import it.unina.prenotazioni.dto.DettaglioSalaDTO;
 import it.unina.prenotazioni.dto.SalaStudioDTO;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,16 +19,9 @@ import java.util.List;
 public class BoundarySalaStudio {
 
     @PostMapping("/crea")
-    public SalaStudioDTO creaSalaStudio(@RequestParam("nome") String nome,
-                                        @RequestParam("descrizione") String descrizione,
-                                        @RequestParam("numeroPostazioni") int numeroPostazioni,
-                                        @RequestParam("orariApertura") List<String> orariApertura,
-                                        @RequestParam("orariChiusura") List<String> orariChiusura,
-                                        @RequestParam("granaMinuti") int granaMinuti,
-                                        @RequestParam(name = "tipologie", required = false) List<String> tipologie,  //required=false perchè è opzionale
-                                        @RequestParam(name = "postazioniAree", required = false) List<Integer> postazioniAree) {
-        return (SalaStudioDTO) BibliotecaFacade.getInstance().creaSalaStudio(
-                nome, descrizione, numeroPostazioni, orariApertura, orariChiusura, granaMinuti, tipologie, postazioniAree);
+    public SalaStudioDTO creaSalaStudio(@RequestBody CreazioneSalaDTO dto) {
+        // Spring Boot mappa automaticamente il JSON in ingresso sui campi di CreazioneSalaDTO
+        return (SalaStudioDTO) BibliotecaFacade.getInstance().creaSalaStudio(dto);
     }
 
     @DeleteMapping("/{idSalaStudio}")

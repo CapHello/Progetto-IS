@@ -64,6 +64,13 @@
                     <span class="area-pill">Postazioni: <strong>${s.postazioniOccupateOggi}/${s.postazioniTotali}</strong></span>`;
 
                 const sale = await api('GET', '/monitoraggio/sale');
+
+                sale.sort((a, b) => {
+                    if (a.attiva && !b.attiva) return -1;
+                    if (!a.attiva && b.attiva) return 1;
+                    return 0;
+                });
+
                 const cont = document.getElementById('contenitoreSale');
                 cont.innerHTML = '';
                 document.getElementById('vuoto').style.display = sale.length ? 'none' : 'block';
