@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class Login {
 
@@ -91,6 +93,13 @@ public class Login {
         // Styling link registrazione
         lblRegistrati.setText("<html>Non hai un account? <font color='#7C73E6'><b>Registrati</b></font></html>");
         lblRegistrati.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        lblRegistrati.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frameCorrente.dispose();
+                new Registrazione().apriForm();
+            }
+        });
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -119,7 +128,8 @@ public class Login {
                             DashboardStudente dashboardStudente = new DashboardStudente();
                             dashboardStudente.apriDashboard(utenteDTO);
                         }else if(utenteDTO.getRuolo().equalsIgnoreCase("Bibliotecario")){
-                            //TODO
+                            frameCorrente.dispose();
+                            new DashboardBibliotecario().apriDashboard();
                         }
 
 
