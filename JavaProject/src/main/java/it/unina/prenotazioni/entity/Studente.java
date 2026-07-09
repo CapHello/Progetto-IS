@@ -5,6 +5,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * <<entity>> Utente che prenota le postazioni; identificato dalla matricola.
+ * numeroTotaleAccessi conta i check-in andati a buon fine (UC10).
+ */
 @Entity
 public class Studente extends Utente{
 
@@ -16,7 +20,7 @@ public class Studente extends Utente{
     @OneToMany(mappedBy = "studente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prenotazione> prenotazioni = new ArrayList<>();
 
-    public Studente() { /* Vuoto perché utilizziamo il Factory Method @Antonio Cacciatore*/ }
+    public Studente() { /* Costruttore vuoto richiesto da JPA: l'istanza nasce da StudenteFactory (UC1). */ }
 
     // Getters and Setters
     public String getMatricola() { return matricola; }

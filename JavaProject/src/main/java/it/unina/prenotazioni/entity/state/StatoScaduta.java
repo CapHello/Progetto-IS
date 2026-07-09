@@ -2,6 +2,7 @@ package it.unina.prenotazioni.entity.state;
 
 import it.unina.prenotazioni.entity.Prenotazione;
 
+/** Stato terminale (Singleton): check-in non effettuato entro la tolleranza (V08), nessuna transizione ammessa. */
 public class StatoScaduta implements StatoPrenotazione {
 
     private static StatoScaduta istanza;

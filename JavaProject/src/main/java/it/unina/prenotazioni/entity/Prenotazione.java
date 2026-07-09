@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * <<entity>> Prenotazione di una postazione per una (data, fascia oraria).
+ * Il ciclo di vita segue il pattern State (ATTIVA → CONFERMATA/ANNULLATA/SCADUTA → CONCLUSA);
+ * come Subject del pattern Observer notifica GestoreNotifiche a ogni cambio di stato.
+ */
 @Entity
 @Table(name = "prenotazione")
 public class Prenotazione extends Subject {
@@ -19,14 +24,15 @@ public class Prenotazione extends Subject {
     private LocalDate data;
 
 
-    // Per garantire la compatibilità tra il Pattern State utilizzato
-    // e la persistenza JPA è stato introdotta la string nomeStato.
+    // Il pattern State non è persistibile: su DB si salva solo il nome dello stato,
+    // mentre l'oggetto State è @Transient e viene ricostruito dai callback JPA (initStato).
     @Column(name = "stato", nullable = false)
     private String nomeStato;
 
     @Transient
     private StatoPrenotazione stato;
 
+    /** Ricostruisce l'oggetto State dal nome persistito (callback JPA dopo load/persist/update). */
     @PostLoad
     @PostPersist
     @PostUpdate
@@ -38,7 +44,8 @@ public class Prenotazione extends Subject {
         else if ("CONCLUSA".equals(nomeStato)) this.stato = StatoConclusa.getInstance();
     }
 
-    // FetchType.EAGER indica una strategia di caricamento dei dati immediata.
+    // EAGER: la prenotazione viene usata fuori dal contesto di persistenza (entity detached),
+    // quindi studente, postazione e fascia devono essere già caricati.
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "studente_id", nullable = false)
     private Studente studente;
@@ -51,10 +58,11 @@ public class Prenotazione extends Subject {
     @JoinColumn(name = "fascia_oraria_id", nullable = false)
     private FasciaOraria fasciaOraria;
 
+    // UC14: evita l'invio ripetuto del promemoria a ogni giro dello scheduler (60s).
     @Column(name = "promemoria_inviato", nullable = false)
     private boolean promemoriaInviato = false;
 
-    public Prenotazione() { /* Imposto vuoto dalla specifica JPA. */ }
+    public Prenotazione() { /* Costruttore vuoto richiesto da JPA. */ }
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -68,7 +76,7 @@ public class Prenotazione extends Subject {
         return stato;
     }
 
-    // setStato incapsula la transizione: aggiorna la rappresentazione serializzabile e notifica gli osservatori (pattern Observer).
+    /** Transizione di stato: aggiorna il nome persistibile e notifica gli osservatori (pattern Observer). */
     public void setStato(StatoPrenotazione stato) {
         if (stato == null) {
             throw new IllegalArgumentException("Lo stato della prenotazione non può essere null");
@@ -113,7 +121,8 @@ public class Prenotazione extends Subject {
 
     /**
      * Annullo forzato usato in EliminaSalaStudio (UC4): imposta ANNULLATA da qualsiasi
-     * stato, senza applicare il vincolo temporale dell'annullamento volontario.
+     * stato, senza il vincolo temporale dell'annullamento volontario. Scrive i campi
+     * direttamente (non passa da setStato) perché la notifica cumulativa la invia GestoreSale.
      */
     public void criticalAnnullaPrenotazione() {
         this.stato = StatoAnnullata.getInstance();

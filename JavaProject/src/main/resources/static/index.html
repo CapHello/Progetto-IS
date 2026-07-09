@@ -33,6 +33,8 @@
 
     <script src="app.js"></script>
     <script>
+        // Login (UC2): invia le credenziali, salva l'utente in sessionStorage e
+        // smista alla dashboard del ruolo. Gli errori del backend finiscono in #errore.
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             mostraErrore('errore', '');

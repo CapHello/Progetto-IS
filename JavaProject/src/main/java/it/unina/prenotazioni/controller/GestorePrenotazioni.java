@@ -26,12 +26,11 @@ import it.unina.prenotazioni.entity.Studente;
 import it.unina.prenotazioni.entity.state.StatoAttiva;
 
 /**
- * Gestore (Singleton) delle prenotazioni: EffettuaPrenotazione (UC7), AnnullaPrenotazione
- * (UC9), EffettuaCheck-in (UC10), MonitoraPrenotazioni (UC5), ConsultaStorico (UC12),
- * GestisciTerminePrenotazione (UC16), MonitoraStatisticheServizio (UC13).
- * Come da diagramma delle classi, gli unici attributi sono l'istanza Singleton
- * {@code instance} e la strategia di assegnazione {@code strategia} (composizione 1-1,
- * pattern Strategy); le dipendenze d'uso verso i registri del livello entity e verso
+ * <<control>> Gestore (Singleton) del ciclo di vita delle prenotazioni:
+ * EffettuaPrenotazione (UC7), AnnullaPrenotazione (UC9), EffettuaCheckIn (UC10),
+ * MonitoraPrenotazioni (UC5), ConsultaStorico (UC12), GestisciTermine (UC16),
+ * Statistiche (UC13). La scelta automatica della postazione è delegata al
+ * pattern Strategy ({@code strategiaAssegnazione}).
  */
 public class GestorePrenotazioni {
 
@@ -54,10 +53,15 @@ public class GestorePrenotazioni {
     }
 
 
+    /** Permette di sostituire l'algoritmo di assegnazione automatica (pattern Strategy). */
     public void setStrategiaAssegnazione(StrategiaAssegnazione strategiaAssegnazione){
         this.strategiaAssegnazione = strategiaAssegnazione;
     }
 
+    /**
+     * Validazioni preliminari di UC7: studente esistente, sala attiva e aperta nella data,
+     * coerenza area/postazione. Restituisce lo studente per evitare una seconda ricerca.
+     */
     private Studente risolviStudente(Long idSala, Long idArea, Long idPostazione,
                                      LocalDate data, Long idStudente){
         Studente studente = registroUtenti.trovaStudentePerId(idStudente);
@@ -91,10 +95,10 @@ public class GestorePrenotazioni {
 
     }
 
+    /** Se lo studente ha scelto una postazione specifica, questa deve esistere ed essere nell'area indicata. */
     private void verificaSuPostazione(Long idArea, Long idPostazione) {
-        // idPostazione == 0 è il valore sentinella per "assegnazione automatica".
-        // Sicuro perché gli id reali sono assegnati solo da MySQL AUTO_INCREMENT (partono da 1) e
-        // nessun punto del codice imposta manualmente l'id di una Postazione prima del persist.
+        // idPostazione == 0 è il sentinella per "assegnazione automatica": sicuro perché gli id
+        // reali partono da 1 (MySQL AUTO_INCREMENT) e non vengono mai impostati a mano.
         if(idPostazione != null && !idPostazione.equals(0L)){
             Postazione p = registroSale.trovaPostazionePerId(idPostazione);
             if(p == null || !p.getArea().getId().equals(idArea)){
@@ -103,16 +107,15 @@ public class GestorePrenotazioni {
         }
     }
 
+    /** L'area indicata deve esistere e appartenere alla sala selezionata. */
     private void verificaSuArea(Long idSala, Long idArea) {
-        // verifico se la Area si trovi effettivamente all'inteno nella Sala selezionata
-        // La lista non è mai vuota essendo che non è possibile creare una Sala con nessun'area presente.
-        // è almeno sempre presente un'area o l'area di default
         Area area = registroSale.trovaAreaPerId(idArea);
         if(area == null || !area.getSalaStudio().getId().equals(idSala)){
             throw new IllegalArgumentException("L'area non è presente all'interno della sala selezionata");
         }
     }
 
+    /** UC7: è prenotabile solo una fascia non ancora iniziata. */
     private void verificaDataFasciaFutura(LocalDate data, FasciaOraria fascia) {
         LocalDateTime inizioSlot = LocalDateTime.of(data, fascia.getOraInizio());
         if (!inizioSlot.isAfter(LocalDateTime.now())) {
@@ -122,7 +125,11 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ UC7
-    public Object effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
+    /**
+     * Valida i dati, verifica unicità (V18) e disponibilità in mutua esclusione,
+     * crea la prenotazione in stato ATTIVA e notifica lo studente a salvataggio riuscito.
+     */
+    public PrenotazioneDTO effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
                                        LocalDate data, Long idFascia, Long idStudente) {
 
 
@@ -169,6 +176,8 @@ public class GestorePrenotazioni {
 
             boolean esito = registroPrenotazioni.salvaPrenotazione(prenotazione);
 
+            // 7. Notifica SOLO dopo il salvataggio riuscito: l'id esiste (assegnato dal DB)
+            //    e non si notificano prenotazioni mai salvate.
             if (esito){
                 prenotazione.attach(GestoreNotifiche.getInstance());
                 prenotazione.notifyObservers();
@@ -197,30 +206,18 @@ public class GestorePrenotazioni {
         // AnnullaPrenotazione() sull'entity → verificaIntervalloAnnullamentoPrenotazione(),
         //      setStato("annullata") → flagIntervalloAnnullamentoPrenotazione
         //      (l'esito negativo è comunicato dall'entity tramite eccezione).
-        boolean flagIntervalloAnnullamentoPrenotazione;
-        String motivoNonValido = null;
         try {
             prenotazione.annullaPrenotazione();
-            flagIntervalloAnnullamentoPrenotazione = true;
         } catch (IllegalStateException e) {
-            flagIntervalloAnnullamentoPrenotazione = false;
-            motivoNonValido = e.getMessage();
+            throw new IllegalStateException(e.getMessage());
         }
+        registroPrenotazioni.aggiorna(prenotazione);
 
-        if (flagIntervalloAnnullamentoPrenotazione) {
-            // alt [AnnullamentoPrenotazioneValido] annullamentoConfermato → persistenza.
-            registroPrenotazioni.aggiorna(prenotazione);
-
-            // inviaNotifica(destinatari, messaggio);
-            Studente destinatario = prenotazione.getStudente();
-            if (destinatario != null) {
-                GestoreNotifiche.getInstance().inviaNotifica(List.of(toUtenteDTO(destinatario)),
+        // inviaNotifica(destinatari, messaggio);
+        Studente destinatario = prenotazione.getStudente();
+        if (destinatario != null) {
+            GestoreNotifiche.getInstance().inviaNotifica(List.of(toUtenteDTO(destinatario)),
                         "La prenotazione #" + prenotazione.getId() + " è stata annullata.");
-            }
-            //annullamentoPrenotazioneConfermato (ritorno regolare).
-        } else {
-            // alt [AnnullamentoPrenotazioneNonValido] limiteTemporaleAnnullamentoPrenotazioneSuperato.
-            throw new IllegalStateException(motivoNonValido);
         }
     }
 
@@ -257,6 +254,8 @@ public class GestorePrenotazioni {
             prenotazione.effettuaCheckin();
             registroPrenotazioni.aggiorna(prenotazione);
 
+            // Il check-in conta come accesso. Aggiorna esplicito dello studente:
+            // non c'è cascade MERGE da Prenotazione verso Studente.
             Studente s = prenotazione.getStudente();
             s.setNumeroTotaleAccessi(s.getNumeroTotaleAccessi() + 1);
             registroUtenti.aggiorna(s);
@@ -268,8 +267,9 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ UC5
-    public List<Object> monitoraPrenotazioni(Long idSalaStudio) {
-        List<Object> risultato = new ArrayList<>();
+    /** Prenotazioni occupanti della giornata corrente per una sala (monitoraggio bibliotecario). */
+    public List<PrenotazioneDTO> monitoraPrenotazioni(Long idSalaStudio) {
+        List<PrenotazioneDTO> risultato = new ArrayList<>();
         for (Prenotazione p : RegistroPrenotazioni.getInstance()
                 .cercaPrenotazioniPerSalaEData(idSalaStudio, LocalDate.now())) {
             risultato.add(toDTO(p));
@@ -278,12 +278,13 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ UC12
-    public List<Object> consultaStoricoPrenotazioni(Long idStudente) {
+    /** Storico completo delle prenotazioni dello studente, in qualunque stato. */
+    public List<PrenotazioneDTO> consultaStoricoPrenotazioni(Long idStudente) {
         Studente studente = RegistroUtenti.getInstance().trovaStudentePerId(idStudente);
         if (studente == null) {
             throw new IllegalArgumentException("Studente non trovato");
         }
-        List<Object> risultato = new ArrayList<>();
+        List<PrenotazioneDTO> risultato = new ArrayList<>();
         for (Prenotazione p : RegistroPrenotazioni.getInstance()
                 .cercaPrenotazioniPerStudente(studente.getMatricola())) {
             risultato.add(toDTO(p));
@@ -292,6 +293,11 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ UC16
+    /**
+     * Invocato periodicamente dallo scheduler: fa scadere le ATTIVE oltre la tolleranza
+     * di check-in (V08) e conclude le CONFERMATE a fine fascia. L'attach dell'observer
+     * prima della transizione fa partire la notifica automatica.
+     */
     public void gestisciTerminePrenotazione() {
         LocalDateTime adesso = LocalDateTime.now();
         for (Prenotazione p : registroPrenotazioni.getPrenotazioniInScadenza()) {
@@ -314,7 +320,8 @@ public class GestorePrenotazioni {
     }
 
     // ------------------------------------------------------------------ UC13
-    public Object monitoraStatisticheServizio() {
+    /** Statistiche della giornata: prenotazioni, non confermate, tasso di occupazione. */
+    public StatisticheDTO monitoraStatisticheServizio() {
         LocalDate oggi = LocalDate.now();
         List<Prenotazione> tutte = RegistroPrenotazioni.getInstance().getTutte();
 
@@ -353,6 +360,7 @@ public class GestorePrenotazioni {
 
 
 
+    /** Risolve la fascia tra quelle prenotabili della sala nella data: valida anche l'appartenenza (UC7). */
     private FasciaOraria risolviFasciaDellaSala(Long idSala, Long idFascia, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null){
@@ -366,11 +374,11 @@ public class GestorePrenotazioni {
         throw new IllegalArgumentException("Lo slot orario selezionato non è ammesso");
     }
 
+    /** Postazione scelta esplicitamente (se indicata e ancora libera) oppure assegnazione automatica via Strategy. */
     private  Postazione selezionaPostazione(Long idPostazione, LocalDate data,
                                            FasciaOraria fascia, List<Postazione> disponibili) {
-        // idPostazione == 0 è il sentinel per "assegnazione automatica" (scelto dal front-end).
-        // Sicuro perché gli id reali sono assegnati solo da MySQL AUTO_INCREMENT (parte da 1) e
-        // nessun punto del codice imposta manualmente l'id di una Postazione prima del persist.
+        // idPostazione == 0 è il sentinella per "assegnazione automatica": sicuro perché gli id
+        // reali partono da 1 (MySQL AUTO_INCREMENT) e non vengono mai impostati a mano.
         if (idPostazione != null && idPostazione > 0) {
             // Postazione scelta esplicitamente dallo studente.
             Postazione scelta = registroSale.trovaPostazionePerId(idPostazione);
@@ -383,6 +391,7 @@ public class GestorePrenotazioni {
         return strategiaAssegnazione.selezionaPostazione(disponibili);
     }
 
+    /** Converte l'entity nel DTO per le boundary (nessun tipo entity attraversa il confine). */
     private PrenotazioneDTO toDTO(Prenotazione p) {
         PrenotazioneDTO dto = new PrenotazioneDTO();
         dto.setIdPrenotazione(p.getId());
@@ -413,6 +422,7 @@ public class GestorePrenotazioni {
         return 0;
     }
 
+    /** Converte lo studente nel DTO destinatario delle notifiche. */
     private UtenteDTO toUtenteDTO(Studente s) {
         UtenteDTO dto = new UtenteDTO();
         dto.setId(s.getId());

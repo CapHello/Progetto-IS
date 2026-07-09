@@ -5,8 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * Avvio dell'applicazione. Spring Boot è usato SOLO per il livello web (REST controller
- * e file statici) e per lo scheduler; la persistenza è Hibernate standalone (JpaUtil).
+ * Avvio dell'applicazione. Spring Boot è usato SOLO per il livello web (endpoint REST
+ * e pagine statiche in resources/static) e per lo scheduler (@EnableScheduling);
+ * la persistenza è Hibernate standalone (JpaUtil), indipendente da Spring.
  */
 @SpringBootApplication
 @EnableScheduling
