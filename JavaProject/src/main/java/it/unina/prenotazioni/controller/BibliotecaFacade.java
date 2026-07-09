@@ -1,5 +1,14 @@
 package it.unina.prenotazioni.controller;
 
+import it.unina.prenotazioni.dto.CreazioneSalaDTO;
+import it.unina.prenotazioni.dto.DettaglioSalaDTO;
+import it.unina.prenotazioni.dto.FasciaDisponibileDTO;
+import it.unina.prenotazioni.dto.PrenotazioneDTO;
+import it.unina.prenotazioni.dto.SalaMonitoraggioDTO;
+import it.unina.prenotazioni.dto.SalaStudioDTO;
+import it.unina.prenotazioni.dto.StatisticheDTO;
+import it.unina.prenotazioni.dto.UtenteDTO;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,50 +31,47 @@ public class BibliotecaFacade {
     }
 
     // --- GestoreUtenti (UC1, UC2, UC8) ---
-    public Object registrazione(String ruolo, String nome, String cognome,
-                                String email, String password, String identificativo) {
+    public UtenteDTO registrazione(String ruolo, String nome, String cognome,
+                                   String email, String password, String identificativo) {
         return GestoreUtenti.getInstance().registrazione(ruolo, nome, cognome, email, password, identificativo);
     }
 
-    public Object autenticazione(String email, String password) {
+    public UtenteDTO autenticazione(String email, String password) {
         return GestoreUtenti.getInstance().autenticazione(email, password);
     }
 
-    public Object visualizzaProfiloPersonale(Long idStudente) {
+    public UtenteDTO visualizzaProfiloPersonale(Long idStudente) {
         return GestoreUtenti.getInstance().visualizzaProfilo(idStudente);
     }
 
     // --- GestoreSale (UC3, UC4, UC6, UC11 + Aggiungi Area) ---
-    public Object creaSalaStudio(String nome, String descrizione, int numeroPostazioni,
-                                 List<String> orariApertura, List<String> orariChiusura, int granaMinuti,
-                                 List<String> tipologie, List<Integer> postazioniAree) {
-        return GestoreSale.getInstance().creaSalaStudio(nome, descrizione, numeroPostazioni,
-                orariApertura, orariChiusura, granaMinuti, tipologie, postazioniAree);
+    public SalaStudioDTO creaSalaStudio(CreazioneSalaDTO richiesta) {
+        return GestoreSale.getInstance().creaSalaStudio(richiesta);
     }
 
     public void eliminaSalaStudio(Long idSalaStudio) {
         GestoreSale.getInstance().eliminaSalaStudio(idSalaStudio);
     }
 
-    public List<Object> consultaSaleDisponibili(LocalDate data) {
+    public List<SalaStudioDTO> consultaSaleDisponibili(LocalDate data) {
         return GestoreSale.getInstance().consultazioneSaleDisponibili(data);
     }
 
-    public List<Object> getFasceDisponibili(Long idSala, LocalDate data) {
+    public List<FasciaDisponibileDTO> getFasceDisponibili(Long idSala, LocalDate data) {
         return GestoreSale.getInstance().getFasceDisponibili(idSala, data);
     }
 
-    public Object selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
+    public DettaglioSalaDTO selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
         return GestoreSale.getInstance().selezionaDettaglioSala(idSala, idFascia, data);
     }
 
-    public List<Object> monitoraSale() {
+    public List<SalaMonitoraggioDTO> monitoraSale() {
         return GestoreSale.getInstance().monitoraSale();
     }
 
     // --- GestorePrenotazioni (UC5, UC7, UC9, UC10, UC12, UC13, UC16) ---
-    public Object effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
-                                       LocalDate data, Long idFascia, Long idStudente) {
+    public PrenotazioneDTO effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
+                                                LocalDate data, Long idFascia, Long idStudente) {
         return GestorePrenotazioni.getInstance()
                 .effettuaPrenotazione(idSala, idArea, idPostazione, data, idFascia, idStudente);
     }
@@ -78,11 +84,11 @@ public class BibliotecaFacade {
         GestorePrenotazioni.getInstance().effettuaCheckIn(idPrenotazione);
     }
 
-    public List<Object> monitoraPrenotazioni(Long idSalaStudio) {
+    public List<PrenotazioneDTO> monitoraPrenotazioni(Long idSalaStudio) {
         return GestorePrenotazioni.getInstance().monitoraPrenotazioni(idSalaStudio);
     }
 
-    public List<Object> consultaStoricoPrenotazioni(Long idStudente) {
+    public List<PrenotazioneDTO> consultaStoricoPrenotazioni(Long idStudente) {
         return GestorePrenotazioni.getInstance().consultaStoricoPrenotazioni(idStudente);
     }
 
@@ -90,7 +96,7 @@ public class BibliotecaFacade {
         GestorePrenotazioni.getInstance().gestisciTerminePrenotazione();
     }
 
-    public Object monitoraStatisticheServizio() {
+    public StatisticheDTO monitoraStatisticheServizio() {
         return GestorePrenotazioni.getInstance().monitoraStatisticheServizio();
     }
 

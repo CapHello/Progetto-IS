@@ -16,10 +16,13 @@ public class SalaStudio {
     private String descrizione;
     private int numeroPostazioniTotali;
 
+    @Column(name = "attiva", nullable = false)
+    private boolean attiva = true;
+
     @OneToMany(mappedBy = "salaStudio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Area> aree = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "sala_slot_prenotabili",
             joinColumns = @JoinColumn(name = "sala_id"),
@@ -28,12 +31,13 @@ public class SalaStudio {
     private List<FasciaOraria> slotOrario = new ArrayList<>();
 
     // Associazione Molti-A-Molti per l'orario lavorativo
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "sala_orari_lavorativi",
             joinColumns = @JoinColumn(name = "sala_id"),
             inverseJoinColumns = @JoinColumn(name = "fascia_id")
     )
+    @OrderColumn(name = "giorno_settimana")
     private List<FasciaOraria> orarioLavorativo = new ArrayList<>();
 
     public SalaStudio() {}
@@ -57,19 +61,8 @@ public class SalaStudio {
     public int getNumeroPostazioniTotali() { return numeroPostazioniTotali; }
     public void setNumeroPostazioniTotali(int numeroPostazioniTotali) { this.numeroPostazioniTotali = numeroPostazioniTotali; }
 
-    public List<Area> getAree() { return aree; }
-    public void setAree(List<Area> aree) { this.aree = aree; }
-
-    public List<FasciaOraria> getOrarioLavorativo() { return orarioLavorativo; }
-    public void setOrarioLavorativo(List<FasciaOraria> orarioLavorativo) {
-        if (orarioLavorativo != null && orarioLavorativo.size() > 5) {
-            throw new IllegalArgumentException("Una sala non può avere più di 5 orari lavorativi.");
-        }
-        this.orarioLavorativo = orarioLavorativo;
-    }
-
-    public List<FasciaOraria> getSlotOrario() { return slotOrario; }
-    public void setSlotOrari(List<FasciaOraria> slotOrario) { this.slotOrario = slotOrario; }
+    public boolean isAttiva() { return attiva; }
+    public void setAttiva(boolean attiva) { this.attiva = attiva; }
 
     // --- Costruzione in memoria (usata in CreaSalaStudio, prima della persistenza) ---
 
@@ -135,15 +128,48 @@ public class SalaStudio {
     /** V06: la sala è aperta nei giorni feriali (lunedì-venerdì). */
     public boolean verificaDataInGiorniApertura(LocalDate data) {
         DayOfWeek giorno = data.getDayOfWeek();
-        return giorno != DayOfWeek.SATURDAY && giorno != DayOfWeek.SUNDAY;
+        return !giorno.equals(DayOfWeek.SATURDAY) && !giorno.equals(DayOfWeek.SUNDAY);
     }
 
-    /** Fasce orarie prenotabili per la data indicata (vuoto se la sala è chiusa quel giorno). */
-    public List<FasciaOraria> getFasceOrariePrestabilite(LocalDate data) {
+    /**
+     * Recupera l'orario lavorativo (apertura e chiusura) per una specifica data.
+     * Sfrutta l'indice della lista per mappare i giorni feriali (Lunedì = 0, Venerdì = 4).
+     */
+    public FasciaOraria getOrarioLavorativoPerData(LocalDate data) {
         if (!verificaDataInGiorniApertura(data)) {
+            return null; // Chiuso nel weekend
+        }
+
+        int indiceGiorno = data.getDayOfWeek().getValue() - 1;
+
+        if (orarioLavorativo != null && indiceGiorno < orarioLavorativo.size()) {
+            return orarioLavorativo.get(indiceGiorno);
+        }
+        return null;
+    }
+
+    /** * V06: Fasce orarie prenotabili per la data indicata.
+     * Filtra gli slot generici della sala facendoli combaciare con l'orario del giorno.
+     */
+    public List<FasciaOraria> getFasceOrariePrestabilite(LocalDate data) {
+        FasciaOraria orarioDelGiorno = getOrarioLavorativoPerData(data);
+
+        if (orarioDelGiorno == null) {
             return new ArrayList<>();
         }
-        return RegistroSale.getInstance().getFascePerSala(id);
+
+        List<FasciaOraria> slotDisponibiliOggi = new ArrayList<>();
+
+        for (FasciaOraria slot : slotOrario) {
+            boolean iniziaDopoApertura = !slot.getOraInizio().isBefore(orarioDelGiorno.getOraInizio());
+            boolean finiscePrimaChiusura = !slot.getOraFine().isAfter(orarioDelGiorno.getOraFine());
+
+            if (iniziaDopoApertura && finiscePrimaChiusura) {
+                slotDisponibiliOggi.add(slot);
+            }
+        }
+
+        return slotDisponibiliOggi;
     }
 
     /** True se esiste almeno una postazione libera nella sala per (data, fascia). */
@@ -155,31 +181,5 @@ public class SalaStudio {
             }
         }
         return false;
-    }
-
-    /** Postazioni libere di una specifica area per (data, fascia). */
-    public List<Postazione> getPostazioniDisponibili(Area area, LocalDate data, FasciaOraria fascia) {
-        return area.getPostazioniDisponibili(data, fascia);
-    }
-
-    public boolean verificaValiditaDati() {
-        if (nome == null || nome.isEmpty() || numeroPostazioniTotali <= 0) {
-            return false;
-        }
-        // Il vincolo di dominio impone massimo 5 orari lavorativi
-        return !(orarioLavorativo != null && orarioLavorativo.size() > 5);
-    }
-
-    /**
-     * Elimina tutte le aree della sala e, tramite ciascuna, le relative postazioni
-     * (UC4 EliminaSalaStudio). Le prenotazioni che insistono sulle postazioni devono
-     * essere già state rimosse dal GestoreSale per rispettare i vincoli di integrità.
-     */
-    public void eliminaAree() {
-        RegistroSale registro = RegistroSale.getInstance();
-        for (Area area : registro.getAreePerSala(id)) {
-            area.eliminaPostazioni();
-            registro.eliminaArea(area.getId());
-        }
     }
 }

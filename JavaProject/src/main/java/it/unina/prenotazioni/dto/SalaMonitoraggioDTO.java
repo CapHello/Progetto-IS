@@ -15,6 +15,7 @@ public class SalaMonitoraggioDTO {
     private int postiAttivi;
     private int postiConfermati;
     private List<String> aree = new ArrayList<>();
+    private boolean attiva;
 
     public SalaMonitoraggioDTO() {}
 
@@ -30,4 +31,6 @@ public class SalaMonitoraggioDTO {
     public void setPostiConfermati(int postiConfermati) { this.postiConfermati = postiConfermati; }
     public List<String> getAree() { return aree; }
     public void setAree(List<String> aree) { this.aree = aree; }
+    public boolean isAttiva() {return attiva;}
+    public void setAttiva(boolean attiva) {this.attiva = attiva;}
 }

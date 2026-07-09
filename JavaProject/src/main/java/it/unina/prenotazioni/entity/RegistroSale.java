@@ -40,50 +40,47 @@ public class RegistroSale {
         return gestorePersistenza.trovaPerId(SalaStudio.class, id);
     }
 
-    public SalaStudio cercaSalaPerNome(String nome) {
-        return gestorePersistenza.cercaPrimoPerCampi(SalaStudio.class, Map.of("nome", nome));
-    }
-
-    public boolean eliminaSala(Long id) {
-        return gestorePersistenza.elimina(SalaStudio.class, id);
-    }
-
-    // Serve per eliminaAree() di Sala Studio
-    public boolean eliminaArea(Long id) {
-        return gestorePersistenza.elimina(Area.class, id);
-    }
-
-    // Serve per eliminaPostazioni() di Area
-    public boolean eliminaPostazione(Long id) {
-        return gestorePersistenza.elimina(Postazione.class, id);
-    }
-
-    public boolean eliminaFascia(Long id) {
-        return gestorePersistenza.elimina(FasciaOraria.class, id);
-    }
-
     public List<SalaStudio> getTutteLeSale() {
         return gestorePersistenza.cercaPerCampi(SalaStudio.class, Map.of());
     }
 
+    public List<SalaStudio> getSaleAttive() {
+        return gestorePersistenza.eseguiQueryCustom(
+                "SELECT s FROM SalaStudio s WHERE s.attiva = true",
+                SalaStudio.class,
+                null
+        );
+    }
+
     /**
-     * Sale visibili/prenotabili in una certa data: quelle aperte (giorni feriali,
-     * V06).
+     * Sale visibili/prenotabili in una certa data: quelle aperte
+     * in cui esiste almeno una fascia oraria con posti disponibili.
      */
     public List<SalaStudio> getSaleDisponibili(LocalDate data) {
         List<SalaStudio> risultato = new ArrayList<>();
-        for (SalaStudio s : getTutteLeSale()) {
+
+        for (SalaStudio s : getSaleAttive()) {
             if (s.verificaDataInGiorniApertura(data)) {
-                risultato.add(s);
+                boolean salaHaPosti = false;
+
+                List<FasciaOraria> fasce = s.getFasceOrariePrestabilite(data);
+
+                for (FasciaOraria fascia : fasce) {
+                    if (s.verificaDisponibilita(data, fascia)) {
+                        salaHaPosti = true;
+                        break;
+                    }
+                }
+
+                if (salaHaPosti) {
+                    risultato.add(s);
+                }
             }
         }
         return risultato;
     }
 
     // --- Aree ---
-    public boolean salvaArea(Area area) {
-        return gestorePersistenza.salva(area);
-    }
 
     public Area trovaAreaPerId(Long idArea) {
         return gestorePersistenza.trovaPerId(Area.class, idArea);
@@ -94,17 +91,11 @@ public class RegistroSale {
     }
 
     // --- Postazioni ---
-    public boolean salvaPostazione(Postazione postazione) {
-        return gestorePersistenza.salva(postazione);
-    }
 
     public List<Postazione> getPostazioniPerArea(Long idArea) {
         return gestorePersistenza.cercaPerCampo(Postazione.class, "area.id", idArea);
     }
 
-    public List<Postazione> getPostazioniPerSala(Long idSala) {
-        return gestorePersistenza.cercaPerCampo(Postazione.class, "area.salaStudio.id", idSala);
-    }
 
     public Postazione trovaPostazionePerId(Long idPostazione) {
         return gestorePersistenza.trovaPerId(Postazione.class, idPostazione);
@@ -137,9 +128,9 @@ public class RegistroSale {
         );
     }
 
+
     public List<FasciaOraria> getFascePerSala(Long idSala) {
         String jpql = "SELECT f FROM SalaStudio s JOIN s.slotOrario f WHERE s.id = :idSala";
-
         return gestorePersistenza.eseguiQueryCustom(jpql, FasciaOraria.class, Map.of("idSala", idSala));
     }
 }

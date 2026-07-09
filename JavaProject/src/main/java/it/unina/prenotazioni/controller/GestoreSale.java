@@ -1,12 +1,6 @@
 package it.unina.prenotazioni.controller;
 
-import it.unina.prenotazioni.dto.AreaDettaglioDTO;
-import it.unina.prenotazioni.dto.DettaglioSalaDTO;
-import it.unina.prenotazioni.dto.FasciaDisponibileDTO;
-import it.unina.prenotazioni.dto.PostazioneDTO;
-import it.unina.prenotazioni.dto.SalaMonitoraggioDTO;
-import it.unina.prenotazioni.dto.SalaStudioDTO;
-import it.unina.prenotazioni.dto.UtenteDTO;
+import it.unina.prenotazioni.dto.*;
 import it.unina.prenotazioni.entity.Area;
 import it.unina.prenotazioni.entity.FasciaOraria;
 import it.unina.prenotazioni.entity.Postazione;
@@ -19,6 +13,7 @@ import it.unina.prenotazioni.entity.Studente;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -50,25 +45,39 @@ public class GestoreSale {
     // La creazione della sala include la definizione delle aree (ciclo dello scenario
     // CreaSalaStudio): tipologie[i] + postazioniAree[i] descrivono le aree; le postazioni
     // non assegnate confluiscono nell'area di default "comune".
-    public SalaStudioDTO creaSalaStudio(String nome, String descrizione, int numeroPostazioni,
-                                 List<String> orariApertura, List<String> orariChiusura, int granaMinuti,
-                                 List<String> tipologie, List<Integer> postazioniAree) {
+    public SalaStudioDTO creaSalaStudio(CreazioneSalaDTO richiestaCreazione) {
 
-        verificaValiditaDati(nome, descrizione, numeroPostazioni, granaMinuti);
+        //verifica input
+        verificaValiditaDati(richiestaCreazione.getNome(), richiestaCreazione.getDescrizione(), richiestaCreazione.getNumeroPostazioni(), richiestaCreazione.getGranaMinuti());
+        verificaValiditaListeOrari(richiestaCreazione.getOrariApertura(), richiestaCreazione.getOrariChiusura());
 
-        if (orariApertura == null || orariChiusura == null ||
-                orariApertura.size() != 5 || orariChiusura.size() != 5) {
-            throw new IllegalArgumentException("Devi fornire esattamente 5 orari di apertura e chiusura (dal Lunedì al Venerdì).");
-        }
-
-        List<String> tipi = (tipologie != null) ? tipologie : new ArrayList<>();
-        List<Integer> posti = (postazioniAree != null) ? postazioniAree : new ArrayList<>();
+        List<String> tipi = (richiestaCreazione.getTipologie() != null) ? richiestaCreazione.getTipologie() : new ArrayList<>();
+        List<Integer> posti = (richiestaCreazione.getPostazioniAree() != null) ? richiestaCreazione.getPostazioniAree() : new ArrayList<>();
         if (tipi.size() != posti.size()) {
             throw new IllegalArgumentException("Dati delle aree incoerenti (tipologie e postazioni non corrispondono)");
         }
 
-        SalaStudio sala = new SalaStudio(nome, descrizione, numeroPostazioni);
+        //Instanziazione
+        SalaStudio sala = new SalaStudio(richiestaCreazione.getNome(), richiestaCreazione.getDescrizione(), richiestaCreazione.getNumeroPostazioni());
 
+        //configurazione
+        configuraOrariESlot(richiestaCreazione.getOrariApertura(), richiestaCreazione.getOrariChiusura(), richiestaCreazione.getGranaMinuti(), sala);
+        configuraAree(richiestaCreazione.getNumeroPostazioni(), tipi, posti, sala);
+
+        //Persistenza
+        registroSale.salvaSala(sala);
+        return toDTO(sala);
+    }
+
+    // ------------------------------------------------------------------ helper per UC3
+    private void verificaValiditaListeOrari(List<String> orariApertura, List<String> orariChiusura) {
+        if (orariApertura == null || orariChiusura == null ||
+                orariApertura.size() != 5 || orariChiusura.size() != 5) {
+            throw new IllegalArgumentException("Devi fornire esattamente 5 orari di apertura e chiusura (dal Lunedì al Venerdì).");
+        }
+    }
+
+    private void configuraOrariESlot(List<String> orariApertura, List<String> orariChiusura, int granaMinuti, SalaStudio sala) {
         Map<String, FasciaOraria> slotUnivoci = new HashMap<>();
 
         for (int i = 0; i < 5; i++) {
@@ -85,14 +94,14 @@ public class GestoreSale {
             // Generiamo i micro-slot per il giorno corrente
             List<FasciaOraria> slotGiorno = generaSlot(apertura, chiusura, granaMinuti);
             for (FasciaOraria f : slotGiorno) {
-                String key = f.getEtichetta(); // Es. "09:00-09:30"
-                if (!slotUnivoci.containsKey(key)) {
-                    slotUnivoci.put(key, f);
-                    sala.addFascia(f); // Aggiunge alla lista slotOrario della sala
+                if (slotUnivoci.putIfAbsent(f.getEtichetta(), f) == null) {
+                    sala.addFascia(f);
                 }
             }
         }
+    }
 
+    private static void configuraAree(int numeroPostazioni, List<String> tipi, List<Integer> posti, SalaStudio sala) {
         // Aree specifiche indicate dal bibliotecario.
         int sommaAree = getSommaAree(numeroPostazioni, tipi, posti);
 
@@ -103,10 +112,6 @@ public class GestoreSale {
         if (rimanenti > 0) {
             sala.creaAreaDefault(rimanenti);
         }
-
-        //Persistenza
-        registroSale.salvaSala(sala);
-        return toDTO(sala);
     }
 
     private static int getSommaAree(int numeroPostazioni, List<String> tipi, List<Integer> posti) {
@@ -139,12 +144,19 @@ public class GestoreSale {
             throw new IllegalArgumentException("Sala studio non trovata");
         }
 
+        sala.setAttiva(false);
+
+        registroSale.aggiornaSala(sala);
+
         List<Prenotazione> prenotazioniSala = registroPrenotazioni.cercaTuttePerSala(idSalaStudio);
         List<UtenteDTO> destinatari = new ArrayList<>();
 
         for (Prenotazione p : prenotazioniSala) {
             if (RegistroPrenotazioni.occupaSlot(p)) {
+
                 p.criticalAnnullaPrenotazione();
+                registroPrenotazioni.aggiorna(p);
+
                 if (p.getStudente() != null) {
                     destinatari.add(toUtenteDTO(p.getStudente()));
                 }
@@ -152,42 +164,25 @@ public class GestoreSale {
         }
 
         GestoreNotifiche.getInstance().inviaNotifica(destinatari,
-                "La sala '" + sala.getNome() + "' è stata eliminata: le prenotazioni attive/confermate sono annullate.");
-
-        for (Prenotazione p : prenotazioniSala) {
-            registroPrenotazioni.elimina(p.getId());
-        }
-
-        sala.eliminaAree();
-
-        List<FasciaOraria> orariLavDaEliminare = registroSale.getOrariLavorativiPerSala(idSalaStudio);
-        List<FasciaOraria> slotDaEliminare = registroSale.getFascePerSala(idSalaStudio);
-
-        registroSale.eliminaSala(idSalaStudio);
-
-        for (FasciaOraria f : orariLavDaEliminare) {
-            registroSale.eliminaFascia(f.getId());
-        }
-        for (FasciaOraria f : slotDaEliminare) {
-            registroSale.eliminaFascia(f.getId());
-        }
+                "La sala '" + sala.getNome() + "' è stata chiusa o rimossa definitivamente. " +
+                        "Le tue prenotazioni ancora attive sono state annullate automaticamente.");
     }
 
     // ------------------------------------------------------------------ UC6
-    public List<Object> consultazioneSaleDisponibili(LocalDate data) {
-        List<Object> risultato = new ArrayList<>();
+    public List<SalaStudioDTO> consultazioneSaleDisponibili(LocalDate data) {
+        List<SalaStudioDTO> risultato = new ArrayList<>();
         for (SalaStudio sala : registroSale.getSaleDisponibili(data)) {
             risultato.add(toDTO(sala));
         }
         return risultato;
     }
 
-    public List<Object> getFasceDisponibili(Long idSala, LocalDate data) {
+    public List<FasciaDisponibileDTO> getFasceDisponibili(Long idSala, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null) {
             throw new IllegalArgumentException("Sala studio non trovata");
         }
-        List<Object> risultato = new ArrayList<>();
+        List<FasciaDisponibileDTO> risultato = new ArrayList<>();
         if (!sala.verificaDataInGiorniApertura(data)) {
             return risultato;
         }
@@ -215,14 +210,14 @@ public class GestoreSale {
     }
 
     /** Dettaglio aree/postazioni di una sala per (data, fascia) (wizard step 3-4). */
-    public Object selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
+    public DettaglioSalaDTO selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null) {
             throw new IllegalArgumentException("Sala studio non trovata");
         }
         FasciaOraria fascia = registroSale.trovaFasciaPerId(idFascia);
         if (fascia == null) {
-            throw new IllegalArgumentException("Fascia oraria non valida per la sala selezionata");
+            throw new IllegalArgumentException("Fascia oraria inesistente.");
         }
 
         DettaglioSalaDTO dto = new DettaglioSalaDTO();
@@ -257,42 +252,71 @@ public class GestoreSale {
      * da prenotazioni ATTIVE (non confermate) e CONFERMATE nella giornata corrente, più le
      * tipologie di area presenti.
      */
-    public List<Object> monitoraSale() {
-        LocalDate oggi = LocalDate.now();
-        List<Object> risultato = new ArrayList<>();
+    public List<SalaMonitoraggioDTO> monitoraSale() {
+        LocalDate oggi = LocalDate.now(ZoneId.of("Europe/Rome"));
+        List<SalaMonitoraggioDTO> risultato = new ArrayList<>();
+
         for (SalaStudio sala : registroSale.getTutteLeSale()) {
-            // Stato per postazione oggi: 'C' = confermata (presenza), 'A' = attiva non confermata.
-            Map<Long, Character> statoPostazione = new HashMap<>();
-            for (Prenotazione p : registroPrenotazioni.cercaPrenotazioniPerSalaEData(sala.getId(), oggi)) {
-                if (p.getPostazione() == null) continue;
-                Long pid = p.getPostazione().getId();
-                if (p.getStato().getStatoEnum() == StatoEnum.CONFERMATA) {
-                    statoPostazione.put(pid, 'C');
-                } else if (statoPostazione.get(pid) == null) {
-                    statoPostazione.put(pid, 'A');
-                }
-            }
-            SalaMonitoraggioDTO dto = new SalaMonitoraggioDTO();
-            dto.setIdSala(sala.getId());
-            dto.setNomeSala(sala.getNome());
-            int liberi = 0, attivi = 0, confermati = 0;
-            for (Area area : registroSale.getAreePerSala(sala.getId())) {
-                dto.getAree().add(area.getTipologia());
-                for (Postazione p : registroSale.getPostazioniPerArea(area.getId())) {
-                    Character st = statoPostazione.get(p.getId());
-                    if (st == null) liberi++;
-                    else if (st == 'C') confermati++;
-                    else attivi++;
-                }
-            }
-            dto.setPostiLiberi(liberi);
-            dto.setPostiAttivi(attivi);
-            dto.setPostiConfermati(confermati);
+            Map<Long, Character> statoPostazione = creaMappaStatoPostazioni(sala.getId(), oggi);
+
+            SalaMonitoraggioDTO dto = calcolaStatisticheSala(sala, statoPostazione);
+
             risultato.add(dto);
         }
+
         return risultato;
     }
 
+    // ------------------------------------------------------------------ helper per UC11
+    private Map<Long, Character> creaMappaStatoPostazioni(Long idSala, LocalDate data) {
+        Map<Long, Character> statoPostazione = new HashMap<>();
+
+        for (Prenotazione p : registroPrenotazioni.cercaPrenotazioniPerSalaEData(idSala, data)) {
+            if (p.getPostazione() == null) continue;
+
+            Long pid = p.getPostazione().getId();
+
+            if (p.getStato().getStatoEnum() == StatoEnum.CONFERMATA) {
+                statoPostazione.put(pid, 'C');
+            } else {
+                statoPostazione.computeIfAbsent(pid, k -> 'A');
+            }
+        }
+        return statoPostazione;
+    }
+
+    private SalaMonitoraggioDTO calcolaStatisticheSala(SalaStudio sala, Map<Long, Character> statoPostazione) {
+        SalaMonitoraggioDTO dto = new SalaMonitoraggioDTO();
+        dto.setIdSala(sala.getId());
+        dto.setNomeSala(sala.getNome());
+        dto.setAttiva(sala.isAttiva());
+
+        int liberi = 0;
+        int attivi = 0;
+        int confermati = 0;
+
+        for (Area area : registroSale.getAreePerSala(sala.getId())) {
+            dto.getAree().add(area.getTipologia());
+
+            for (Postazione p : registroSale.getPostazioniPerArea(area.getId())) {
+                Character st = statoPostazione.get(p.getId());
+
+                if (st == null) {
+                    liberi++;
+                } else if (st == 'C') {
+                    confermati++;
+                } else {
+                    attivi++;
+                }
+            }
+        }
+
+        dto.setPostiLiberi(liberi);
+        dto.setPostiAttivi(attivi);
+        dto.setPostiConfermati(confermati);
+
+        return dto;
+    }
     // ------------------------------------------------------------------ helper
     private int contaPostiDisponibili(Long idSala, LocalDate data, FasciaOraria fascia) {
         int posti = 0;
@@ -344,6 +368,7 @@ public class GestoreSale {
         dto.setNome(sala.getNome());
         dto.setDescrizione(sala.getDescrizione());
         dto.setNumeroPostazioniTotali(sala.getNumeroPostazioniTotali());
+        dto.setAttiva(sala.isAttiva());
 
         // Peschiamo dal DB in modo sicuro
         List<String> fasce = new ArrayList<>();
@@ -351,13 +376,6 @@ public class GestoreSale {
             fasce.add(f.getEtichetta());
         }
         dto.setFasceOrarie(fasce);
-
-        /* Se serve verrà riaggiunto
-        List<String> orariLavorativi = new ArrayList<>();
-        for (FasciaOraria ol: registroSale.getOrariLavorativiPerSala(sala.getId())) {
-            orariLavorativi.add(ol.getEtichetta());
-        }
-        */
 
         return dto;
     }

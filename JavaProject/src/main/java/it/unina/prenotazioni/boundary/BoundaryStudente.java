@@ -1,6 +1,7 @@
 package it.unina.prenotazioni.boundary;
 
 import it.unina.prenotazioni.controller.BibliotecaFacade;
+import it.unina.prenotazioni.dto.PrenotazioneDTO;
 import it.unina.prenotazioni.dto.UtenteDTO;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,11 +16,11 @@ public class BoundaryStudente {
 
     @GetMapping("/{idStudente}/profilo")
     public UtenteDTO visualizzaProfiloPersonale(@PathVariable("idStudente") Long idStudente) {
-        return (UtenteDTO) BibliotecaFacade.getInstance().visualizzaProfiloPersonale(idStudente);
+        return BibliotecaFacade.getInstance().visualizzaProfiloPersonale(idStudente);
     }
 
     @GetMapping("/{idStudente}/storico")
-    public List<Object> consultaStoricoPrenotazioni(@PathVariable("idStudente") Long idStudente) {
+    public List<PrenotazioneDTO> consultaStoricoPrenotazioni(@PathVariable("idStudente") Long idStudente) {
         return BibliotecaFacade.getInstance().consultaStoricoPrenotazioni(idStudente);
     }
 }

@@ -4,12 +4,14 @@ import it.unina.prenotazioni.entity.state.*;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "prenotazione")
 public class Prenotazione extends Subject {
+
+    /** V08: tolleranza (in minuti) dopo l'inizio della fascia entro cui è consentito il check-in. */
+    public static final int TOLLERANZA_CHECKIN_MINUTI = 10;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -49,6 +51,9 @@ public class Prenotazione extends Subject {
     @JoinColumn(name = "fascia_oraria_id", nullable = false)
     private FasciaOraria fasciaOraria;
 
+    @Column(name = "promemoria_inviato", nullable = false)
+    private boolean promemoriaInviato = false;
+
     public Prenotazione() { /* Imposto vuoto dalla specifica JPA. */ }
 
     // Getters and Setters
@@ -71,6 +76,13 @@ public class Prenotazione extends Subject {
         this.stato = stato;
         this.nomeStato = stato.getStatoEnum().name();
         notifyObservers();
+    }
+
+    public boolean isPromemoriaInviato() {
+        return promemoriaInviato;
+    }
+    public void setPromemoriaInviato(boolean promemoriaInviato) {
+        this.promemoriaInviato = promemoriaInviato;
     }
 
     // --- Azioni del pattern State (delegano allo stato corrente) ---
@@ -104,16 +116,28 @@ public class Prenotazione extends Subject {
      * stato, senza applicare il vincolo temporale dell'annullamento volontario.
      */
     public void criticalAnnullaPrenotazione() {
-        setStato(StatoAnnullata.getInstance());
+        this.stato = StatoAnnullata.getInstance();
+        this.nomeStato = this.stato.getStatoEnum().name();
     }
 
-    /** UC10: il check-in richiede prenotazione ATTIVA e riferita alla giornata corrente. */
+    /**
+     * UC10: il check-in richiede prenotazione ATTIVA, riferita alla giornata corrente ed
+     * entro la finestra consentita (dalla mezzanotte fino a inizio fascia + tolleranza, V08).
+     * Il limite superiore è verificato qui in modo sincrono, senza dipendere dal tempismo
+     * dello scheduler che marca le prenotazioni SCADUTE.
+     */
     public void verificaPrenotazioneAttivaInDataCorrente() {
         if (getStato() == null || getStato().getStatoEnum() != StatoEnum.ATTIVA) {
             throw new IllegalStateException("La prenotazione non è in stato ATTIVA");
         }
         if (!LocalDate.now().equals(data)) {
             throw new IllegalStateException("Il check-in è consentito solo nel giorno della prenotazione");
+        }
+        LocalDateTime limite = LocalDateTime.of(data, fasciaOraria.getOraInizio())
+                .plusMinutes(TOLLERANZA_CHECKIN_MINUTI);
+        if (LocalDateTime.now().isAfter(limite)) {
+            throw new IllegalStateException("superata la tolleranza di " + TOLLERANZA_CHECKIN_MINUTI
+                    + " minuti dall'inizio della fascia oraria");
         }
     }
 

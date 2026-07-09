@@ -67,11 +67,4 @@ public class Area {
         }
     }
 
-    /** Elimina tutte le postazioni dell'area (invocato durante EliminaSalaStudio, UC4). */
-    public void eliminaPostazioni() {
-        RegistroSale registro = RegistroSale.getInstance();
-        for (Postazione p : registro.getPostazioniPerArea(id)) {
-            registro.eliminaPostazione(p.getId());
-        }
-    }
 }

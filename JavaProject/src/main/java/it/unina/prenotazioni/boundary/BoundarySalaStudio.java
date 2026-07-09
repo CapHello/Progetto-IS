@@ -1,7 +1,9 @@
 package it.unina.prenotazioni.boundary;
 
 import it.unina.prenotazioni.controller.BibliotecaFacade;
+import it.unina.prenotazioni.dto.CreazioneSalaDTO;
 import it.unina.prenotazioni.dto.DettaglioSalaDTO;
+import it.unina.prenotazioni.dto.FasciaDisponibileDTO;
 import it.unina.prenotazioni.dto.SalaStudioDTO;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +20,9 @@ import java.util.List;
 public class BoundarySalaStudio {
 
     @PostMapping("/crea")
-    public SalaStudioDTO creaSalaStudio(@RequestParam("nome") String nome,
-                                        @RequestParam("descrizione") String descrizione,
-                                        @RequestParam("numeroPostazioni") int numeroPostazioni,
-                                        @RequestParam("orariApertura") List<String> orariApertura,
-                                        @RequestParam("orariChiusura") List<String> orariChiusura,
-                                        @RequestParam("granaMinuti") int granaMinuti,
-                                        @RequestParam(name = "tipologie", required = false) List<String> tipologie,  //required=false perchè è opzionale
-                                        @RequestParam(name = "postazioniAree", required = false) List<Integer> postazioniAree) {
-        return (SalaStudioDTO) BibliotecaFacade.getInstance().creaSalaStudio(
-                nome, descrizione, numeroPostazioni, orariApertura, orariChiusura, granaMinuti, tipologie, postazioniAree);
+    public SalaStudioDTO creaSalaStudio(@RequestBody CreazioneSalaDTO dto) {
+        // Spring Boot mappa automaticamente il JSON in ingresso sui campi di CreazioneSalaDTO
+        return BibliotecaFacade.getInstance().creaSalaStudio(dto);
     }
 
     @DeleteMapping("/{idSalaStudio}")
@@ -36,13 +31,13 @@ public class BoundarySalaStudio {
     }
 
     @GetMapping("/disponibili")
-    public List<Object> consultazioneSaleDisponibili(
+    public List<SalaStudioDTO> consultazioneSaleDisponibili(
             @RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
         return BibliotecaFacade.getInstance().consultaSaleDisponibili(data);
     }
 
     @GetMapping("/{idSala}/fasce")
-    public List<Object> getFasceDisponibili(
+    public List<FasciaDisponibileDTO> getFasceDisponibili(
             @PathVariable("idSala") Long idSala,
             @RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
         return BibliotecaFacade.getInstance().getFasceDisponibili(idSala, data);
@@ -53,6 +48,6 @@ public class BoundarySalaStudio {
             @PathVariable("idSala") Long idSala,
             @RequestParam("idFascia") Long idFascia,
             @RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
-        return (DettaglioSalaDTO) BibliotecaFacade.getInstance().selezionaDettaglioSala(idSala, idFascia, data);
+        return BibliotecaFacade.getInstance().selezionaDettaglioSala(idSala, idFascia, data);
     }
 }

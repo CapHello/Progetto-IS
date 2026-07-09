@@ -30,25 +30,22 @@ public class GestoreUtenti {
         return istanza;
     }
 
-    private void verificaValidita(String ruolo, String nome, String password)
-    {
-        // Controlli con i messaggi attesi dai test di unità (non modificarne le sottostringhe).
-        if (ruolo == null || ruolo.isEmpty() || !verificaRuolo(ruolo)) {
-            throw new IllegalArgumentException("Il ruolo è obbligatorio e valido.");
-        }
-        if (nome == null || nome.isEmpty()) {
-            throw new IllegalArgumentException("Il nome è obbligatorio.");
-        }
-        if (password == null || password.length() < 8) {
-            throw new IllegalArgumentException("La password deve contenere almeno 8 caratteri.");
-        }
-        if (password.length() > 32) {
-            throw new IllegalArgumentException("La password non può superare i 32 caratteri.");
+    private void richiedi(boolean condizione, String messaggio) {
+        if (!condizione) {
+            throw new IllegalArgumentException(messaggio);
         }
     }
 
+    private void verificaValidita(String ruolo, String nome, String password) {
+        // Controlli con i messaggi attesi dai test di unità (non modificarne le sottostringhe).
+        richiedi(ruolo != null && !ruolo.isEmpty() && verificaRuolo(ruolo), "Il ruolo è obbligatorio e valido.");
+        richiedi(nome != null && !nome.isEmpty(), "Il nome è obbligatorio.");
+        richiedi(password != null && password.length() >= 8, "La password deve contenere almeno 8 caratteri.");
+        richiedi(password.length() <= 32, "La password non può superare i 32 caratteri.");
+    }
+
     // ------------------------------------------------------------------ UC1
-    public Object registrazione(String ruolo, String nome, String cognome,
+    public UtenteDTO registrazione(String ruolo, String nome, String cognome,
                                 String email, String password, String identificativo) {
         verificaValidita(ruolo, nome, password);
 
@@ -83,7 +80,7 @@ public class GestoreUtenti {
     }
 
     // ------------------------------------------------------------------ UC2
-    public Object autenticazione(String email, String password) {
+    public UtenteDTO autenticazione(String email, String password) {
         Utente utente = registroUtenti.cercaUtentePerEmail(email);
 
         if (utente == null) {
@@ -108,7 +105,7 @@ public class GestoreUtenti {
     }
 
     // -------------------------------------------------------------- UC8 (profilo)
-    public Object visualizzaProfilo(Long idStudente) {
+    public UtenteDTO visualizzaProfilo(Long idStudente) {
         Studente studente = registroUtenti.trovaStudentePerId(idStudente);
         if (studente == null) {
             throw new IllegalArgumentException("Studente non trovato");
