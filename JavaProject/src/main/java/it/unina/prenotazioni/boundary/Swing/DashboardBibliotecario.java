@@ -243,11 +243,12 @@ public class DashboardBibliotecario {
     public JFrame apriDashboard() {
         frameCorrente = new JFrame("Dashboard Bibliotecario");
         frameCorrente.setContentPane(dashboardPane);
-        frameCorrente.setSize(1000, 760);
+        frameCorrente.setSize(1000, 1000);
         frameCorrente.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
-        frameCorrente.setResizable(true);
+        frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);
+
         return frameCorrente;
     }
 

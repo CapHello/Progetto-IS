@@ -59,7 +59,9 @@
         <children>
           <component id="a3b4c" class="javax.swing.JLabel" binding="lblNome">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                <preferred-size width="209" height="32"/>
+              </grid>
             </constraints>
             <properties>
               <font name="SansSerif" size="20" style="1"/>

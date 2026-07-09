@@ -275,10 +275,10 @@ public class CreaSala {
     public JFrame apriForm() {
         frameCorrente = new JFrame("Crea nuova Sala Studio");
         frameCorrente.setContentPane(creaSalaPane);
-        frameCorrente.setSize(960, 760);
+        frameCorrente.setSize(1000, 1000);
         frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
-        frameCorrente.setResizable(true);
+        frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);
         return frameCorrente;
     }

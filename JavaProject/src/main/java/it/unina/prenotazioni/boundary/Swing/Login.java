@@ -112,7 +112,7 @@ public class Login {
                 }
 
                 if(password.isBlank() || password.equalsIgnoreCase("Password")){
-                    mostraErrore("Inserisci la password cretino");
+                    mostraErrore("Inserisci la password");
                     return;
                 }
 
@@ -131,6 +131,8 @@ public class Login {
                             frameCorrente.dispose();
                             new DashboardBibliotecario().apriDashboard();
                         }
+
+
 
 
 
