@@ -297,7 +297,6 @@ public class GestorePrenotazioni {
 
     // ------------------------------------------------------------------ UC16
     public void gestisciTerminePrenotazione() {
-        RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
         LocalDateTime adesso = LocalDateTime.now();
         for (Prenotazione p : registroPrenotazioni.getPrenotazioniInScadenza()) {
             StatoEnum stato = p.getStato().getStatoEnum();
