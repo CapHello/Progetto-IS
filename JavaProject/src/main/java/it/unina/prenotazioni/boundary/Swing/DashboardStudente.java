@@ -1,17 +1,23 @@
 package it.unina.prenotazioni.boundary.Swing;
 
+import it.unina.prenotazioni.dto.UtenteDTO;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class DashboardStudente {
 
     public static void main(String[] args){
         // test sulla singola interfaccia
-        DashboardStudente dashboardStudente1 = new DashboardStudente();
+        UtenteDTO utente = new UtenteDTO();
+        utente.setId(1L);
+        utente.setNome("Giovanni");
+        utente.setCognome("Rossi");
+        utente.setIdentificativo("N46001234");
+        utente.setNumeroTotaleAccessi(12);
 
-        dashboardStudente1.apriDashboard("Giovanni","124",234986);
+        new DashboardStudente().apriDashboard(utente);
     }
 
     private static final Color VIOLA        = new Color(124, 115, 230);
@@ -32,6 +38,10 @@ public class DashboardStudente {
     private JLabel     lblVuoto;
     private JButton    btnNuovaPrenotazione;
 
+    // Utente loggato e frame corrente — servono per il wizard di prenotazione e per il logout
+    private UtenteDTO utente;
+    private JFrame frameCorrente;
+
     public DashboardStudente() {
         // Styling aggiuntivo non configurabile nel form designer
         btnLogout.setBackground(Color.WHITE);
@@ -42,35 +52,35 @@ public class DashboardStudente {
         btnNuovaPrenotazione.setFocusPainted(false);
         btnNuovaPrenotazione.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        btnNuovaPrenotazione.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SelezionaDataAndSala selezionaDataAndSala = new SelezionaDataAndSala();
-                selezionaDataAndSala.apriForm();
-            }
+        btnNuovaPrenotazione.addActionListener(e -> {
+            frameCorrente.dispose();
+            new SelezionaDataAndSala(new StatoWizard(utente)).apriForm();
+        });
+        btnLogout.addActionListener(e -> {
+            frameCorrente.dispose();
+            new Login().apriLogin();
         });
     }
 
-    public JFrame apriDashboard(String nome, String matricola, int totaleAccessi) {
-        JFrame frame = new JFrame("Dashboard Studente");
-        frame.setContentPane(dashboardStudente);
+    public JFrame apriDashboard(UtenteDTO utente) {
+        this.utente = utente;
+        frameCorrente = new JFrame("Dashboard Studente");
+        frameCorrente.setContentPane(dashboardStudente);
 
-        lblNome.setText("Profilo Personale di " + nome);
-        lblMatricola.setText("Matricola: " + matricola);
-        lblAccessi.setText("Totale accessi: " + totaleAccessi);
+        lblNome.setText("Profilo Personale di " + utente.getNome() + " " + utente.getCognome());
+        lblMatricola.setText("Matricola: " + utente.getIdentificativo());
+        lblAccessi.setText("Totale accessi: " + utente.getNumeroTotaleAccessi());
 
         comboOrdine.setModel(new DefaultComboBoxModel<>(new String[]{"data", "stato"}));
 
-        frame.setSize(1000, 1000);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+        frameCorrente.setSize(1000, 1000);
+        frameCorrente.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameCorrente.setLocationRelativeTo(null);
 
-        frame.setResizable(false);
-        frame.setVisible(true);
+        frameCorrente.setResizable(false);
+        frameCorrente.setVisible(true);
 
-
-
-        return frame;
+        return frameCorrente;
     }
 
     // Getter per il controller

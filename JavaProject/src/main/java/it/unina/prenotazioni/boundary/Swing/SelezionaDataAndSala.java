@@ -1,20 +1,27 @@
 package it.unina.prenotazioni.boundary.Swing;
 
+import it.unina.prenotazioni.controller.BibliotecaFacade;
+import it.unina.prenotazioni.dto.SalaStudioDTO;
+import it.unina.prenotazioni.dto.UtenteDTO;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.awt.event.ActionListener;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Locale;
 
+/** Step 1 del wizard di prenotazione: scelta della data e della sala disponibile (UC6). */
 public class SelezionaDataAndSala {
 
     public static void main(String[] args) {
-        SelezionaDataAndSala selezionaDataAndSala = new SelezionaDataAndSala();
-
-        selezionaDataAndSala.apriForm();
+        // test sulla singola interfaccia: serve uno studente (id 1) nel DB per completare il flusso
+        UtenteDTO utente = new UtenteDTO();
+        utente.setId(1L);
+        new SelezionaDataAndSala(new StatoWizard(utente)).apriForm();
     }
 
     private static final Color VIOLA       = new Color(124, 115, 230);
@@ -40,24 +47,21 @@ public class SelezionaDataAndSala {
     private JButton btnContinua;
 
     // Stato interno
-    private LocalDate meseCorrente    = LocalDate.now().withDayOfMonth(1);
-    private LocalDate dataSelezionata = null;
-    private ButtonGroup gruppoSale    = new ButtonGroup();
+    private final StatoWizard stato;
+    private LocalDate meseCorrente;
+    private JFrame frameCorrente;
+    private ButtonGroup gruppoSale = new ButtonGroup();
 
-    public SelezionaDataAndSala() {
-        // Styling header
-        btnLogout.setBackground(Color.WHITE);
-        btnLogout.setForeground(VIOLA);
-        btnLogout.setFocusPainted(false);
-        btnLogout.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    public SelezionaDataAndSala(StatoWizard stato) {
+        this.stato = stato;
+        // riparte dal mese della data già scelta quando si torna indietro dallo step 2
+        meseCorrente = (stato.getData() != null ? stato.getData() : LocalDate.now()).withDayOfMonth(1);
 
-        // Styling btnContinua
-        btnContinua.setBackground(VIOLA);
-        btnContinua.setForeground(Color.WHITE);
-        btnContinua.setFocusPainted(false);
-        btnContinua.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        // Styling non configurabile nel form designer
+        StileWizard.stilizzaLogout(btnLogout);
+        StileWizard.stilizzaBottone(btnContinua, VIOLA);
+        lblSteps.setText(StileWizard.htmlSteps(1));
 
-        // Bordi card (non configurabili nel form designer)
         cardData.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(220, 220, 225), 1, true),
                 new EmptyBorder(15, 15, 15, 15)));
@@ -68,8 +72,17 @@ public class SelezionaDataAndSala {
 
         pannelloSale.setBackground(Color.WHITE);
 
-        // Costruisce il calendario per il mese corrente
+        btnLogout.addActionListener(e -> {
+            frameCorrente.dispose();
+            new Login().apriLogin();
+        });
+        btnContinua.addActionListener(e -> continua());
+
+        // Costruisce il calendario e, al ritorno dallo step 2, ripropone le sale della data scelta
         costruisciCalendario();
+        if (stato.getData() != null) {
+            aggiornaSale(stato.getData());
+        }
     }
 
     // ── CALENDARIO ───────────────────────────────────────────────────────────
@@ -128,16 +141,20 @@ public class SelezionaDataAndSala {
             btnG.setBorderPainted(false);
             btnG.setOpaque(true);
 
-            if (data.equals(dataSelezionata)) {
+            boolean weekend = data.getDayOfWeek() == DayOfWeek.SATURDAY
+                    || data.getDayOfWeek() == DayOfWeek.SUNDAY;
+
+            if (data.equals(stato.getData())) {
                 btnG.setBackground(VIOLA);
                 btnG.setForeground(Color.WHITE);
-            } else if (data.equals(oggi)) {
-                btnG.setBackground(OGGI_COLOR);
-                btnG.setForeground(Color.BLACK);
-            } else if (data.isBefore(oggi)) {
+            } else if (data.isBefore(oggi) || weekend) {
+                // giorni passati e weekend non prenotabili (le sale aprono nei giorni feriali)
                 btnG.setBackground(Color.WHITE);
                 btnG.setForeground(GRIGIO);
                 btnG.setEnabled(false);
+            } else if (data.equals(oggi)) {
+                btnG.setBackground(OGGI_COLOR);
+                btnG.setForeground(Color.BLACK);
             } else {
                 btnG.setBackground(Color.WHITE);
                 btnG.setForeground(Color.BLACK);
@@ -145,7 +162,10 @@ public class SelezionaDataAndSala {
 
             final LocalDate dataFinal = data;
             btnG.addActionListener(e -> {
-                dataSelezionata = dataFinal;
+                stato.setData(dataFinal);
+                // il cambio data invalida la sala scelta in precedenza (come nella GUI web)
+                stato.setIdSala(null);
+                stato.setNomeSala(null);
                 costruisciCalendario();
                 aggiornaSale(dataFinal);
             });
@@ -168,50 +188,81 @@ public class SelezionaDataAndSala {
         return btn;
     }
 
-    // ── SALE (STUB) ──────────────────────────────────────────────────────────
+    // ── SALE (UC6) ───────────────────────────────────────────────────────────
 
+    /** Sale aperte e con posti liberi nella data scelta, come radio-card selezionabili. */
     private void aggiornaSale(LocalDate data) {
         pannelloSale.removeAll();
         pannelloSale.setLayout(new BoxLayout(pannelloSale, BoxLayout.Y_AXIS));
         pannelloSale.setBackground(Color.WHITE);
         gruppoSale = new ButtonGroup();
 
-        // STUB: una sala fissa — sostituire con chiamata al controller
-        JRadioButton rbSala1 = new JRadioButton(
-                "<html><b>Sala1</b><br><font color='gray'><small>20 postazioni totali · nessuna</small></font></html>");
-        rbSala1.setBackground(Color.WHITE);
-        rbSala1.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        rbSala1.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(new Color(220, 220, 225), 1, true),
-                new EmptyBorder(8, 10, 8, 10)));
-        rbSala1.setAlignmentX(Component.LEFT_ALIGNMENT);
-        rbSala1.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        List<SalaStudioDTO> sale;
+        try {
+            sale = BibliotecaFacade.getInstance().consultaSaleDisponibili(data);
+        } catch (RuntimeException ex) {
+            mostraErrore(ex.getMessage());
+            sale = List.of();
+        }
 
-        gruppoSale.add(rbSala1);
-        pannelloSale.add(rbSala1);
+        if (sale.isEmpty()) {
+            JLabel lblVuoto = new JLabel("Nessuna sala disponibile per questa data.");
+            lblVuoto.setForeground(StileWizard.GRIGIO_TESTO);
+            lblVuoto.setAlignmentX(Component.LEFT_ALIGNMENT);
+            pannelloSale.add(lblVuoto);
+        }
+
+        for (SalaStudioDTO sala : sale) {
+            String descrizione = sala.getDescrizione() == null ? "" : sala.getDescrizione();
+            JRadioButton radio = StileWizard.creaRadioCard("<html><b>" + sala.getNome()
+                    + "</b><br><font color='gray'><small>" + sala.getNumeroPostazioniTotali()
+                    + " postazioni totali · " + descrizione + "</small></font></html>");
+            radio.setAlignmentX(Component.LEFT_ALIGNMENT);
+            radio.setMaximumSize(new Dimension(Integer.MAX_VALUE, 64));
+            radio.addActionListener(e -> {
+                stato.setIdSala(sala.getId());
+                stato.setNomeSala(sala.getNome());
+            });
+            if (sala.getId().equals(stato.getIdSala())) {
+                radio.setSelected(true); // riselezione al ritorno dallo step 2
+            }
+            gruppoSale.add(radio);
+            pannelloSale.add(radio);
+            pannelloSale.add(Box.createVerticalStrut(8));
+        }
         pannelloSale.add(Box.createVerticalGlue());
 
         pannelloSale.revalidate();
         pannelloSale.repaint();
     }
 
+    private void continua() {
+        if (stato.getData() == null) {
+            mostraErrore("Seleziona una data");
+            return;
+        }
+        if (stato.getIdSala() == null) {
+            mostraErrore("Seleziona una sala");
+            return;
+        }
+        frameCorrente.dispose();
+        new SelezionaFascia(stato).apriForm();
+    }
+
     // ── APRI FORM ────────────────────────────────────────────────────────────
 
     public JFrame apriForm() {
-        JFrame frame = new JFrame("Nuova Prenotazione");
-        frame.setContentPane(selezionaDataSalaPane);
-        frame.setSize(960, 700);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.setResizable(true);
-        frame.setVisible(true);
-        return frame;
+        frameCorrente = new JFrame("Nuova Prenotazione");
+        frameCorrente.setContentPane(selezionaDataSalaPane);
+        frameCorrente.setSize(960, 700);
+        frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameCorrente.setLocationRelativeTo(null);
+        frameCorrente.setResizable(true);
+        frameCorrente.setVisible(true);
+        return frameCorrente;
     }
 
-    // ── GETTER / LISTENER per il controller ──────────────────────────────────
-
-    public void addLogoutListener(ActionListener l)   { btnLogout.addActionListener(l); }
-    public void addContinuaListener(ActionListener l) { btnContinua.addActionListener(l); }
-    public LocalDate getDataSelezionata()             { return dataSelezionata; }
-    public ButtonGroup getGruppoSale()                { return gruppoSale; }
+    public void mostraErrore(String messaggio) {
+        JOptionPane.showMessageDialog(selezionaDataSalaPane, messaggio, "Errore", JOptionPane.ERROR_MESSAGE);
+    }
 }

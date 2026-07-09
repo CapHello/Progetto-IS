@@ -2,7 +2,6 @@ package it.unina.prenotazioni.boundary.Swing;
 
 import it.unina.prenotazioni.controller.BibliotecaFacade;
 import it.unina.prenotazioni.dto.UtenteDTO;
-import it.unina.prenotazioni.entity.Utente;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -118,7 +117,7 @@ public class Login {
                         if (utenteDTO.getRuolo().equalsIgnoreCase("Studente")) {
                             frameCorrente.dispose();
                             DashboardStudente dashboardStudente = new DashboardStudente();
-                            dashboardStudente.apriDashboard(utenteDTO.getNome(), utenteDTO.getCognome(), utenteDTO.getNumeroTotaleAccessi());
+                            dashboardStudente.apriDashboard(utenteDTO);
                         }else if(utenteDTO.getRuolo().equalsIgnoreCase("Bibliotecario")){
                             //TODO
                         }
