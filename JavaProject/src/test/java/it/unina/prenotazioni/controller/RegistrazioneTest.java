@@ -8,6 +8,16 @@ import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// NOTE: i test case in cui si richiedeva che il codice della postazione, area e sala studio
+// dovesse trovarsi all'interno di un intervallo specificato in fase di analisi non è necessario implementarli
+// mi basta fare il test sull'id univoco di hybernate che deve esser necessariamente > 0 tranne nel caso di postazione che
+// assume volutamente il valore 0 per indicare la strategia di assegnazione.
+
+// il motivo principale per cui non è necessario:
+// essendo che prenotazioni, area e sale sono già memorizzate all'interno del database allora il test sul codiceNumerico di ognuna
+// di queste è già svolto dalla test-suite di creaSaleStudio. Inoltre come parametri in input ad effettuaPrenotazione non
+// è presente il codiceNumerico di ognuno di questi oggetti citati, ma il codice identificativo generato attraverso hybernate.
+
 @DisplayName("Suite di Test - Registrazione Utente")
 class RegistrazioneTest {
 
@@ -81,9 +91,9 @@ class RegistrazioneTest {
         assertEquals(codice, risultato.getIdentificativo());
     }
 
-    // ==========================================
+    // 
     // CASI DI ERRORE [ERROR] - PARTIZIONE RUOLO
-    // ==========================================
+    // 
 
     @Test
     @DisplayName("TC3: Fallimento con Ruolo vuoto")
@@ -109,9 +119,9 @@ class RegistrazioneTest {
         assertEquals("Il ruolo è obbligatorio e valido.", exception.getMessage());
     }
 
-    // ==========================================
+    // 
     // CASI DI ERRORE [ERROR] - PARTIZIONE NOME
-    // ==========================================
+    // 
 
     @Test
     @DisplayName("TC5: Fallimento con Nome vuoto")
@@ -147,9 +157,9 @@ class RegistrazioneTest {
         assertEquals("Formato nome non valido (solo lettere, max 20 caratteri).", exception.getMessage());
     }
 
-    // ==========================================
+    // 
     // CASI DI ERRORE [ERROR] - PARTIZIONE COGNOME
-    // ==========================================
+    // 
 
     @Test
     @DisplayName("TC8: Fallimento con Cognome vuoto")
@@ -185,9 +195,9 @@ class RegistrazioneTest {
         assertEquals("Formato cognome non valido (solo lettere, max 20 caratteri).", exception.getMessage());
     }
 
-    // ==========================================
+    // 
     // CASI DI ERRORE [ERROR] - PARTIZIONE EMAIL (Completamento)
-    // ==========================================
+    // 
 
     @Test
     @DisplayName("TC11: Fallimento con Email vuota")
@@ -243,9 +253,9 @@ class RegistrazioneTest {
         assertEquals("Email già associata a un account.", exception.getMessage());
     }
 
-    // ==========================================
+    // 
     // CASI DI ERRORE [ERROR] - PARTIZIONE PASSWORD
-    // ==========================================
+    // 
 
     @Test
     @DisplayName("TC15: Fallimento con Password vuota")
@@ -281,9 +291,9 @@ class RegistrazioneTest {
         assertEquals("La password non può superare i 32 caratteri.", exception.getMessage());
     }
 
-    // ==========================================
+    // 
     // CASI DI ERRORE [ERROR] - PARTIZIONE IDENTIFICATIVO
-    // ==========================================
+    // 
 
     @Test
     @DisplayName("TC18: Fallimento con Identificativo vuoto")

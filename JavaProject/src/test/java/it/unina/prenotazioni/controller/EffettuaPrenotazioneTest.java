@@ -29,7 +29,7 @@ class EffettuaPrenotazioneTest {
     private Long ID_STUDENTE;
     private Long FASCIA_09_30;
 
-    private final Long ASSEGNAZIONE_AUTOMATICA = null;
+    private final Long ASSEGNAZIONE_AUTOMATICA = 0L;
     private final LocalDate DATA_VALIDA = LocalDate.of(2026, 8, 27);
 
     @BeforeEach
@@ -315,6 +315,7 @@ class EffettuaPrenotazioneTest {
         assertEquals("L'area non è presente all'interno della sala selezionata", exception.getMessage());
     }
 
+
     @Test
     @DisplayName("TC20: Area selezionata satura per la fascia oraria")
     void effettuaPrenotazione_AreaSaturaFascia_LanciaEccezione() {
@@ -414,9 +415,9 @@ class EffettuaPrenotazioneTest {
         assertTrue(exception.getMessage().contains("La postazione selezionata non è più disponibile"));
     }
 
-    // ==========================================
+    //
     // METODI DI SUPPORTO PER IL SETUP DEL DB
-    // ==========================================
+    //
 
     /**
      * Occupa fisicamente una postazione nel database simulando la prenotazione

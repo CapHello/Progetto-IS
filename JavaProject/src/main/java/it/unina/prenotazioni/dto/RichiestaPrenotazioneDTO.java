@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 /**
  * Parameter object di UC7: raggruppa i dati della richiesta di prenotazione,
- * come CreazioneSalaDTO fa per UC3. idPostazione null o 0 = assegnazione automatica.
+ * come CreazioneSalaDTO fa per UC3. idPostazione 0 = assegnazione automatica.
  */
 public class RichiestaPrenotazioneDTO {
     private Long idSala;
