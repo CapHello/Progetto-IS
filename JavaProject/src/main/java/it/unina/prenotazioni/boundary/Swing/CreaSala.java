@@ -255,7 +255,7 @@ public class CreaSala {
         frameCorrente = new JFrame("Crea nuova Sala Studio");
         frameCorrente.setContentPane(creaSalaPane);
         frameCorrente.setSize(1000, 1000);
-        frameCorrente.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
         frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);

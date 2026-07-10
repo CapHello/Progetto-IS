@@ -122,7 +122,7 @@ public class SelezionaArea {
         frameCorrente = new JFrame("Nuova Prenotazione");
         frameCorrente.setContentPane(selezionaAreaPane);
         frameCorrente.setSize(1000, 1000);
-        frameCorrente.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
         frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);
