@@ -1,9 +1,10 @@
 package it.unina.prenotazioni.boundary.Swing;
 
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 import it.unina.prenotazioni.dto.AreaDettaglioDTO;
-import it.unina.prenotazioni.dto.DettaglioSalaDTO;
 import it.unina.prenotazioni.dto.PostazioneDTO;
-import it.unina.prenotazioni.dto.UtenteDTO;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
@@ -11,42 +12,9 @@ import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.time.LocalDate;
 import java.util.Locale;
 
 public class SelezionaPostazione {
-
-    public static void main(String[] args) {
-        // test sulla singola interfaccia con dati fittizi
-        UtenteDTO utente = new UtenteDTO();
-        utente.setId(1L);
-        StatoWizard stato = new StatoWizard(utente);
-        stato.setData(LocalDate.now());
-        stato.setIdSala(1L);
-        stato.setNomeSala("Sala1");
-        stato.setIdFascia(1L);
-        stato.setEtichettaFascia("08:30-10:30");
-        stato.setIdArea(1L);
-        stato.setTipologiaArea("comune");
-
-        DettaglioSalaDTO dettaglio = new DettaglioSalaDTO();
-        AreaDettaglioDTO area = new AreaDettaglioDTO(1L, "comune");
-        int liberi = 0;
-        for (int i = 1; i <= 20; i++) {
-            PostazioneDTO posto = new PostazioneDTO();
-            posto.setId((long) i);
-            posto.setNumero(i);
-            posto.setTipologiaArea("comune");
-            posto.setDisponibile(i % 7 != 0);
-            if (posto.isDisponibile()) liberi++;
-            area.getPostazioni().add(posto);
-        }
-        area.setPostiDisponibili(liberi);
-        dettaglio.getAree().add(area);
-        stato.setDettaglio(dettaglio);
-
-        new SelezionaPostazione(stato).apriForm();
-    }
 
     // Campi legati al .form
     private JPanel selezionaPostazionePane;
@@ -111,7 +79,7 @@ public class SelezionaPostazione {
         costruisciGriglia();
     }
 
-    // ── GRIGLIA POSTI ────────────────────────────────────────────────────────
+    // --- GRIGLIA POSTI ---
 
     private void costruisciGriglia() {
         pannelloPosti.removeAll();
@@ -206,7 +174,7 @@ public class SelezionaPostazione {
         new RiepilogoPrenotazione(stato).apriForm();
     }
 
-    // ── APRI FORM ────────────────────────────────────────────────────────────
+    // --- APRI FORM ---
 
     public JFrame apriForm() {
         frameCorrente = new JFrame("Nuova Prenotazione");
@@ -239,113 +207,113 @@ public class SelezionaPostazione {
      */
     private void $$$setupUI$$$() {
         selezionaPostazionePane = new JPanel();
-        selezionaPostazionePane.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
+        selezionaPostazionePane.setLayout(new GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
         selezionaPostazionePane.setBackground(new Color(-5192482));
         header = new JPanel();
-        header.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 3, new Insets(10, 15, 10, 15), -1, -1));
+        header.setLayout(new GridLayoutManager(1, 3, new Insets(10, 15, 10, 15), -1, -1));
         header.setBackground(new Color(-8621082));
         header.setOpaque(true);
-        selezionaPostazionePane.add(header, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        selezionaPostazionePane.add(header, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         lblTitolo = new JLabel();
         Font lblTitoloFont = this.$$$getFont$$$("SansSerif", Font.BOLD, 20, lblTitolo.getFont());
         if (lblTitoloFont != null) lblTitolo.setFont(lblTitoloFont);
         lblTitolo.setForeground(new Color(-1));
         lblTitolo.setText("  Dashboard Studente");
-        header.add(lblTitolo, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final com.intellij.uiDesigner.core.Spacer spacer1 = new com.intellij.uiDesigner.core.Spacer();
-        header.add(spacer1, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        header.add(lblTitolo, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer1 = new Spacer();
+        header.add(spacer1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         btnLogout = new JButton();
         btnLogout.setText("Logout");
-        header.add(btnLogout, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_EAST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        header.add(btnLogout, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         pannelloSteps = new JPanel();
-        pannelloSteps.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(12, 20, 12, 20), -1, -1));
+        pannelloSteps.setLayout(new GridLayoutManager(1, 1, new Insets(12, 20, 12, 20), -1, -1));
         pannelloSteps.setBackground(new Color(-5192482));
         pannelloSteps.setOpaque(true);
-        selezionaPostazionePane.add(pannelloSteps, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        selezionaPostazionePane.add(pannelloSteps, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         lblSteps = new JLabel();
         lblSteps.setForeground(new Color(-6710887));
         lblSteps.setHorizontalAlignment(0);
         lblSteps.setText("1 Data  Sala  ──  2 Fascia Oraria  ──  3 Area  ──  4 Postazione  ──  5 Conferma");
         lblSteps.setDisplayedMnemonic(' ');
         lblSteps.setDisplayedMnemonicIndex(7);
-        pannelloSteps.add(lblSteps, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        pannelloSteps.add(lblSteps, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         pannelloContenuto = new JPanel();
-        pannelloContenuto.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(10, 30, 20, 30), -1, 8));
+        pannelloContenuto.setLayout(new GridLayoutManager(2, 1, new Insets(10, 30, 20, 30), -1, 8));
         pannelloContenuto.setBackground(new Color(-5192482));
         pannelloContenuto.setOpaque(true);
-        selezionaPostazionePane.add(pannelloContenuto, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        selezionaPostazionePane.add(pannelloContenuto, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         pannelloSplit = new JPanel();
-        pannelloSplit.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), 15, -1));
+        pannelloSplit.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), 15, -1));
         pannelloSplit.setBackground(new Color(-5192482));
         pannelloSplit.setOpaque(true);
-        pannelloContenuto.add(pannelloSplit, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        pannelloContenuto.add(pannelloSplit, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         cardPosti = new JPanel();
-        cardPosti.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, 10));
+        cardPosti.setLayout(new GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, 10));
         cardPosti.setBackground(new Color(-1));
         cardPosti.setOpaque(true);
-        pannelloSplit.add(cardPosti, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        pannelloSplit.add(cardPosti, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         lblTitoloCard = new JLabel();
         Font lblTitoloCardFont = this.$$$getFont$$$("SansSerif", Font.BOLD, 16, lblTitoloCard.getFont());
         if (lblTitoloCardFont != null) lblTitoloCard.setFont(lblTitoloCardFont);
         lblTitoloCard.setText("4. Scegli la postazione");
-        cardPosti.add(lblTitoloCard, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        cardPosti.add(lblTitoloCard, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         lblSottotitolo = new JLabel();
         lblSottotitolo.setForeground(new Color(-6710887));
         lblSottotitolo.setText("sala · area · data · fascia");
-        cardPosti.add(lblSottotitolo, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        cardPosti.add(lblSottotitolo, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         pannelloPosti = new JPanel();
-        pannelloPosti.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        pannelloPosti.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         pannelloPosti.setBackground(new Color(-1));
         pannelloPosti.setOpaque(true);
-        cardPosti.add(pannelloPosti, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        cardPosti.add(pannelloPosti, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         colonnaDestra = new JPanel();
-        colonnaDestra.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, 15));
+        colonnaDestra.setLayout(new GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, 15));
         colonnaDestra.setBackground(new Color(-5192482));
         colonnaDestra.setOpaque(true);
-        pannelloSplit.add(colonnaDestra, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(300, -1), null, 0, false));
+        pannelloSplit.add(colonnaDestra, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(300, -1), null, 0, false));
         cardDettaglio = new JPanel();
-        cardDettaglio.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, 10));
+        cardDettaglio.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, 10));
         cardDettaglio.setBackground(new Color(-460036));
         cardDettaglio.setOpaque(true);
-        colonnaDestra.add(cardDettaglio, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        colonnaDestra.add(cardDettaglio, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         lblTitoloDettaglio = new JLabel();
         Font lblTitoloDettaglioFont = this.$$$getFont$$$("SansSerif", Font.BOLD, 15, lblTitoloDettaglio.getFont());
         if (lblTitoloDettaglioFont != null) lblTitoloDettaglio.setFont(lblTitoloDettaglioFont);
         lblTitoloDettaglio.setText("Postazione");
-        cardDettaglio.add(lblTitoloDettaglio, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        cardDettaglio.add(lblTitoloDettaglio, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         lblDettaglio = new JLabel();
         lblDettaglio.setForeground(new Color(-6710887));
         lblDettaglio.setText("Seleziona una postazione libera.");
-        cardDettaglio.add(lblDettaglio, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_NORTHWEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, 1, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        cardDettaglio.add(lblDettaglio, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_NORTHWEST, GridConstraints.FILL_HORIZONTAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         cardAuto = new JPanel();
-        cardAuto.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, 10));
+        cardAuto.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, 10));
         cardAuto.setBackground(new Color(-1));
         cardAuto.setOpaque(true);
-        colonnaDestra.add(cardAuto, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        colonnaDestra.add(cardAuto, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         lblOppure = new JLabel();
         Font lblOppureFont = this.$$$getFont$$$("SansSerif", Font.BOLD, 15, lblOppure.getFont());
         if (lblOppureFont != null) lblOppure.setFont(lblOppureFont);
         lblOppure.setText("Oppure");
-        cardAuto.add(lblOppure, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        cardAuto.add(lblOppure, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         rbAutomatica = new JRadioButton();
         rbAutomatica.setText("Assegnazione automatica");
-        cardAuto.add(rbAutomatica, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        cardAuto.add(rbAutomatica, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         btnContinua = new JButton();
         btnContinua.setBackground(new Color(-8621082));
         btnContinua.setForeground(new Color(-1));
         btnContinua.setText("Continua");
-        colonnaDestra.add(btnContinua, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        colonnaDestra.add(btnContinua, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         pannelloAzioni = new JPanel();
-        pannelloAzioni.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+        pannelloAzioni.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
         pannelloAzioni.setBackground(new Color(-5192482));
         pannelloAzioni.setOpaque(true);
-        pannelloContenuto.add(pannelloAzioni, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        pannelloContenuto.add(pannelloAzioni, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         lblIndietro = new JLabel();
         lblIndietro.setForeground(new Color(-6710887));
         lblIndietro.setText("← Indietro");
-        pannelloAzioni.add(lblIndietro, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final com.intellij.uiDesigner.core.Spacer spacer2 = new com.intellij.uiDesigner.core.Spacer();
-        pannelloAzioni.add(spacer2, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        pannelloAzioni.add(lblIndietro, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer2 = new Spacer();
+        pannelloAzioni.add(spacer2, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
     }
 
     /**
@@ -376,4 +344,5 @@ public class SelezionaPostazione {
     public JComponent $$$getRootComponent$$$() {
         return selezionaPostazionePane;
     }
+
 }

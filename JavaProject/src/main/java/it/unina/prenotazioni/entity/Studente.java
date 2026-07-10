@@ -17,6 +17,8 @@ public class Studente extends Utente{
 
     private int numeroTotaleAccessi;
 
+    // Lato inverso dell'associazione con Prenotazione: serve solo al mapping JPA,
+    // non lo leggiamo mai (le ricerche passano dal RegistroPrenotazioni).
     @OneToMany(mappedBy = "studente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prenotazione> prenotazioni = new ArrayList<>();
 

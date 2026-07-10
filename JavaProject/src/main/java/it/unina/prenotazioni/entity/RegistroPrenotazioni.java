@@ -87,7 +87,7 @@ public class RegistroPrenotazioni {
         return gestorePersistenza.cercaPerCampo(Prenotazione.class, "postazione.area.salaStudio.id", idSala);
     }
 
-    /** Prenotazioni potenzialmente in scadenza: ATTIVE (→ SCADUTA) e CONFERMATE (→ CONCLUSA). */
+    /** Prenotazioni potenzialmente in scadenza: le ATTIVE (che possono scadere) e le CONFERMATE (che possono concludersi). */
     public List<Prenotazione> getPrenotazioniInScadenza() {
         List<Prenotazione> risultato = new ArrayList<>();
         risultato.addAll(gestorePersistenza.cercaPerCampo(Prenotazione.class, "nomeStato", StatoEnum.ATTIVA.name()));

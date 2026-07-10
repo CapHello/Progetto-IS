@@ -23,7 +23,7 @@ public class FasciaOraria {
         this.oraFine = oraFine;
     }
 
-    // Getters (niente setter: i campi sono valorizzati dal costruttore e da JPA via field access)
+    // Getters (niente setter: i campi li valorizzano il costruttore e JPA)
     public Long getId() { return id; }
 
     public LocalTime getOraInizio() { return oraInizio; }

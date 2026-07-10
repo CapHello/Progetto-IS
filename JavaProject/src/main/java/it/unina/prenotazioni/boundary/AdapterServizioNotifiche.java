@@ -13,7 +13,7 @@ public class AdapterServizioNotifiche implements ServizioNotifiche {
 
     private final GatewayEmailEsterno gateway = new GatewayEmailEsterno();
 
-    /** Traduce la richiesta di notifica in una send() per ciascun destinatario; esito != 200 → eccezione. */
+    /** Traduce la notifica in una send() per ciascun destinatario; se l'esito non è 200 lancia eccezione. */
     @Override
     public void inviaNotifica(List<UtenteDTO> destinatari, String messaggio) {
         for (UtenteDTO dto : destinatari) {

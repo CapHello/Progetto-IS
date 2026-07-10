@@ -131,11 +131,13 @@ public class RegistroSale {
     }
 
     /**
-     * Orari lavorativi di una sala. NB: questa JPQL non garantisce l'ordine per giorno;
-     * per l'orario di uno specifico giorno usare SalaStudio.getOrarioLavorativoPerData.
+     * Orari lavorativi della sala ordinati per giorno: ORDER BY INDEX(f) ordina sulla
+     * colonna giorno_settimana (0 = Lunedì ... 4 = Venerdì), quindi la posizione nella
+     * lista corrisponde al giorno. Funziona perché creaSalaStudio crea una FasciaOraria
+     * diversa per ogni giorno (se fosse condivisa, Hibernate la restituirebbe una sola volta).
      */
     public List<FasciaOraria> getOrariLavorativiPerSala(Long idSala) {
-        String jpql = "SELECT f FROM SalaStudio s JOIN s.orarioLavorativo f WHERE s.id = :idSala";
+        String jpql = "SELECT f FROM SalaStudio s JOIN s.orarioLavorativo f WHERE s.id = :idSala ORDER BY INDEX(f)";
         return gestorePersistenza.eseguiQueryCustom(
                 jpql,
                 FasciaOraria.class,

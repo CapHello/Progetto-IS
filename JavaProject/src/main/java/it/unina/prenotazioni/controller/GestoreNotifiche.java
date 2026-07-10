@@ -19,7 +19,7 @@ public class GestoreNotifiche implements Observer {
 
     private static GestoreNotifiche istanza;
     private final RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
-    // Iniettato dal boundary (ConfigurazioneNotifiche) → nessuna dipendenza controller→boundary.
+    // Iniettato dal boundary (ConfigurazioneNotifiche): così il controller non dipende dal boundary.
     private ServizioNotifiche servizioNotifiche;
 
     private GestoreNotifiche() {}
@@ -89,11 +89,7 @@ public class GestoreNotifiche implements Observer {
         };
     }
 
-    /**
-     * Converte lo studente nel DTO destinatario delle notifiche. Unico punto di
-     * conversione Studente→UtenteDTO del layer controller (visibilità di package):
-     * lo usano anche GestoreSale (UC4) e GestorePrenotazioni (UC9).
-     */
+    /** Converte lo studente nel DTO destinatario delle notifiche; lo usano anche gli altri gestori. */
     UtenteDTO toUtenteDTO(Studente s) {
         UtenteDTO dto = new UtenteDTO();
         dto.setId(s.getId());

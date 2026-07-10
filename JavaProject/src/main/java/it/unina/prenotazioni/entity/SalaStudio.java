@@ -56,7 +56,7 @@ public class SalaStudio {
         this.numeroPostazioniTotali = numeroPostazioniTotali;
     }
 
-    // Getters and Setters (id e numeroPostazioniTotali non hanno setter: assegnati da DB/costruttore)
+    // Getters and Setters (niente setter per id e numeroPostazioniTotali: li assegnano DB e costruttore)
     public Long getId() { return id; }
 
     public String getNome() { return nome; }

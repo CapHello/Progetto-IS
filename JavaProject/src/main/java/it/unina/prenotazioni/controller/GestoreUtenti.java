@@ -17,10 +17,10 @@ public class GestoreUtenti {
     private static final int MAX_TENTATIVI = 5;
     private static final int MINUTI_BLOCCO = 15;
 
-    /** V13: email istituzionale — dominio unina.it o suoi sottodomini (es. studenti.unina.it). */
+    /** V13: email istituzionale, dominio unina.it o suoi sottodomini (es. studenti.unina.it). */
     private static final String REGEX_EMAIL_ISTITUZIONALE = "^[^@\\s]+@([^@\\s]+\\.)*unina\\.it$";
 
-    /** V14: matricola studente — una lettera maiuscola seguita da 8 cifre. */
+    /** V14: matricola studente, una lettera maiuscola seguita da 8 cifre. */
     private static final String REGEX_MATRICOLA = "[A-Z]\\d{8}";
 
     private final RegistroUtenti registroUtenti = RegistroUtenti.getInstance();
