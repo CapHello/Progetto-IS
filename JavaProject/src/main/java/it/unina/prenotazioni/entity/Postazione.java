@@ -17,10 +17,13 @@ public class Postazione {
     @JoinColumn(name = "area_id", nullable = false)
     private Area area;
 
+    private int codiceNumerico;
+
     public Postazione() {}
 
-    public Postazione(Area area) {
+    public Postazione(Area area, int codiceNumerico) {
         this.area = area;
+        this.codiceNumerico = codiceNumerico;
     }
 
     // Getters (niente setter: i campi li valorizzano il costruttore e JPA)

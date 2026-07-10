@@ -67,11 +67,23 @@ public class GestorePrenotazioni {
         Studente studente = registroUtenti.trovaStudentePerId(idStudente);
 
         if (studente == null) {
-            throw new IllegalArgumentException("Studente non trovato");
+            throw new IllegalArgumentException("Studente non trovato.");
         }
-        SalaStudio sala = registroSale.cercaSalaPerId(idSala);
+        if (idSala == null){
+            throw new IllegalArgumentException("La selezione della sala studio è obbligatoria");
+        }
+        if (idSala < 1){
+            throw new IllegalArgumentException("Identificativo sala non valido");
+        }
+        SalaStudio sala;
+        try{
+            sala = registroSale.cercaSalaPerId(idSala);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Sala studio non trovata.");
+        }
+
         if (sala == null) {
-            throw new IllegalArgumentException("Sala studio non trovata");
+            throw new IllegalArgumentException("Sala studio non trovata.");
         }
         if (!sala.isAttiva()){
             throw new IllegalArgumentException("La sala non è attiva, non sarà più disponibile");
@@ -79,9 +91,12 @@ public class GestorePrenotazioni {
         if (!sala.verificaDataInGiorniApertura(data)) {
             throw new IllegalArgumentException("La sala è chiusa nella data selezionata (giorni feriali)");
         }
-        // per robustezza perché non potrà mai presentarsi essendo che il front-end non permette di non selezionare alcuna area
         if (idArea == null) {
             throw new IllegalArgumentException("Area non specificata");
+        }
+
+        if (idArea < 1) {
+            throw new IllegalArgumentException("Identificativo area non valido.");
         }
 
 
@@ -100,6 +115,9 @@ public class GestorePrenotazioni {
         // idPostazione == 0 è il sentinella per "assegnazione automatica": sicuro perché gli id
         // reali partono da 1 (MySQL AUTO_INCREMENT) e non vengono mai impostati a mano.
         if(idPostazione != null && !idPostazione.equals(0L)){
+            if (idPostazione < 0L) {
+                throw new IllegalArgumentException("Identificativo postazione non valido.");
+            }
             Postazione p = registroSale.trovaPostazionePerId(idPostazione);
             if(p == null || !p.getArea().getId().equals(idArea)){
                 throw new IllegalArgumentException("La postazione selezionata non è presente nell'area");
@@ -115,14 +133,7 @@ public class GestorePrenotazioni {
         }
     }
 
-    /** UC7: è prenotabile solo una fascia non ancora iniziata. */
-    private void verificaDataFasciaFutura(LocalDate data, FasciaOraria fascia) {
-        LocalDateTime inizioSlot = LocalDateTime.of(data, fascia.getOraInizio());
-        if (!inizioSlot.isAfter(LocalDateTime.now())) {
-            throw new IllegalArgumentException(
-                    "Non è possibile prenotare una fascia oraria già iniziata o passata");
-        }
-    }
+
 
     // ------------------------------------------------------------------ UC7
     /**
@@ -143,8 +154,6 @@ public class GestorePrenotazioni {
 
         FasciaOraria fascia = risolviFasciaDellaSala(idSala, idFascia, data);
 
-        verificaDataFasciaFutura(data, fascia);
-
         // aggiunto il blocco synchronized per gestire la concorrenza tra accessi multipli
         // in tal modo due studenti sono impossibilitati di avere la stessa postazione prenotata per lo stesso giorno e data
         synchronized (this){
@@ -154,18 +163,12 @@ public class GestorePrenotazioni {
                         "Esiste già una tua prenotazione attiva o confermata in questa data e fascia oraria");
             }
 
-
-
             // 3-4. Insieme delle postazioni disponibili (per area specifica o per l'intera sala (area comune)).
             List<Postazione> disponibili = registroSale.getPostazioniDisponibili(idArea, data, fascia.getId());
             if (disponibili.isEmpty()){
                 throw new IllegalStateException(
                         "Non sono presenti delle postazioni disponibili per l'area selezionata");
             }
-
-
-
-
 
             // 5. Selezione postazione (specifica o automatica via Strategy).
             Postazione postazione = selezionaPostazione(idPostazione, data, fascia, disponibili);
@@ -352,14 +355,20 @@ public class GestorePrenotazioni {
     private FasciaOraria risolviFasciaDellaSala(Long idSala, Long idFascia, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null){
-            throw new IllegalArgumentException("Sala studio non trovata");
+            throw new IllegalArgumentException("Sala studio non trovata.");
+        }
+        if (idFascia == null){
+            throw new IllegalArgumentException("La fascia oraria è obbligatoria");
+        }
+        if (data.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Non è possibile prenotare una fascia oraria già iniziata o passata");
         }
         for (FasciaOraria f : sala.getFasceOrariePrestabilite(data)) {
             if (f.getId().equals(idFascia)) {
                 return f;
             }
         }
-        throw new IllegalArgumentException("Lo slot orario selezionato non è ammesso");
+        throw new IllegalArgumentException("La fascia oraria selezionata non è disponibile o è già trascorsa");
     }
 
     /** Postazione scelta esplicitamente (se indicata e ancora libera) oppure assegnazione automatica via Strategy. */
