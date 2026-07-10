@@ -16,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
@@ -53,7 +54,7 @@ public class SelezionaDataAndSala {
 
     public SelezionaDataAndSala(StatoWizard stato) {
         this.stato = stato;
-        meseCorrente = (stato.getData() != null ? stato.getData() : LocalDate.now()).withDayOfMonth(1);
+        meseCorrente = (stato.getData() != null ? stato.getData() : LocalDate.now(ZoneId.of("Europe/Rome"))).withDayOfMonth(1);
 
         // Styling non configurabile nel form designer
         StileWizard.stilizzaLogout(btnLogout);
@@ -140,7 +141,7 @@ public class SelezionaDataAndSala {
         int offset = meseCorrente.withDayOfMonth(1).getDayOfWeek().getValue() - 1;
         for (int i = 0; i < offset; i++) gridPanel.add(new JLabel(""));
 
-        LocalDate oggi = LocalDate.now();
+        LocalDate oggi = LocalDate.now(ZoneId.of("Europe/Rome"));
         for (int g = 1; g <= meseCorrente.lengthOfMonth(); g++) {
             LocalDate data = meseCorrente.withDayOfMonth(g);
             JButton btnG = new JButton(String.valueOf(g));

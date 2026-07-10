@@ -8,6 +8,7 @@ import it.unina.prenotazioni.entity.StatoEnum;
 import it.unina.prenotazioni.entity.Studente;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 /**
@@ -70,7 +71,7 @@ public class GestoreNotifiche implements Observer {
      */
     public void inviaPromemoria() {
         for (Prenotazione p : registroPrenotazioni.getPrenotazioniInScadenza()) {
-            if (p.getStato().getStatoEnum() == StatoEnum.ATTIVA && LocalDate.now().equals(p.getData()) && !p.isPromemoriaInviato()) {
+            if (p.getStato().getStatoEnum() == StatoEnum.ATTIVA && LocalDate.now(ZoneId.of("Europe/Rome")).equals(p.getData()) && !p.isPromemoriaInviato()) {
                 Studente s = p.getStudente();
                 if (s != null) {
                     inviaNotifica(List.of(toUtenteDTO(s)),
