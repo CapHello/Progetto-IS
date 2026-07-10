@@ -141,7 +141,7 @@ class EliminaSalaStudioTest {
 
     /*
     * TC4: è possibile superare l'Id 100 in quanto vengono gestiti da Hibernate.
-    * Noi gestiamo il V10 con l'attributo codiceNumerico già verificato in creaSalaTest
+    * Noi gestiamo il V10 con l'attributo codiceNumerico, già verificato in CreaSalaStudioTest.
     */
 
     @Test

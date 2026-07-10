@@ -20,7 +20,7 @@ class RegistrazioneTest {
         bibliotecaFacade = BibliotecaFacade.getInstance();
         em = JpaUtil.getInstance().getEntityManager();
 
-        // Pulizia totale del DB in-memory prima di ogni test
+        // Pulizia totale del DB di test prima di ogni test
         svuotaDatabase(em);
     }
 
@@ -82,7 +82,7 @@ class RegistrazioneTest {
     }
 
     // ==========================================
-    // CASI DI ERRORE [ERROR] - PARTIZIONE RUOLO
+    // CASI DI ERRORE - PARTIZIONE RUOLO
     // ==========================================
 
     @Test
@@ -110,7 +110,7 @@ class RegistrazioneTest {
     }
 
     // ==========================================
-    // CASI DI ERRORE [ERROR] - PARTIZIONE NOME
+    // CASI DI ERRORE - PARTIZIONE NOME
     // ==========================================
 
     @Test
@@ -148,7 +148,7 @@ class RegistrazioneTest {
     }
 
     // ==========================================
-    // CASI DI ERRORE [ERROR] - PARTIZIONE COGNOME
+    // CASI DI ERRORE - PARTIZIONE COGNOME
     // ==========================================
 
     @Test
@@ -186,7 +186,7 @@ class RegistrazioneTest {
     }
 
     // ==========================================
-    // CASI DI ERRORE [ERROR] - PARTIZIONE EMAIL (Completamento)
+    // CASI DI ERRORE - PARTIZIONE EMAIL (Completamento)
     // ==========================================
 
     @Test
@@ -244,7 +244,7 @@ class RegistrazioneTest {
     }
 
     // ==========================================
-    // CASI DI ERRORE [ERROR] - PARTIZIONE PASSWORD
+    // CASI DI ERRORE - PARTIZIONE PASSWORD
     // ==========================================
 
     @Test
@@ -282,7 +282,7 @@ class RegistrazioneTest {
     }
 
     // ==========================================
-    // CASI DI ERRORE [ERROR] - PARTIZIONE IDENTIFICATIVO
+    // CASI DI ERRORE - PARTIZIONE IDENTIFICATIVO
     // ==========================================
 
     @Test
@@ -305,7 +305,7 @@ class RegistrazioneTest {
                     "Studente", "Mario", "Rossi", "m.iderrato@studenti.unina.it", "Password123!", "n86001234"
             );
         });
-        assertEquals("Formato identificativo non riconosciuto.", exception.getMessage());
+        assertEquals("Formato identificativo non riconosciuto: la matricola deve essere una lettera maiuscola seguita da 8 cifre (es. N86001234).", exception.getMessage());
     }
 
     @Test

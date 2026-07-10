@@ -203,8 +203,6 @@ class CreaSalaStudioTest {
             bibliotecaFacade.creaSalaStudio(richiesta);
         });
 
-        // Ho adattato il messaggio aspettato per corrispondere alla logica implementabile
-        // Assicurati che nel tuo validatore esista questo controllo.
         assertTrue(exception.getMessage().contains("non può essere negativo") ||
                 exception.getMessage().contains("almeno una postazione"));
     }
@@ -232,7 +230,6 @@ class CreaSalaStudioTest {
     @DisplayName("TC: Creazione fallisce al superamento del limite di 100 sale attive")
     void creaSalaStudio_LimiteCentosaleSuperato_LanciaEccezione() {
         // Setup: Saturiamo il limite creando esattamente 100 sale
-        // Assicurati che il database di test sia stato pulito nel @BeforeEach / setUp()
         for (int i = 1; i <= 100; i++) {
             CreazioneSalaDTO dto = new CreazioneSalaDTO();
             dto.setNome("Sala " + i);
