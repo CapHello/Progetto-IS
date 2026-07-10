@@ -20,7 +20,7 @@ public class BoundaryPrenotazione {
     public PrenotazioneDTO effettuaPrenotazione(
             @RequestParam("idSala") Long idSala,
             @RequestParam(name = "idArea", required = false) Long idArea,
-            @RequestParam(name = "idPostazione", required = false) Long idPostazione,
+            @RequestParam(name = "idPostazione", required = false, defaultValue = "0") Long idPostazione,
             @RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data,
             @RequestParam("idFascia") Long idFascia,
             @RequestParam("idStudente") Long idStudente) {
