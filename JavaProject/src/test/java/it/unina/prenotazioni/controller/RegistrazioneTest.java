@@ -35,11 +35,14 @@ class RegistrazioneTest {
                 transaction.begin();
             }
 
+            // Le prenotazioni referenziano gli studenti (FK): vanno eliminate prima degli utenti.
+            em.createQuery("DELETE FROM Prenotazione").executeUpdate();
             em.createQuery("DELETE FROM Utente").executeUpdate();
 
             transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) transaction.rollback();
+            throw new RuntimeException("Errore durante la pulizia del database di test: " + e.getMessage(), e);
         }
     }
 
@@ -228,13 +231,13 @@ class RegistrazioneTest {
 
         // 1. Registriamo il primo utente con successo
         bibliotecaFacade.registrazione(
-                "Studente", "Antonio", "Rossi", emailDuplicata, "Password123!", "N86001007A"
+                "Studente", "Antonio", "Rossi", emailDuplicata, "Password123!", "N86001007"
         );
 
         // 2. Tentiamo di registrare il secondo utente con la STESSA email ma matricola diversa
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             bibliotecaFacade.registrazione(
-                    "Studente", "Mario", "Verdi", emailDuplicata, "AltraPass456!", "N86001007B"
+                    "Studente", "Mario", "Verdi", emailDuplicata, "AltraPass456!", "N86001008"
             );
         });
         assertEquals("Email già associata a un account.", exception.getMessage());
@@ -297,9 +300,9 @@ class RegistrazioneTest {
     @DisplayName("TC19: Fallimento con Formato Identificativo non riconosciuto")
     void registrazioneConIdentificativoErrato_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            // "M86001234" anziché il formato corretto per studente
+            // "n86001234" (lettera minuscola) anziché il formato corretto: una maiuscola + 8 cifre
             bibliotecaFacade.registrazione(
-                    "Studente", "Mario", "Rossi", "m.iderrato@studenti.unina.it", "Password123!", "M86001234"
+                    "Studente", "Mario", "Rossi", "m.iderrato@studenti.unina.it", "Password123!", "n86001234"
             );
         });
         assertEquals("Formato identificativo non riconosciuto.", exception.getMessage());
