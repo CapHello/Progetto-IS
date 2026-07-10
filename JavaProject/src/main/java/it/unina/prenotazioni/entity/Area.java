@@ -17,7 +17,7 @@ public class Area {
     private Long id;
 
     private String tipologia;
-    private int codiceNumerico;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sala_studio_id", nullable = false)
@@ -28,13 +28,13 @@ public class Area {
 
     public Area() {}
 
-    public Area(String tipologia, SalaStudio salaStudio, int codiceNumerico) {
+    public Area(String tipologia, SalaStudio salaStudio) {
         this.tipologia = tipologia;
         this.salaStudio = salaStudio;
-        this.codiceNumerico = codiceNumerico;
+
     }
 
-    // Getters (niente setter: i campi li valorizzano il costruttore e JPA)
+    // Getters (niente setter: i campi sono valorizzati dal costruttore e da JPA via field access)
     public Long getId() { return id; }
 
     public String getTipologia() { return tipologia; }
@@ -63,9 +63,7 @@ public class Area {
     /** Genera in memoria le postazioni dell'area; la persistenza avviene a cascata (UC3). */
     public void creaPostazioni(int numeroPostazioni) {
         for (int i = 0; i < numeroPostazioni; i++) {
-            // i parte da 0, quindi il codice è i+1: le postazioni sono numerate da 1 a N
-            // (lo 0 è riservato come sentinella per l'assegnazione automatica)
-            Postazione p = new Postazione(this, i+1);
+            Postazione p = new Postazione(this);
             this.postazioni.add(p);
         }
     }

@@ -24,12 +24,6 @@ public class SalaStudio {
     private String descrizione;
     private int numeroPostazioniTotali;
 
-    // Codice "visibile" della sala (1-100), assegnato da GestoreSale al primo valore libero.
-    // Niente vincolo unique sul DB: le sale eliminate (soft delete) restano in tabella col
-    // loro codice, che può essere riassegnato a una sala nuova; l'unicità vale solo tra le
-    // sale attive ed è garantita dalla logica di assegnazione.
-    // Limite noto: due creazioni simultanee potrebbero ottenere lo stesso codice.
-    private int codiceNumerico;
 
 
     @Column(name = "attiva", nullable = false)
@@ -81,14 +75,6 @@ public class SalaStudio {
     public boolean isAttiva() { return attiva; }
     public void setAttiva(boolean attiva) { this.attiva = attiva; }
 
-    public int getCodiceNumerico() {
-        return codiceNumerico;
-    }
-
-    public void setCodiceNumerico(int codiceNumerico) {
-        this.codiceNumerico = codiceNumerico;
-    }
-
     // --- Costruzione in memoria (usata in CreaSalaStudio, prima della persistenza) ---
 
     /** Aggiunge una fascia oraria (slot prenotabile) all'orario della sala. */
@@ -121,12 +107,9 @@ public class SalaStudio {
         }
 
         verificaNumeroPostazioni(postazioniAssegnate + numPostazioni);
-        int codiceNumericoArea = 0;
-        if (!tipologia.equalsIgnoreCase("comune")){
-            codiceNumericoArea = aree.size() + 1;
-        }
 
-        Area area = new Area(tipologia, this, codiceNumericoArea);
+
+        Area area = new Area(tipologia, this);
 
         area.creaPostazioni(numPostazioni);
 
