@@ -40,6 +40,7 @@ public class SelezionaDataAndSala {
     private JLabel lblLegenda;
     private JPanel cardSala;
     private JLabel lblTitoloSala;
+    private JScrollPane scrollSale;
     private JPanel pannelloSale;
     private JPanel pannelloBottom;
     private JLabel lblIndietro;
@@ -69,6 +70,11 @@ public class SelezionaDataAndSala {
                 new EmptyBorder(15, 15, 15, 15)));
 
         pannelloSale.setBackground(Color.WHITE);
+
+        // Con molte sale la lista supera l'altezza della card: si scorre in verticale.
+        scrollSale.setBorder(null);
+        scrollSale.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollSale.getVerticalScrollBar().setUnitIncrement(16);
 
         btnLogout.addActionListener(e -> {
             frameCorrente.dispose();
@@ -353,11 +359,13 @@ public class SelezionaDataAndSala {
         if (lblTitoloSalaFont != null) lblTitoloSala.setFont(lblTitoloSalaFont);
         lblTitoloSala.setText("1.2 Scegli la Sala Studio");
         cardSala.add(lblTitoloSala, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        scrollSale = new JScrollPane();
+        cardSala.add(scrollSale, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         pannelloSale = new JPanel();
         pannelloSale.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         pannelloSale.setBackground(new Color(-1));
         pannelloSale.setOpaque(true);
-        cardSala.add(pannelloSale, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        scrollSale.setViewportView(pannelloSale);
         pannelloBottom = new JPanel();
         pannelloBottom.setLayout(new GridLayoutManager(1, 3, new Insets(10, 30, 20, 30), -1, -1));
         pannelloBottom.setBackground(new Color(-5192482));
