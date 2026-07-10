@@ -113,7 +113,7 @@ public class GestorePrenotazioni {
         // verifico la correttezza e la coerenza dei parametri in ingresso per quanto riguarda sala, area, postazione, idFascia
         Studente studente = risolviStudente(idStudente);
         SalaStudio sala = risolviSala(idSala, data);
-        Area area = risolviArea(sala,idArea);
+        risolviArea(sala,idArea);
         FasciaOraria fascia = risolviFascia(sala, idFascia, data);
 
         // aggiunto il blocco synchronized per gestire la concorrenza tra accessi multipli

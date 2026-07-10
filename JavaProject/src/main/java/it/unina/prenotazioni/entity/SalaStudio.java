@@ -23,7 +23,7 @@ public class SalaStudio {
     private String nome;
     private String descrizione;
     private int numeroPostazioniTotali;
-    private int codiceNumerico;
+
 
 
     @Column(name = "attiva", nullable = false)
@@ -75,14 +75,6 @@ public class SalaStudio {
     public boolean isAttiva() { return attiva; }
     public void setAttiva(boolean attiva) { this.attiva = attiva; }
 
-    public int getCodiceNumerico() {
-        return codiceNumerico;
-    }
-
-    public void setCodiceNumerico(int codiceNumerico) {
-        this.codiceNumerico = codiceNumerico;
-    }
-
     // --- Costruzione in memoria (usata in CreaSalaStudio, prima della persistenza) ---
 
     /** Aggiunge una fascia oraria (slot prenotabile) all'orario della sala. */
@@ -115,12 +107,9 @@ public class SalaStudio {
                 .sum();
 
         verificaNumeroPostazioni(postazioniAssegnate + numPostazioni);
-        int codiceNumericoArea = 0;
-        if (!tipologia.equalsIgnoreCase("comune")){
-            codiceNumericoArea = aree.size() + 1;
-        }
 
-        Area area = new Area(tipologia, this, codiceNumericoArea);
+
+        Area area = new Area(tipologia, this);
 
         area.creaPostazioni(numPostazioni);
 

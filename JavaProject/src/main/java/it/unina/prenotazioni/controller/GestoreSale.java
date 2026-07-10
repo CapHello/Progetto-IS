@@ -23,8 +23,7 @@ import java.util.*;
  */
 public class GestoreSale {
 
-    private static final int CODICE_MAX_SALE = 100;
-    private static final int CODICE_MIN_SALE = 1;
+
 
     private static GestoreSale istanza;
 
@@ -59,11 +58,11 @@ public class GestoreSale {
             throw new IllegalArgumentException("Dati delle aree incoerenti (tipologie e postazioni non corrispondono)");
         }
 
-        int codiceNumerico = assegnaCodiceNumerico();
+
 
         //Instanziazione
         SalaStudio sala = new SalaStudio(richiestaCreazione.getNome(), richiestaCreazione.getDescrizione(), richiestaCreazione.getNumeroPostazioni());
-        sala.setCodiceNumerico(codiceNumerico);
+
         //configurazione
         configuraOrariESlot(richiestaCreazione.getOrariApertura(), richiestaCreazione.getOrariChiusura(), richiestaCreazione.getGranaMinuti(), sala);
         configuraAree(richiestaCreazione.getNumeroPostazioni(), tipi, posti, sala);
@@ -161,8 +160,8 @@ public class GestoreSale {
             throw new IllegalArgumentException("L'ID della sala è obbligatorio.");
         }
 
-        if (idSalaStudio < 1) {
-            throw new IllegalArgumentException("ID Sala non valido. L'ID deve essere maggiore di zero.");
+        if (idSalaStudio < 1 || idSalaStudio > 100) {
+            throw new IllegalArgumentException("ID Sala non valido. Inserire un valore compreso tra 1 e 100.");
         }
 
         SalaStudio sala = registroSale.cercaSalaPerId(idSalaStudio);
@@ -426,15 +425,7 @@ public class GestoreSale {
         return slot;
     }
 
-    private int assegnaCodiceNumerico(){
-        Set<Integer> occupati = new HashSet<>(registroSale.getCodiciNumericiOccupati());
-        for(int codice = CODICE_MIN_SALE; codice <= CODICE_MAX_SALE; codice++){
-            if(!occupati.contains(codice)){
-                return codice; // primo codice libero trovato
-            }
-        }
-        throw new IllegalArgumentException("Numero massimo di sale raggiunto (100 codici esauriti)");
-    }
+
 
     /** Converte l'entity nel DTO per le boundary (nessun tipo entity attraversa il confine). */
     private SalaStudioDTO toDTO(SalaStudio sala) {
