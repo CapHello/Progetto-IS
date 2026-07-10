@@ -67,11 +67,23 @@ public class GestorePrenotazioni {
         Studente studente = registroUtenti.trovaStudentePerId(idStudente);
 
         if (studente == null) {
-            throw new IllegalArgumentException("Studente non trovato");
+            throw new IllegalArgumentException("Studente non trovato.");
         }
-        SalaStudio sala = registroSale.cercaSalaPerId(idSala);
+        if (idSala == null){
+            throw new IllegalArgumentException("La selezione della sala studio è obbligatoria");
+        }
+        if (idSala > 100 || idSala < 1){
+            throw new IllegalArgumentException("Identificativo sala non valido (atteso intero tra 1 e 100)");
+        }
+        SalaStudio sala = null;
+        try{
+            sala = registroSale.cercaSalaPerId(idSala);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Sala studio non trovata.");
+        }
+
         if (sala == null) {
-            throw new IllegalArgumentException("Sala studio non trovata");
+            throw new IllegalArgumentException("Sala studio non trovata.");
         }
         if (!sala.isAttiva()){
             throw new IllegalArgumentException("La sala non è attiva, non sarà più disponibile");
@@ -79,10 +91,10 @@ public class GestorePrenotazioni {
         if (!sala.verificaDataInGiorniApertura(data)) {
             throw new IllegalArgumentException("La sala è chiusa nella data selezionata (giorni feriali)");
         }
-        // per robustezza perché non potrà mai presentarsi essendo che il front-end non permette di non selezionare alcuna area
         if (idArea == null) {
             throw new IllegalArgumentException("Area non specificata");
         }
+
 
 
         verificaSuArea(idSala, idArea);
@@ -115,14 +127,7 @@ public class GestorePrenotazioni {
         }
     }
 
-    /** UC7: è prenotabile solo una fascia non ancora iniziata. */
-    private void verificaDataFasciaFutura(LocalDate data, FasciaOraria fascia) {
-        LocalDateTime inizioSlot = LocalDateTime.of(data, fascia.getOraInizio());
-        if (!inizioSlot.isAfter(LocalDateTime.now())) {
-            throw new IllegalArgumentException(
-                    "Non è possibile prenotare una fascia oraria già iniziata o passata");
-        }
-    }
+
 
     // ------------------------------------------------------------------ UC7
     /**
@@ -143,7 +148,7 @@ public class GestorePrenotazioni {
 
         FasciaOraria fascia = risolviFasciaDellaSala(idSala, idFascia, data);
 
-        verificaDataFasciaFutura(data, fascia);
+
 
         // aggiunto il blocco synchronized per gestire la concorrenza tra accessi multipli
         // in tal modo due studenti sono impossibilitati di avere la stessa postazione prenotata per lo stesso giorno e data
@@ -358,14 +363,17 @@ public class GestorePrenotazioni {
     private FasciaOraria risolviFasciaDellaSala(Long idSala, Long idFascia, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null){
-            throw new IllegalArgumentException("Sala studio non trovata");
+            throw new IllegalArgumentException("Sala studio non trovata.");
+        }
+        if (idFascia == null){
+            throw new IllegalArgumentException("La fascia oraria è obbligatoria");
         }
         for (FasciaOraria f : sala.getFasceOrariePrestabilite(data)) {
             if (f.getId().equals(idFascia)) {
                 return f;
             }
         }
-        throw new IllegalArgumentException("Lo slot orario selezionato non è ammesso");
+        throw new IllegalArgumentException("La fascia oraria selezionata non è disponibile o è già trascorsa");
     }
 
     /** Postazione scelta esplicitamente (se indicata e ancora libera) oppure assegnazione automatica via Strategy. */

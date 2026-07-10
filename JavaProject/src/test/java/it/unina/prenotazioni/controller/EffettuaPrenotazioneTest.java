@@ -96,10 +96,6 @@ class EffettuaPrenotazioneTest {
         }
     }
 
-    // ==========================================
-    // CASI DI SUCCESSO
-    // ==========================================
-
     @Test
     @DisplayName("TC1: Tutti validi — area specifica, postazione specifica")
     void effettuaPrenotazione_TuttiValidi_Successo() {
@@ -153,11 +149,11 @@ class EffettuaPrenotazioneTest {
     }
 
     // ==========================================
-    // CASI DI ERRORE - SALA (IdSala)
+    // CASI DI ERRORE - SALA (idSala)
     // ==========================================
 
     @Test
-    @DisplayName("TC5: IdSala mancante (null)")
+    @DisplayName("TC5: idSala mancante (null)")
     void effettuaPrenotazione_SalaNull_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
@@ -168,14 +164,14 @@ class EffettuaPrenotazioneTest {
     }
 
     /*
-     * TC6: IdSala con tipo errato ("5A")
+     * TC6: idSala con tipo errato ("5A")
      * NON IMPLEMENTABILE: Il compilatore Java impedisce di passare una stringa "5A"
      * a un parametro tipizzato come Long (idSala). L'errore viene intercettato
      * in fase di compilazione o deserializzazione dal Controller.
      */
 
     @Test
-    @DisplayName("TC7: IdSala fuori dall'intervallo [1,100]")
+    @DisplayName("TC7: idSala fuori dall'intervallo [1,100]")
     void effettuaPrenotazione_SalaFuoriRange_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
@@ -186,7 +182,7 @@ class EffettuaPrenotazioneTest {
     }
 
     @Test
-    @DisplayName("TC8: IdSala non esistente")
+    @DisplayName("TC8: idSala non esistente")
     void effettuaPrenotazione_SalaNonEsistente_LanciaEccezione() {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
@@ -270,7 +266,7 @@ class EffettuaPrenotazioneTest {
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, idFasciaNonPrevista, ID_STUDENTE
             ));
         });
-        assertEquals("La fascia oraria selezionata non è tra quelle previste per la sala", exception.getMessage());
+        assertEquals("La fascia oraria selezionata non è disponibile o è già trascorsa", exception.getMessage());
     }
 
     @Test
@@ -284,7 +280,7 @@ class EffettuaPrenotazioneTest {
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, dataOdierna, idFasciaPassata, ID_STUDENTE
             ));
         });
-        assertEquals("La fascia oraria selezionata è già trascorsa", exception.getMessage());
+        assertEquals("La fascia oraria selezionata non è disponibile o è già trascorsa", exception.getMessage());
     }
 
     // ==========================================
@@ -307,7 +303,7 @@ class EffettuaPrenotazioneTest {
         assertEquals("Identificativo area non valido (atteso intero tra 0 e 10)", exception.getMessage());
     }
     @Test
-    @DisplayName("TC19: IdArea non esistente nella sala selezionata")
+    @DisplayName("TC19: idArea non esistente nella sala selezionata")
     void effettuaPrenotazione_AreaNonEsistente_LanciaEccezione() {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
@@ -347,13 +343,13 @@ class EffettuaPrenotazioneTest {
     }
 
     /*
-     * TC22: IdPostazione con tipo errato ("abc")
-     * NON IMPLEMENTABILE: Come per l'IdSala, Java non permette di passare una String ("abc")
-     * a un parametro tipizzato come Long (IdPostazione).
+     * TC22: idPostazione con tipo errato ("abc")
+     * NON IMPLEMENTABILE: Come per l'idSala, Java non permette di passare una String ("abc")
+     * a un parametro tipizzato come Long (idPostazione).
      */
 
     @Test
-    @DisplayName("TC23: IdPostazione fuori dall'intervallo dell'area (V20)")
+    @DisplayName("TC23: idPostazione fuori dall'intervallo dell'area (V20)")
     void effettuaPrenotazione_PostazioneFuoriRange_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             // Simuliamo l'ID 99 (oppure 9999L per essere sicuri che non esista nel DB)
@@ -400,7 +396,7 @@ class EffettuaPrenotazioneTest {
         });
         assertEquals("Esiste già una tua prenotazione attiva o confermata in questa data e fascia oraria", exception.getMessage());
     }
-
+    // TODO da rivedere: non penso si faccia in questo modo un test sull'accesso concorrente
     @Test
     @DisplayName("TC26: Postazione non più disponibile (Race Condition V09)")
     void effettuaPrenotazione_RaceCondition_LanciaEccezione() {
@@ -415,7 +411,7 @@ class EffettuaPrenotazioneTest {
             ));
         });
         // N.B: Sostituisci "15" con l'accesso dinamico all'ID se il tuo Facade lo genera dinamicamente
-        assertTrue(exception.getMessage().contains("stata appena prenotata da un altro Studente"));
+        assertTrue(exception.getMessage().contains("La postazione selezionata non è più disponibile"));
     }
 
     // ==========================================
