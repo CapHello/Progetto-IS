@@ -95,8 +95,6 @@
             return minuti;
         }
 
-        const escapeAttr = (v) => (v || '').replace(/"/g, '&quot;');
-
         // Rigenera le righe-area in base al "Numero aree", preservando i valori già inseriti.
         function renderAree() {
             const n = Math.max(0, parseInt(document.getElementById('numeroAree').value, 10) || 0);
@@ -111,7 +109,7 @@
                 row.style.gap = '0.75rem';
                 row.innerHTML =
                     '<input type="text" class="form-control area-nome" style="flex:2;" required ' +
-                        'placeholder="Nome area ' + (i + 1) + ' (es. Silenziosa)" value="' + escapeAttr(nomi[i]) + '">' +
+                        'placeholder="Nome area ' + (i + 1) + ' (es. Silenziosa)" value="' + (nomi[i] || '') + '">' +
                     '<input type="number" class="form-control area-posti" style="flex:1;" min="1" required ' +
                         'placeholder="Postazioni" value="' + (posti[i] || 1) + '">';
                 cont.appendChild(row);

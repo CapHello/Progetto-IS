@@ -23,6 +23,12 @@ public class SalaStudio {
     private String nome;
     private String descrizione;
     private int numeroPostazioniTotali;
+
+    // Codice "visibile" della sala (1-100), assegnato da GestoreSale al primo valore libero.
+    // Niente vincolo unique sul DB: le sale eliminate (soft delete) restano in tabella col
+    // loro codice, che può essere riassegnato a una sala nuova; l'unicità vale solo tra le
+    // sale attive ed è garantita dalla logica di assegnazione.
+    // Limite noto: due creazioni simultanee potrebbero ottenere lo stesso codice.
     private int codiceNumerico;
 
 

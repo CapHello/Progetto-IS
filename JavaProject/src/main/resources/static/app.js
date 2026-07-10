@@ -40,7 +40,11 @@ async function api(method, path, params, isJson = false) {
 
   const res = await fetch(url, opts);
   const testo = await res.text();
-  const dati = testo ? JSON.parse(testo) : null;
+  let dati = null;
+  if (testo) {
+    try { dati = JSON.parse(testo); }
+    catch (e) { dati = null; } // risposta non JSON (es. pagina di errore): si usa il codice HTTP
+  }
 
   if (!res.ok) {
     throw new Error(dati && dati.errore ? dati.errore : ('Errore ' + res.status));

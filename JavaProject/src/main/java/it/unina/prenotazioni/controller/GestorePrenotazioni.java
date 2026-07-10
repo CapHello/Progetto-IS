@@ -24,7 +24,6 @@ import it.unina.prenotazioni.entity.SalaStudio;
 import it.unina.prenotazioni.entity.StatoEnum;
 import it.unina.prenotazioni.entity.Studente;
 import it.unina.prenotazioni.entity.state.StatoAttiva;
-import org.springframework.cglib.core.Local;
 
 /**
  * <<control>> Gestore (Singleton) del ciclo di vita delle prenotazioni:
