@@ -160,8 +160,8 @@ public class GestoreSale {
             throw new IllegalArgumentException("L'ID della sala è obbligatorio.");
         }
 
-        if (idSalaStudio < 1 || idSalaStudio > 100) {
-            throw new IllegalArgumentException("ID Sala non valido. Inserire un valore compreso tra 1 e 100.");
+        if (idSalaStudio < 1) {
+            throw new IllegalArgumentException("ID Sala non valido. L'ID deve essere maggiore di zero.");
         }
 
         SalaStudio sala = registroSale.cercaSalaPerId(idSalaStudio);

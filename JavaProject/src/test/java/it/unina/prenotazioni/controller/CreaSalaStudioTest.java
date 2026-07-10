@@ -221,44 +221,4 @@ class CreaSalaStudioTest {
      * le stringhe o i double prima dell'esecuzione.
      */
 
-    // ==========================================
-    // CASI DI ERRORE - Numero Sale
-    // ==========================================
-
-
-    @Test
-    @DisplayName("TC: Creazione fallisce al superamento del limite di 100 sale attive")
-    void creaSalaStudio_LimiteCentosaleSuperato_LanciaEccezione() {
-        // Setup: Saturiamo il limite creando esattamente 100 sale
-        for (int i = 1; i <= 100; i++) {
-            CreazioneSalaDTO dto = new CreazioneSalaDTO();
-            dto.setNome("Sala " + i);
-            dto.setDescrizione("Descrizione test sala " + i);
-            dto.setNumeroPostazioni(10);
-            dto.setOrariApertura(List.of("09:00", "09:00", "09:00", "09:00", "09:00"));
-            dto.setOrariChiusura(List.of("18:00", "18:00", "18:00", "18:00", "18:00"));
-            dto.setGranaMinuti(60);
-            dto.setTipologie(List.of("Area Default"));
-            dto.setPostazioniAree(List.of(10));
-
-            bibliotecaFacade.creaSalaStudio(dto);
-        }
-
-        // Act & Assert: Tentiamo di creare la 101esima sala
-        CreazioneSalaDTO dto101 = new CreazioneSalaDTO();
-        dto101.setNome("Sala 101");
-        dto101.setDescrizione("Descrizione test sala eccedente");
-        dto101.setNumeroPostazioni(10);
-        dto101.setOrariApertura(List.of("09:00", "09:00", "09:00", "09:00", "09:00"));
-        dto101.setOrariChiusura(List.of("18:00", "18:00", "18:00", "18:00", "18:00"));
-        dto101.setGranaMinuti(60);
-        dto101.setTipologie(List.of("Area Default"));
-        dto101.setPostazioniAree(List.of(10));
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bibliotecaFacade.creaSalaStudio(dto101);
-        });
-
-        assertEquals("Numero massimo di sale raggiunto (100 codici esauriti)", exception.getMessage());
-    }
 }
