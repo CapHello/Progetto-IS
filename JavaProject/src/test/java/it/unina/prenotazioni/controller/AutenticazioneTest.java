@@ -51,11 +51,14 @@ class AutenticazioneTest {
                 transaction.begin();
             }
 
+            // Le prenotazioni referenziano gli studenti (FK): vanno eliminate prima degli utenti.
+            em.createQuery("DELETE FROM Prenotazione").executeUpdate();
             em.createQuery("DELETE FROM Utente").executeUpdate();
 
             transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) transaction.rollback();
+            throw new RuntimeException("Errore durante la pulizia del database di test: " + e.getMessage(), e);
         }
     }
 

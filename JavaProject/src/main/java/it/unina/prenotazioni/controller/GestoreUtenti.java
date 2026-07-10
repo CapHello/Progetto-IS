@@ -17,6 +17,12 @@ public class GestoreUtenti {
     private static final int MAX_TENTATIVI = 5;
     private static final int MINUTI_BLOCCO = 15;
 
+    /** V13: email istituzionale — dominio unina.it o suoi sottodomini (es. studenti.unina.it). */
+    private static final String REGEX_EMAIL_ISTITUZIONALE = "^[^@\\s]+@([^@\\s]+\\.)*unina\\.it$";
+
+    /** V14: matricola studente — una lettera maiuscola seguita da 8 cifre. */
+    private static final String REGEX_MATRICOLA = "[A-Z]\\d{8}";
+
     private final RegistroUtenti registroUtenti = RegistroUtenti.getInstance();
 
     private static GestoreUtenti istanza;
@@ -87,32 +93,54 @@ public class GestoreUtenti {
 
     // ------------------------------------------------------------------ UC2
     /**
-     * Verifica le credenziali; dopo 5 tentativi falliti blocca temporaneamente
-     * l'account per 15 minuti (V21). L'errore è sempre generico ("Credenziali errate")
-     * per non rivelare quali email sono registrate.
+     * Valida il formato delle credenziali, poi le verifica sul registro; dopo 5 tentativi
+     * falliti blocca temporaneamente l'account per 15 minuti (V21). L'errore di verifica è
+     * lo stesso per email inesistente e password errata, per non rivelare quali email
+     * sono registrate.
      */
     public UtenteDTO autenticazione(String email, String password) {
+        verificaFormatoCredenziali(email, password);
+
         Utente utente = registroUtenti.cercaUtentePerEmail(email);
 
         if (utente == null) {
-            throw new SecurityException("Credenziali errate");
+            throw new SecurityException("Credenziali non valide o utente inesistente.");
         }
         if (utente.isBloccato()) {
-            throw new SecurityException("Account temporaneamente bloccato. Riprovare più tardi.");
+            throw new SecurityException("Account bloccato per troppi tentativi falliti. Riprovare tra "
+                    + MINUTI_BLOCCO + " minuti.");
         }
 
         if (!verificaCredenziali(utente, password)) {
             incrementaTentativi(utente);
-            if (utente.getTentativiFalliti() >= MAX_TENTATIVI) {
+            boolean appenaBloccato = utente.getTentativiFalliti() >= MAX_TENTATIVI;
+            if (appenaBloccato) {
                 bloccaAccountTemporaneamente(utente, MINUTI_BLOCCO);
             }
             registroUtenti.aggiorna(utente);
-            throw new SecurityException("Credenziali errate");
+            if (appenaBloccato) {
+                throw new SecurityException("Credenziali errate. Account bloccato per " + MINUTI_BLOCCO
+                        + " minuti per troppi tentativi falliti.");
+            }
+            throw new SecurityException("Credenziali non valide o utente inesistente.");
         }
 
         resetTentativi(utente);
         registroUtenti.aggiorna(utente);
         return toDTO(utente);
+    }
+
+    /**
+     * Formato delle credenziali in ingresso (prima della verifica sul registro): un input
+     * malformato viene rifiutato subito e non consuma tentativi di accesso. I limiti sono
+     * quelli imposti dalla registrazione (password 8-32; email istituzionale sotto i 255).
+     */
+    private void verificaFormatoCredenziali(String email, String password) {
+        richiedi(email != null && !email.isEmpty(), "L'email è obbligatoria.");
+        richiedi(email.length() < 255 && email.matches(REGEX_EMAIL_ISTITUZIONALE), "Formato email non valido.");
+        richiedi(password != null && !password.isEmpty(), "La password è obbligatoria.");
+        richiedi(password.length() >= 8, "La password deve contenere almeno 8 caratteri.");
+        richiedi(password.length() <= 32, "Formato password non valido.");
     }
 
     // -------------------------------------------------------------- UC8 (profilo)
@@ -134,6 +162,9 @@ public class GestoreUtenti {
         validaNomeCognome(nome, cognome);
         validaEmail(email);
         validaIdentificativo(matricola, "matricola");
+        if (!matricola.matches(REGEX_MATRICOLA)) {
+            throw new IllegalArgumentException("Formato identificativo non riconosciuto.");
+        }
     }
 
     private void verificaCorrettezzaBibliotecario(String nome, String cognome, String email, String codice) {
@@ -161,7 +192,7 @@ public class GestoreUtenti {
         if (email.length() > 255) {
             throw new IllegalArgumentException("Email troppo lunga (max 255 caratteri).");
         }
-        if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+        if (!email.matches(REGEX_EMAIL_ISTITUZIONALE)) {
             throw new IllegalArgumentException("Formato email non valido.");
         }
     }
