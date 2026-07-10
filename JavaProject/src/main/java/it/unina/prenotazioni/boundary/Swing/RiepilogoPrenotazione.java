@@ -2,6 +2,7 @@ package it.unina.prenotazioni.boundary.Swing;
 
 import it.unina.prenotazioni.controller.BibliotecaFacade;
 import it.unina.prenotazioni.dto.PrenotazioneDTO;
+import it.unina.prenotazioni.dto.RichiestaPrenotazioneDTO;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -94,8 +95,9 @@ public class RiepilogoPrenotazione {
     private void conferma() {
         try {
             PrenotazioneDTO prenotazione = BibliotecaFacade.getInstance().effettuaPrenotazione(
-                    stato.getIdSala(), stato.getIdArea(), stato.getIdPostazione(),
-                    stato.getData(), stato.getIdFascia(), stato.getStudente().getId());
+                    new RichiestaPrenotazioneDTO(
+                            stato.getIdSala(), stato.getIdArea(), stato.getIdPostazione(),
+                            stato.getData(), stato.getIdFascia(), stato.getStudente().getId()));
             frameCorrente.dispose();
             new PrenotazioneConfermata(stato, prenotazione).apriForm();
         } catch (RuntimeException ex) {

@@ -2,6 +2,7 @@ package it.unina.prenotazioni.boundary.SpringBoot;
 
 import it.unina.prenotazioni.controller.BibliotecaFacade;
 import it.unina.prenotazioni.dto.PrenotazioneDTO;
+import it.unina.prenotazioni.dto.RichiestaPrenotazioneDTO;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +24,8 @@ public class BoundaryPrenotazione {
             @RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data,
             @RequestParam("idFascia") Long idFascia,
             @RequestParam("idStudente") Long idStudente) {
-        return BibliotecaFacade.getInstance()
-                .effettuaPrenotazione(idSala, idArea, idPostazione, data, idFascia, idStudente);
+        return BibliotecaFacade.getInstance().effettuaPrenotazione(
+                new RichiestaPrenotazioneDTO(idSala, idArea, idPostazione, data, idFascia, idStudente));
     }
 
     /** UC9: annulla la prenotazione (consentito fino a 6 ore prima dell'inizio, V07). */

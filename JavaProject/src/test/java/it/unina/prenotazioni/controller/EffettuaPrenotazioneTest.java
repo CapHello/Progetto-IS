@@ -103,9 +103,9 @@ class EffettuaPrenotazioneTest {
     @Test
     @DisplayName("TC1: Tutti validi — area specifica, postazione specifica")
     void effettuaPrenotazione_TuttiValidi_Successo() {
-        PrenotazioneDTO risultato = bibliotecaFacade.effettuaPrenotazione(
+        PrenotazioneDTO risultato = bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                 SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-        );
+        ));
 
         assertNotNull(risultato);
         assertEquals("ATTIVA", risultato.getStato());
@@ -115,9 +115,9 @@ class EffettuaPrenotazioneTest {
     @Test
     @DisplayName("TC2: Tutti validi — area specifica, assegnazione automatica")
     void effettuaPrenotazione_AreaSpecificaAuto_Successo() {
-        PrenotazioneDTO risultato = bibliotecaFacade.effettuaPrenotazione(
+        PrenotazioneDTO risultato = bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                 SALA_VALIDA, AREA_VALIDA, ASSEGNAZIONE_AUTOMATICA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-        );
+        ));
 
         assertNotNull(risultato);
         assertEquals("ATTIVA", risultato.getStato());
@@ -130,9 +130,9 @@ class EffettuaPrenotazioneTest {
     void effettuaPrenotazione_AreaComuneSpecifica_Successo() {
         Long idPostazioneAreaComune = em.find(Area.class, AREA_COMUNE).getPostazioni().get(0).getId();
 
-        PrenotazioneDTO risultato = bibliotecaFacade.effettuaPrenotazione(
+        PrenotazioneDTO risultato = bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                 SALA_VALIDA, AREA_COMUNE, idPostazioneAreaComune, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-        );
+        ));
 
         assertNotNull(risultato);
         assertEquals("ATTIVA", risultato.getStato());
@@ -142,9 +142,9 @@ class EffettuaPrenotazioneTest {
     @Test
     @DisplayName("TC4: Tutti validi — area comune, assegnazione automatica")
     void effettuaPrenotazione_AreaComuneAuto_Successo() {
-        PrenotazioneDTO risultato = bibliotecaFacade.effettuaPrenotazione(
+        PrenotazioneDTO risultato = bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                 SALA_VALIDA, AREA_COMUNE, ASSEGNAZIONE_AUTOMATICA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-        );
+        ));
 
         assertNotNull(risultato);
         assertEquals("ATTIVA", risultato.getStato());
@@ -160,9 +160,9 @@ class EffettuaPrenotazioneTest {
     @DisplayName("TC5: IdSala mancante (null)")
     void effettuaPrenotazione_SalaNull_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     null, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("La selezione della sala studio è obbligatoria", exception.getMessage());
     }
@@ -178,9 +178,9 @@ class EffettuaPrenotazioneTest {
     @DisplayName("TC7: IdSala fuori dall'intervallo [1,100]")
     void effettuaPrenotazione_SalaFuoriRange_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     150L, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("Identificativo sala non valido (atteso intero tra 1 e 100)", exception.getMessage());
     }
@@ -189,9 +189,9 @@ class EffettuaPrenotazioneTest {
     @DisplayName("TC8: IdSala non esistente")
     void effettuaPrenotazione_SalaNonEsistente_LanciaEccezione() {
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     77L, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("Sala studio non trovata.", exception.getMessage());
     }
@@ -204,9 +204,9 @@ class EffettuaPrenotazioneTest {
     @DisplayName("TC9: Data mancante (null)")
     void effettuaPrenotazione_DataNull_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, null, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("La data è obbligatoria", exception.getMessage());
     }
@@ -216,9 +216,9 @@ class EffettuaPrenotazioneTest {
     void effettuaPrenotazione_DataPassata_LanciaEccezione() {
         LocalDate dataPassata = LocalDate.of(2024, 1, 10);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, dataPassata, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("Non è possibile prenotare una fascia oraria già iniziata o passata", exception.getMessage());
     }
@@ -234,9 +234,9 @@ class EffettuaPrenotazioneTest {
     void effettuaPrenotazione_DataChiusura_LanciaEccezione() {
         LocalDate sabato = LocalDate.of(2026, 7, 4); // 4 Luglio 2026 è sabato
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, sabato, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("La sala è chiusa nella data selezionata (giorni feriali)", exception.getMessage());
     }
@@ -249,9 +249,9 @@ class EffettuaPrenotazioneTest {
     @DisplayName("TC13: Fascia oraria mancante (null)")
     void effettuaPrenotazione_FasciaNull_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, null, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("La fascia oraria è obbligatoria", exception.getMessage());
     }
@@ -266,9 +266,9 @@ class EffettuaPrenotazioneTest {
     void effettuaPrenotazione_FasciaNonPrevista_LanciaEccezione() {
         Long idFasciaNonPrevista = 99L; // Fascia inesistente per la Sala 5
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, idFasciaNonPrevista, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("La fascia oraria selezionata non è tra quelle previste per la sala", exception.getMessage());
     }
@@ -280,9 +280,9 @@ class EffettuaPrenotazioneTest {
         Long idFasciaPassata = 0L; // Assumiamo che l'ID 0 corrisponda a una fascia mattutina già chiusa
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, dataOdierna, idFasciaPassata, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("La fascia oraria selezionata è già trascorsa", exception.getMessage());
     }
@@ -300,9 +300,9 @@ class EffettuaPrenotazioneTest {
     @DisplayName("TC18: IdArea fuori dall'intervallo [0,10]")
     void effettuaPrenotazione_AreaFuoriRange_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, 15L, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("Identificativo area non valido (atteso intero tra 0 e 10)", exception.getMessage());
     }
@@ -310,9 +310,9 @@ class EffettuaPrenotazioneTest {
     @DisplayName("TC19: IdArea non esistente nella sala selezionata")
     void effettuaPrenotazione_AreaNonEsistente_LanciaEccezione() {
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, 999L, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("L'area non è presente all'interno della sala selezionata", exception.getMessage());
     }
@@ -324,9 +324,9 @@ class EffettuaPrenotazioneTest {
         saturaArea(AREA_VALIDA, DATA_VALIDA, FASCIA_09_30);
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, ASSEGNAZIONE_AUTOMATICA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("Non sono presenti delle postazioni disponibili per l'area selezionata", exception.getMessage());
     }
@@ -337,9 +337,9 @@ class EffettuaPrenotazioneTest {
         saturaArea(AREA_VALIDA, DATA_VALIDA, FASCIA_09_30);
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, ASSEGNAZIONE_AUTOMATICA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         // Nota: A livello logico, se la verifica viene fatta per data o fascia, il messaggio potrebbe variare.
         // Assicurati che il tuo Facade lanci esattamente questa stringa se l'intero giorno è saturo.
@@ -357,9 +357,9 @@ class EffettuaPrenotazioneTest {
     void effettuaPrenotazione_PostazioneFuoriRange_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             // Simuliamo l'ID 99 (oppure 9999L per essere sicuri che non esista nel DB)
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, 9999L, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("Identificativo postazione non valido (atteso intero tra 0 e il numero di postazioni dell'area)", exception.getMessage());
     }
@@ -371,9 +371,9 @@ class EffettuaPrenotazioneTest {
         occupaPostazione(POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30);
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("La postazione selezionata non è più disponibile", exception.getMessage());
     }
@@ -386,17 +386,17 @@ class EffettuaPrenotazioneTest {
     @DisplayName("TC25: Studente con prenotazione già esistente nella stessa data e fascia (V18)")
     void effettuaPrenotazione_DoppiaPrenotazioneStudente_LanciaEccezione() {
         // 1. Lo studente effettua una prenotazione regolare
-        bibliotecaFacade.effettuaPrenotazione(
+        bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                 SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-        );
+        ));
 
         // 2. Tenta di prenotare un'altra postazione per la STESSA data e fascia
         Long altraPostazione = em.find(Area.class, AREA_VALIDA).getPostazioni().get(1).getId();
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, altraPostazione, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         assertEquals("Esiste già una tua prenotazione attiva o confermata in questa data e fascia oraria", exception.getMessage());
     }
@@ -410,9 +410,9 @@ class EffettuaPrenotazioneTest {
         occupaPostazione(POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30);
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            );
+            ));
         });
         // N.B: Sostituisci "15" con l'accesso dinamico all'ID se il tuo Facade lo genera dinamicamente
         assertTrue(exception.getMessage().contains("stata appena prenotata da un altro Studente"));

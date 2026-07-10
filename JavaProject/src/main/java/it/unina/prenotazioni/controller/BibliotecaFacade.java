@@ -4,6 +4,7 @@ import it.unina.prenotazioni.dto.CreazioneSalaDTO;
 import it.unina.prenotazioni.dto.DettaglioSalaDTO;
 import it.unina.prenotazioni.dto.FasciaDisponibileDTO;
 import it.unina.prenotazioni.dto.PrenotazioneDTO;
+import it.unina.prenotazioni.dto.RichiestaPrenotazioneDTO;
 import it.unina.prenotazioni.dto.SalaMonitoraggioDTO;
 import it.unina.prenotazioni.dto.SalaStudioDTO;
 import it.unina.prenotazioni.dto.StatisticheDTO;
@@ -80,13 +81,11 @@ public class BibliotecaFacade {
         return GestoreSale.getInstance().monitoraSale();
     }
 
-    // --- GestorePrenotazioni (UC5, UC7, UC9, UC10, UC12, UC13, UC16) ---
+    // --- GestorePrenotazioni (UC7, UC9, UC10, UC12, UC13, UC16) ---
 
     /** UC7: effettua una prenotazione (postazione specifica o assegnata automaticamente). */
-    public PrenotazioneDTO effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
-                                                LocalDate data, Long idFascia, Long idStudente) {
-        return GestorePrenotazioni.getInstance()
-                .effettuaPrenotazione(idSala, idArea, idPostazione, data, idFascia, idStudente);
+    public PrenotazioneDTO effettuaPrenotazione(RichiestaPrenotazioneDTO richiesta) {
+        return GestorePrenotazioni.getInstance().effettuaPrenotazione(richiesta);
     }
 
     /** UC9: annulla una prenotazione (entro il vincolo temporale V07). */
@@ -97,11 +96,6 @@ public class BibliotecaFacade {
     /** UC10: check-in della prenotazione nel giorno e nella finestra consentita (V08). */
     public void effettuaCheckin(Long idPrenotazione) {
         GestorePrenotazioni.getInstance().effettuaCheckIn(idPrenotazione);
-    }
-
-    /** UC5: prenotazioni occupanti della giornata per una sala. */
-    public List<PrenotazioneDTO> monitoraPrenotazioni(Long idSalaStudio) {
-        return GestorePrenotazioni.getInstance().monitoraPrenotazioni(idSalaStudio);
     }
 
     /** UC12: storico prenotazioni dello studente. */

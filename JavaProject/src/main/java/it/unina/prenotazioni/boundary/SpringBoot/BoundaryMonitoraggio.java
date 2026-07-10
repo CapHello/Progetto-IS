@@ -1,7 +1,6 @@
 package it.unina.prenotazioni.boundary.SpringBoot;
 
 import it.unina.prenotazioni.controller.BibliotecaFacade;
-import it.unina.prenotazioni.dto.PrenotazioneDTO;
 import it.unina.prenotazioni.dto.SalaMonitoraggioDTO;
 import it.unina.prenotazioni.dto.StatisticheDTO;
 import org.springframework.web.bind.annotation.*;
@@ -9,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * <<endpoint>> Monitoraggio del bibliotecario: stato sale (UC11), prenotazioni attive
- * per sala (UC5) e statistiche di servizio (UC13).
+ * <<endpoint>> Monitoraggio del bibliotecario: stato sale (UC11) e statistiche
+ * di servizio (UC13).
  */
 
 @RestController
@@ -21,12 +20,6 @@ public class BoundaryMonitoraggio {
     @GetMapping("/sale")
     public List<SalaMonitoraggioDTO> monitoraSale() {
         return BibliotecaFacade.getInstance().monitoraSale();
-    }
-
-    /** UC5: prenotazioni occupanti della giornata per la sala indicata. */
-    @GetMapping("/prenotazioni/{idSalaStudio}")
-    public List<PrenotazioneDTO> monitoraPrenotazioni(@PathVariable("idSalaStudio") Long idSalaStudio) {
-        return BibliotecaFacade.getInstance().monitoraPrenotazioni(idSalaStudio);
     }
 
     /** UC13: statistiche di servizio della giornata. */
