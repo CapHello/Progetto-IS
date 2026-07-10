@@ -14,11 +14,10 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 
-/** Step 1 del wizard di prenotazione: scelta della data e della sala disponibile (UC6). */
 public class SelezionaDataAndSala {
 
     public static void main(String[] args) {
-        // test sulla singola interfaccia: serve uno studente (id 1) nel DB per completare il flusso
+        // test sulla singola interfaccia
         UtenteDTO utente = new UtenteDTO();
         utente.setId(1L);
         new SelezionaDataAndSala(new StatoWizard(utente)).apriForm();
@@ -54,7 +53,6 @@ public class SelezionaDataAndSala {
 
     public SelezionaDataAndSala(StatoWizard stato) {
         this.stato = stato;
-        // riparte dal mese della data già scelta quando si torna indietro dallo step 2
         meseCorrente = (stato.getData() != null ? stato.getData() : LocalDate.now()).withDayOfMonth(1);
 
         // Styling non configurabile nel form designer
@@ -78,7 +76,6 @@ public class SelezionaDataAndSala {
         });
         btnContinua.addActionListener(e -> continua());
 
-        // Costruisce il calendario e, al ritorno dallo step 2, ripropone le sale della data scelta
         costruisciCalendario();
         if (stato.getData() != null) {
             aggiornaSale(stato.getData());
@@ -148,7 +145,6 @@ public class SelezionaDataAndSala {
                 btnG.setBackground(VIOLA);
                 btnG.setForeground(Color.WHITE);
             } else if (data.isBefore(oggi) || weekend) {
-                // giorni passati e weekend non prenotabili (le sale aprono nei giorni feriali)
                 btnG.setBackground(Color.WHITE);
                 btnG.setForeground(GRIGIO);
                 btnG.setEnabled(false);
@@ -163,7 +159,6 @@ public class SelezionaDataAndSala {
             final LocalDate dataFinal = data;
             btnG.addActionListener(e -> {
                 stato.setData(dataFinal);
-                // il cambio data invalida la sala scelta in precedenza (come nella GUI web)
                 stato.setIdSala(null);
                 stato.setNomeSala(null);
                 costruisciCalendario();
@@ -188,9 +183,8 @@ public class SelezionaDataAndSala {
         return btn;
     }
 
-    // ── SALE (UC6) ───────────────────────────────────────────────────────────
+    // ── SALE ─────────────────────────────────────────────────────────────────
 
-    /** Sale aperte e con posti liberi nella data scelta, come radio-card selezionabili. */
     private void aggiornaSale(LocalDate data) {
         pannelloSale.removeAll();
         pannelloSale.setLayout(new BoxLayout(pannelloSale, BoxLayout.Y_AXIS));
@@ -224,7 +218,7 @@ public class SelezionaDataAndSala {
                 stato.setNomeSala(sala.getNome());
             });
             if (sala.getId().equals(stato.getIdSala())) {
-                radio.setSelected(true); // riselezione al ritorno dallo step 2
+                radio.setSelected(true);
             }
             gruppoSale.add(radio);
             pannelloSale.add(radio);
@@ -254,10 +248,10 @@ public class SelezionaDataAndSala {
     public JFrame apriForm() {
         frameCorrente = new JFrame("Nuova Prenotazione");
         frameCorrente.setContentPane(selezionaDataSalaPane);
-        frameCorrente.setSize(960, 700);
+        frameCorrente.setSize(1000, 1000);
         frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
-        frameCorrente.setResizable(true);
+        frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);
         return frameCorrente;
     }

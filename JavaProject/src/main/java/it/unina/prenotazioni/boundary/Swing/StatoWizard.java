@@ -5,14 +5,8 @@ import it.unina.prenotazioni.dto.UtenteDTO;
 
 import java.time.LocalDate;
 
-/**
- * Scelte accumulate tra gli step del wizard di prenotazione (equivalente dell'oggetto
- * "stato" di prenotazione.html): ogni boundary lo riceve nel costruttore, lo aggiorna
- * con la propria selezione e lo passa allo step successivo.
- */
 class StatoWizard {
 
-    /** Sentinella condivisa col backend (UC7): la postazione la sceglie il sistema. */
     static final Long ASSEGNAZIONE_AUTOMATICA = 0L;
 
     private final UtenteDTO studente;

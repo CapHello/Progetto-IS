@@ -11,10 +11,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-/**
- * Registrazione di un nuovo utente (UC1), replica Swing di registrazione.html:
- * la validazione vera è lato server (GestoreUtenti), qui si mostra solo l'esito.
- */
 public class Registrazione {
 
     public static void main(String[] args) {
@@ -50,7 +46,7 @@ public class Registrazione {
                 new LineBorder(new Color(220, 220, 228), 1, true),
                 new EmptyBorder(35, 40, 35, 40)));
 
-        // Styling e segnaposto dei campi (stessa tecnica del Login)
+        // Styling e placeholder dei campi
         for (JTextField campo : new JTextField[]{txtNome, txtCognome, txtEmail, txtPassword, txtIdentificativo}) {
             StileWizard.stilizzaCampo(campo);
         }
@@ -59,7 +55,7 @@ public class Registrazione {
         StileWizard.installaPlaceholder(txtEmail, PLACEHOLDER_EMAIL);
         StileWizard.installaPlaceholder(txtIdentificativo, PLACEHOLDER_CODICE);
 
-        // Segnaposto della password: va gestito a parte per l'echo char
+        // Placeholder password
         txtPassword.setEchoChar((char) 0);
         txtPassword.setForeground(StileWizard.PLACEHOLDER);
         txtPassword.addFocusListener(new FocusAdapter() {
@@ -99,7 +95,7 @@ public class Registrazione {
         btnRegistrati.addActionListener(e -> registra());
     }
 
-    // ── REGISTRAZIONE (UC1) ──────────────────────────────────────────────────
+    // ── REGISTRAZIONE ────────────────────────────────────────────────────────
 
     private void registra() {
         String nome           = StileWizard.valoreCampo(txtNome, PLACEHOLDER_NOME);
@@ -135,7 +131,7 @@ public class Registrazione {
     public JFrame apriForm() {
         frameCorrente = new JFrame("Crea Account");
         frameCorrente.setContentPane(registrazionePane);
-        frameCorrente.setSize(960, 700);
+        frameCorrente.setSize(1000, 1000);
         frameCorrente.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
         frameCorrente.setResizable(false);

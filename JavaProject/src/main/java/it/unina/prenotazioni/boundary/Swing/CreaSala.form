@@ -11,7 +11,6 @@
     <border type="none"/>
     <children>
 
-      <!-- HEADER (row=0) -->
       <grid id="1f594" binding="header" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="10" left="15" bottom="10" right="15"/>
         <constraints>
@@ -49,7 +48,6 @@
         </children>
       </grid>
 
-      <!-- CONTENUTO (row=1): card centrata e scrollabile -->
       <grid id="c3d4e" binding="pannelloContenuto" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="15" left="30" bottom="20" right="30"/>
         <constraints>
@@ -70,8 +68,8 @@
 
           <scrollpane id="c8d9e" binding="scrollCrea">
             <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <preferred-size width="680" height="-1"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="7" hsize-policy="0" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <preferred-size width="680" height="840"/>
               </grid>
             </constraints>
             <properties/>
@@ -171,7 +169,6 @@
                     <properties/>
                   </component>
 
-                  <!-- Righe area (nome + postazioni) rigenerate dal codice Java -->
                   <grid id="d0e1f" binding="pannelloAree" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
@@ -205,8 +202,7 @@
                     </properties>
                   </component>
 
-                  <!-- Righe orario (giorno + apertura + chiusura) popolate dal codice Java -->
-                  <grid id="a3b4c" binding="pannelloOrari" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="a3b4c" binding="pannelloOrari" layout-manager="GridLayoutManager" row-count="6" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="8" vgap="6">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
                       <grid row="8" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -216,7 +212,188 @@
                       <opaque value="true"/>
                     </properties>
                     <border type="none"/>
-                    <children/>
+                    <children>
+                      <component id="1d7e3" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+                            <preferred-size width="90" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value=""/>
+                        </properties>
+                      </component>
+                      <component id="a92b5" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font name="SansSerif" size="11" style="1"/>
+                          <foreground color="-6710887"/>
+                          <text value="Apertura"/>
+                        </properties>
+                      </component>
+                      <component id="63c0f" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <font name="SansSerif" size="11" style="1"/>
+                          <foreground color="-6710887"/>
+                          <text value="Chiusura"/>
+                        </properties>
+                      </component>
+
+                      <component id="e85a1" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <foreground color="-11905688"/>
+                          <text value="Lunedì"/>
+                        </properties>
+                      </component>
+                      <component id="07f9c" class="javax.swing.JTextField" binding="txtAperturaLunedi">
+                        <constraints>
+                          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="-1" height="38"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="08:30"/>
+                        </properties>
+                      </component>
+                      <component id="b46d8" class="javax.swing.JTextField" binding="txtChiusuraLunedi">
+                        <constraints>
+                          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="-1" height="38"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="18:30"/>
+                        </properties>
+                      </component>
+
+                      <component id="f1a27" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <foreground color="-11905688"/>
+                          <text value="Martedì"/>
+                        </properties>
+                      </component>
+                      <component id="39e5b" class="javax.swing.JTextField" binding="txtAperturaMartedi">
+                        <constraints>
+                          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="-1" height="38"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="08:30"/>
+                        </properties>
+                      </component>
+                      <component id="c80d4" class="javax.swing.JTextField" binding="txtChiusuraMartedi">
+                        <constraints>
+                          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="-1" height="38"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="18:30"/>
+                        </properties>
+                      </component>
+
+                      <component id="52b7e" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <foreground color="-11905688"/>
+                          <text value="Mercoledì"/>
+                        </properties>
+                      </component>
+                      <component id="96f03" class="javax.swing.JTextField" binding="txtAperturaMercoledi">
+                        <constraints>
+                          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="-1" height="38"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="08:30"/>
+                        </properties>
+                      </component>
+                      <component id="4ac1d" class="javax.swing.JTextField" binding="txtChiusuraMercoledi">
+                        <constraints>
+                          <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="-1" height="38"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="18:30"/>
+                        </properties>
+                      </component>
+
+                      <component id="d7852" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <foreground color="-11905688"/>
+                          <text value="Giovedì"/>
+                        </properties>
+                      </component>
+                      <component id="20e9a" class="javax.swing.JTextField" binding="txtAperturaGiovedi">
+                        <constraints>
+                          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="-1" height="38"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="08:30"/>
+                        </properties>
+                      </component>
+                      <component id="8b5c6" class="javax.swing.JTextField" binding="txtChiusuraGiovedi">
+                        <constraints>
+                          <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="-1" height="38"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="18:30"/>
+                        </properties>
+                      </component>
+
+                      <component id="6f0b1" class="javax.swing.JLabel">
+                        <constraints>
+                          <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <foreground color="-11905688"/>
+                          <text value="Venerdì"/>
+                        </properties>
+                      </component>
+                      <component id="e34d7" class="javax.swing.JTextField" binding="txtAperturaVenerdi">
+                        <constraints>
+                          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="-1" height="38"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="08:30"/>
+                        </properties>
+                      </component>
+                      <component id="15a8f" class="javax.swing.JTextField" binding="txtChiusuraVenerdi">
+                        <constraints>
+                          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="-1" height="38"/>
+                          </grid>
+                        </constraints>
+                        <properties>
+                          <text value="18:30"/>
+                        </properties>
+                      </component>
+                    </children>
                   </grid>
 
                   <component id="b4c5d" class="javax.swing.JLabel" binding="lblGrana">
@@ -238,7 +415,6 @@
                     </properties>
                   </component>
 
-                  <!-- Azioni: Indietro | Procedi -->
                   <grid id="d6e7f" binding="pannelloAzioni" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="10" left="0" bottom="0" right="0"/>
                     <constraints>

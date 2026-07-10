@@ -11,11 +11,10 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.List;
 
-/** Step 2 del wizard di prenotazione: scelta della fascia oraria con i posti liberi (UC7). */
 public class SelezionaFascia {
 
     public static void main(String[] args) {
-        // test sulla singola interfaccia: servono nel DB una sala (id 1) aperta nella data odierna
+        // test sulla singola interfaccia
         UtenteDTO utente = new UtenteDTO();
         utente.setId(1L);
         StatoWizard stato = new StatoWizard(utente);
@@ -76,7 +75,6 @@ public class SelezionaFascia {
 
     // ── FASCE ────────────────────────────────────────────────────────────────
 
-    /** UC7: fasce prenotabili della sala nella data scelta; azzera la selezione a ogni ingresso (come la GUI web). */
     private void caricaFasce() {
         pannelloFasce.removeAll();
         pannelloFasce.setLayout(new BorderLayout());
@@ -131,10 +129,10 @@ public class SelezionaFascia {
     public JFrame apriForm() {
         frameCorrente = new JFrame("Nuova Prenotazione");
         frameCorrente.setContentPane(selezionaFasciaPane);
-        frameCorrente.setSize(960, 700);
+        frameCorrente.setSize(1000, 1000);
         frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
-        frameCorrente.setResizable(true);
+        frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);
         return frameCorrente;
     }

@@ -11,15 +11,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 
-/**
- * Step 4 del wizard di prenotazione: scelta della postazione nell'area (UC7).
- * Non interroga il controller: usa il DettaglioSalaDTO già caricato allo step 3
- * (come la GUI web); idPostazione = 0 significa "assegnazione automatica".
- */
 public class SelezionaPostazione {
 
     public static void main(String[] args) {
-        // test sulla singola interfaccia con un dettaglio fittizio (nessun accesso al DB)
+        // test sulla singola interfaccia con dati fittizi
         UtenteDTO utente = new UtenteDTO();
         utente.setId(1L);
         StatoWizard stato = new StatoWizard(utente);
@@ -77,7 +72,7 @@ public class SelezionaPostazione {
     // Stato interno
     private final StatoWizard stato;
     private JFrame frameCorrente;
-    private JButton bottoneSelezionato; // posto evidenziato in viola nella griglia
+    private JButton bottoneSelezionato;
 
     public SelezionaPostazione(StatoWizard stato) {
         this.stato = stato;
@@ -115,7 +110,6 @@ public class SelezionaPostazione {
 
     // ── GRIGLIA POSTI ────────────────────────────────────────────────────────
 
-    /** Griglia dei posti dell'area scelta: verdi i liberi, rossi gli occupati (non cliccabili). */
     private void costruisciGriglia() {
         pannelloPosti.removeAll();
         pannelloPosti.setLayout(new BorderLayout());
@@ -214,10 +208,10 @@ public class SelezionaPostazione {
     public JFrame apriForm() {
         frameCorrente = new JFrame("Nuova Prenotazione");
         frameCorrente.setContentPane(selezionaPostazionePane);
-        frameCorrente.setSize(960, 700);
+        frameCorrente.setSize(1000, 1000);
         frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
-        frameCorrente.setResizable(true);
+        frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);
         return frameCorrente;
     }

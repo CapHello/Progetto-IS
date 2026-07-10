@@ -10,11 +10,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-/**
- * Step 5 del wizard di prenotazione: riepilogo delle scelte e conferma (UC7).
- * Alla conferma invoca effettuaPrenotazione sulla Facade e, in caso di successo,
- * apre la schermata di prenotazione confermata.
- */
 public class RiepilogoPrenotazione {
 
     // Campi legati al .form
@@ -28,6 +23,16 @@ public class RiepilogoPrenotazione {
     private JPanel  cardRiepilogo;
     private JLabel  lblTitoloCard;
     private JPanel  pannelloRiepilogo;
+    private JLabel  lblVoceSala;
+    private JLabel  lblValoreSala;
+    private JLabel  lblVoceData;
+    private JLabel  lblValoreData;
+    private JLabel  lblVoceFascia;
+    private JLabel  lblValoreFascia;
+    private JLabel  lblVoceArea;
+    private JLabel  lblValoreArea;
+    private JLabel  lblVocePostazione;
+    private JLabel  lblValorePostazione;
     private JPanel  pannelloPromemoria;
     private JLabel  lblPromemoriaTitolo;
     private JLabel  lblPromemoria;
@@ -49,7 +54,6 @@ public class RiepilogoPrenotazione {
         StileWizard.bordaCard(cardRiepilogo);
         lblSteps.setText(StileWizard.htmlSteps(5));
 
-        // Box promemoria con la barra viola a sinistra (come la GUI web)
         pannelloPromemoria.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 4, 0, 0, StileWizard.VIOLA),
                 BorderFactory.createCompoundBorder(
@@ -61,7 +65,12 @@ public class RiepilogoPrenotazione {
                 + "<li>Alla conferma riceverai una notifica sulla tua casella di posta istituzionale.</li>"
                 + "</ul></html>");
 
-        costruisciRiepilogo();
+        pannelloRiepilogo.setBorder(new LineBorder(StileWizard.GRIGIO_BORDO, 1, true));
+        lblValoreSala.setText(stato.getNomeSala());
+        lblValoreData.setText(StileWizard.formattaData(stato.getData()));
+        lblValoreFascia.setText(stato.getEtichettaFascia());
+        lblValoreArea.setText(stato.getTipologiaArea());
+        lblValorePostazione.setText(stato.getEtichettaPostazione());
 
         btnLogout.addActionListener(e -> {
             frameCorrente.dispose();
@@ -77,37 +86,7 @@ public class RiepilogoPrenotazione {
         btnConferma.addActionListener(e -> conferma());
     }
 
-    // ── RIEPILOGO ────────────────────────────────────────────────────────────
-
-    private void costruisciRiepilogo() {
-        pannelloRiepilogo.setLayout(new BorderLayout());
-        pannelloRiepilogo.setBackground(Color.WHITE);
-
-        JPanel box = new JPanel(new GridLayout(5, 2, 10, 18));
-        box.setBackground(StileWizard.GRIGIO_SFONDO);
-        box.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(StileWizard.GRIGIO_BORDO, 1, true),
-                new EmptyBorder(24, 28, 24, 28)));
-
-        aggiungiVoce(box, "Sala Studio:", stato.getNomeSala());
-        aggiungiVoce(box, "Data:", StileWizard.formattaData(stato.getData()));
-        aggiungiVoce(box, "Fascia Oraria:", stato.getEtichettaFascia());
-        aggiungiVoce(box, "Area:", stato.getTipologiaArea());
-        aggiungiVoce(box, "Postazione:", stato.getEtichettaPostazione());
-
-        pannelloRiepilogo.add(box, BorderLayout.NORTH);
-    }
-
-    private void aggiungiVoce(JPanel box, String nome, String valore) {
-        JLabel lblNome = new JLabel(nome);
-        lblNome.setForeground(StileWizard.GRIGIO_TESTO);
-        JLabel lblValore = new JLabel(valore);
-        lblValore.setFont(new Font("SansSerif", Font.BOLD, 14));
-        box.add(lblNome);
-        box.add(lblValore);
-    }
-
-    // ── CONFERMA (UC7) ───────────────────────────────────────────────────────
+    // ── CONFERMA ─────────────────────────────────────────────────────────────
 
     private void conferma() {
         try {
@@ -126,10 +105,10 @@ public class RiepilogoPrenotazione {
     public JFrame apriForm() {
         frameCorrente = new JFrame("Nuova Prenotazione");
         frameCorrente.setContentPane(riepilogoPane);
-        frameCorrente.setSize(960, 700);
+        frameCorrente.setSize(1000, 1000);
         frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
-        frameCorrente.setResizable(true);
+        frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);
         return frameCorrente;
     }

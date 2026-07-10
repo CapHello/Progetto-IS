@@ -10,11 +10,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 
-/** Step 3 del wizard di prenotazione: scelta dell'area della sala (UC7). */
 public class SelezionaArea {
 
     public static void main(String[] args) {
-        // test sulla singola interfaccia: servono nel DB una sala (id 1) e una fascia (id 1) valide
+        // test sulla singola interfaccia
         UtenteDTO utente = new UtenteDTO();
         utente.setId(1L);
         StatoWizard stato = new StatoWizard(utente);
@@ -77,10 +76,6 @@ public class SelezionaArea {
 
     // ── AREE ─────────────────────────────────────────────────────────────────
 
-    /**
-     * UC7: carica il dettaglio aree/postazioni della sala per (data, fascia) e lo conserva
-     * nello stato per lo step successivo; azzera la selezione a ogni ingresso (come la GUI web).
-     */
     private void caricaAree() {
         pannelloAree.removeAll();
         pannelloAree.setLayout(new BorderLayout());
@@ -135,10 +130,10 @@ public class SelezionaArea {
     public JFrame apriForm() {
         frameCorrente = new JFrame("Nuova Prenotazione");
         frameCorrente.setContentPane(selezionaAreaPane);
-        frameCorrente.setSize(960, 700);
+        frameCorrente.setSize(1000, 1000);
         frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
-        frameCorrente.setResizable(true);
+        frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);
         return frameCorrente;
     }

@@ -116,33 +116,19 @@ public class Login {
                     return;
                 }
 
-
-                UtenteDTO utenteDTO = null;
                 try{
-                    utenteDTO = BibliotecaFacade.getInstance().autenticazione(email, password);
-                    if (utenteDTO == null){
-                        mostraErrore("Non sei registrato, registrati!!");
-                    }else {
-                        if (utenteDTO.getRuolo().equalsIgnoreCase("Studente")) {
-                            frameCorrente.dispose();
-                            DashboardStudente dashboardStudente = new DashboardStudente();
-                            dashboardStudente.apriDashboard(utenteDTO);
-                        }else if(utenteDTO.getRuolo().equalsIgnoreCase("Bibliotecario")){
-                            frameCorrente.dispose();
-                            new DashboardBibliotecario().apriDashboard();
-                        }
-
-
-
-
-
+                    UtenteDTO utenteDTO = BibliotecaFacade.getInstance().autenticazione(email, password);
+                    if (utenteDTO.getRuolo().equalsIgnoreCase("Studente")) {
+                        frameCorrente.dispose();
+                        DashboardStudente dashboardStudente = new DashboardStudente();
+                        dashboardStudente.apriDashboard(utenteDTO);
+                    }else if(utenteDTO.getRuolo().equalsIgnoreCase("Bibliotecario")){
+                        frameCorrente.dispose();
+                        new DashboardBibliotecario().apriDashboard();
                     }
-                }catch (SecurityException exception){
+                }catch (RuntimeException exception){
                     mostraErrore(exception.getMessage());
                 }
-
-
-
             }
         });
     }
@@ -162,7 +148,7 @@ public class Login {
     public JFrame apriLogin() {
         frameCorrente = new JFrame("Login");
         frameCorrente.setContentPane(loginPane);
-        frameCorrente.setSize(960, 700);
+        frameCorrente.setSize(1000, 1000);
         frameCorrente.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
         frameCorrente.setResizable(false);

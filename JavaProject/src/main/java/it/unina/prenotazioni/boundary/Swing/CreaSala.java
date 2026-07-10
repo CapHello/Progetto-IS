@@ -4,8 +4,6 @@ import it.unina.prenotazioni.controller.BibliotecaFacade;
 import it.unina.prenotazioni.dto.CreazioneSalaDTO;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -14,16 +12,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Creazione di una nuova sala studio (UC3), replica Swing di crea-sala.html:
- * orari per i 5 giorni feriali e aree specifiche dinamiche; l'area "comune" di
- * default è sempre presente (V19) e riceve le postazioni non assegnate alle aree.
- * Le validazioni di merito restano nel controller (GestoreSale).
- */
 public class CreaSala {
 
     public static void main(String[] args) {
-        // test sulla singola interfaccia: MySQL serve solo alla pressione di "Procedi"
+        // test sulla singola interfaccia
         new CreaSala().apriForm();
     }
 
@@ -50,17 +42,27 @@ public class CreaSala {
     private JLabel      lblRiepilogoAree;
     private JLabel      lblOrariTitolo;
     private JPanel      pannelloOrari;
+    private JTextField  txtAperturaLunedi;
+    private JTextField  txtChiusuraLunedi;
+    private JTextField  txtAperturaMartedi;
+    private JTextField  txtChiusuraMartedi;
+    private JTextField  txtAperturaMercoledi;
+    private JTextField  txtChiusuraMercoledi;
+    private JTextField  txtAperturaGiovedi;
+    private JTextField  txtChiusuraGiovedi;
+    private JTextField  txtAperturaVenerdi;
+    private JTextField  txtChiusuraVenerdi;
     private JLabel      lblGrana;
     private JTextField  txtGrana;
     private JPanel      pannelloAzioni;
     private JLabel      lblIndietro;
     private JButton     btnProcedi;
 
-    // Stato interno: campi delle righe-area e degli orari creati dinamicamente
+    // Stato interno
     private final List<JTextField> nomiAree  = new ArrayList<>();
     private final List<JSpinner>   postiAree = new ArrayList<>();
-    private final JTextField[] orariApertura = new JTextField[GIORNI.length];
-    private final JTextField[] orariChiusura = new JTextField[GIORNI.length];
+    private JTextField[] orariApertura;
+    private JTextField[] orariChiusura;
     private JFrame frameCorrente;
 
     public CreaSala() {
@@ -82,7 +84,16 @@ public class CreaSala {
         spinPostazioni.addChangeListener(e -> aggiornaRiepilogo());
         spinAree.addChangeListener(e -> rigeneraAree());
 
-        costruisciOrari();
+        // campi orario del form in ordine Lun-Ven
+        orariApertura = new JTextField[]{txtAperturaLunedi, txtAperturaMartedi,
+                txtAperturaMercoledi, txtAperturaGiovedi, txtAperturaVenerdi};
+        orariChiusura = new JTextField[]{txtChiusuraLunedi, txtChiusuraMartedi,
+                txtChiusuraMercoledi, txtChiusuraGiovedi, txtChiusuraVenerdi};
+        for (int i = 0; i < GIORNI.length; i++) {
+            StileWizard.stilizzaCampo(orariApertura[i]);
+            StileWizard.stilizzaCampo(orariChiusura[i]);
+        }
+
         rigeneraAree();
 
         btnLogout.addActionListener(e -> {
@@ -101,7 +112,6 @@ public class CreaSala {
 
     // ── AREE DINAMICHE ───────────────────────────────────────────────────────
 
-    /** Rigenera le righe-area in base al numero scelto, preservando i valori già inseriti (come la GUI web). */
     private void rigeneraAree() {
         List<String>  vecchiNomi  = new ArrayList<>();
         List<Integer> vecchiPosti = new ArrayList<>();
@@ -148,7 +158,6 @@ public class CreaSala {
         aggiornaRiepilogo();
     }
 
-    /** L'area "comune" riceve le postazioni non assegnate: il riepilogo mostra il resto in tempo reale. */
     private void aggiornaRiepilogo() {
         int totale = (Integer) spinPostazioni.getValue();
         int somma = 0;
@@ -165,39 +174,8 @@ public class CreaSala {
         }
     }
 
-    // ── ORARI SETTIMANALI ────────────────────────────────────────────────────
+    // ── CREAZIONE ────────────────────────────────────────────────────────────
 
-    private void costruisciOrari() {
-        pannelloOrari.setLayout(new GridLayout(0, 3, 8, 6));
-        pannelloOrari.setBackground(Color.WHITE);
-
-        JLabel vuota = new JLabel("");
-        JLabel apertura = new JLabel("Apertura");
-        JLabel chiusura = new JLabel("Chiusura");
-        for (JLabel intestazione : new JLabel[]{vuota, apertura, chiusura}) {
-            intestazione.setForeground(StileWizard.GRIGIO_TESTO);
-            intestazione.setFont(new Font("SansSerif", Font.BOLD, 11));
-            pannelloOrari.add(intestazione);
-        }
-
-        for (int i = 0; i < GIORNI.length; i++) {
-            JLabel giorno = new JLabel(GIORNI[i]);
-            giorno.setForeground(new Color(74, 85, 104));
-            pannelloOrari.add(giorno);
-
-            orariApertura[i] = new JTextField("08:30");
-            StileWizard.stilizzaCampo(orariApertura[i]);
-            pannelloOrari.add(orariApertura[i]);
-
-            orariChiusura[i] = new JTextField("18:30");
-            StileWizard.stilizzaCampo(orariChiusura[i]);
-            pannelloOrari.add(orariChiusura[i]);
-        }
-    }
-
-    // ── CREAZIONE (UC3) ──────────────────────────────────────────────────────
-
-    /** Converte una grana testuale ("30m", "1h", "1h30m", "90") in minuti, come la GUI web. */
     private int granaInMinuti(String testo) {
         String s = testo.trim().toLowerCase().replace(" ", "");
         if (s.matches("\\d+")) {

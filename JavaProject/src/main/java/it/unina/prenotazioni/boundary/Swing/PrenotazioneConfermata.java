@@ -8,14 +8,10 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.time.LocalDate;
 
-/**
- * Schermata finale del wizard di prenotazione: esito della prenotazione appena
- * registrata (UC7) con ritorno alla dashboard dello studente.
- */
 public class PrenotazioneConfermata {
 
     public static void main(String[] args) {
-        // test sulla singola interfaccia con dati fittizi (nessun accesso al DB)
+        // test sulla singola interfaccia
         UtenteDTO utente = new UtenteDTO();
         utente.setId(1L);
         utente.setNome("Giovanni");
@@ -62,7 +58,7 @@ public class PrenotazioneConfermata {
         StileWizard.stilizzaLogout(btnLogout);
         StileWizard.stilizzaBottone(btnDashboard, StileWizard.VIOLA);
         StileWizard.bordaCard(cardConfermata);
-        lblSteps.setText(StileWizard.htmlSteps(6)); // tutti gli step completati
+        lblSteps.setText(StileWizard.htmlSteps(6));
         pannelloBox.setBorder(new LineBorder(StileWizard.GRIGIO_BORDO, 1, true));
 
         pannelloIcona.setLayout(new GridBagLayout());
@@ -92,15 +88,14 @@ public class PrenotazioneConfermata {
     public JFrame apriForm() {
         frameCorrente = new JFrame("Prenotazione Confermata");
         frameCorrente.setContentPane(confermataPane);
-        frameCorrente.setSize(960, 700);
+        frameCorrente.setSize(1000, 1000);
         frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
-        frameCorrente.setResizable(true);
+        frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);
         return frameCorrente;
     }
 
-    /** Cerchio verde con la spunta, come l'icona di successo della GUI web. */
     private static class CerchioSpunta extends JPanel {
 
         CerchioSpunta() {
