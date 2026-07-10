@@ -2,6 +2,7 @@ package it.unina.prenotazioni.controller;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -357,10 +358,13 @@ public class GestorePrenotazioni {
         }
         for (FasciaOraria f : sala.getFasceOrariePrestabilite(data)){
             if(f.getId().equals(idFascia)){
+                if(data.isEqual(LocalDate.now()) && !f.getOraInizio().isAfter(LocalTime.now())){
+                    throw new IllegalArgumentException("La fascia oraria selezionata è già trascorsa nella giornata corrente");
+                }
                 return f;
             }
         }
-        throw new IllegalArgumentException("La fascia oraria selezionata non è disponibile o è già trascorsa");
+        throw new IllegalArgumentException("La fascia oraria selezionata non è disponibile");
     }
 
     /** Postazione scelta esplicitamente (se indicata e ancora libera) oppure assegnazione automatica via Strategy. */

@@ -54,7 +54,7 @@ class EliminaSalaStudioTest {
 
             // 3. Creazione Sala Studio con 30 postazioni divise in 2 aree (Pre-condizione TC1)
             SalaStudio sala = new SalaStudio("Sala da Eliminare", "Test Eliminazione", 30);
-            sala.setCodiceNumerico(1);
+
             Area area1 = sala.aggiungiArea("Area 1", 15);
             Area area2 = sala.aggiungiArea("Area 2", 15);
             em.persist(sala);
