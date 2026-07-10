@@ -2,6 +2,7 @@ package it.unina.prenotazioni.controller;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -24,7 +25,6 @@ import it.unina.prenotazioni.entity.SalaStudio;
 import it.unina.prenotazioni.entity.StatoEnum;
 import it.unina.prenotazioni.entity.Studente;
 import it.unina.prenotazioni.entity.state.StatoAttiva;
-import org.springframework.cglib.core.Local;
 
 /**
  * <<control>> Gestore (Singleton) del ciclo di vita delle prenotazioni:
@@ -70,30 +70,6 @@ public class GestorePrenotazioni {
         }
         return studente;
     }
-
-    /** Se lo studente ha scelto una postazione specifica, questa deve esistere ed essere nell'area indicata. */
-    private void verificaSuPostazione(Long idArea, Long idPostazione) {
-        // idPostazione == 0 è il sentinella per "assegnazione automatica": sicuro perché gli id
-        // reali partono da 1 (MySQL AUTO_INCREMENT) e non vengono mai impostati a mano.
-        if(idPostazione != null && !idPostazione.equals(0L)){
-            if (idPostazione < 0L) {
-                throw new IllegalArgumentException("Identificativo postazione non valido.");
-            }
-            Postazione p = registroSale.trovaPostazionePerId(idPostazione);
-            if(p == null || !p.getArea().getId().equals(idArea)){
-                throw new IllegalArgumentException("La postazione selezionata non è presente nell'area");
-            }
-        }
-    }
-
-    /** L'area indicata deve esistere e appartenere alla sala selezionata. */
-    private void verificaSuArea(Long idSala, Long idArea) {
-        Area area = registroSale.trovaAreaPerId(idArea);
-        if(area == null || !area.getSalaStudio().getId().equals(idSala)){
-            throw new IllegalArgumentException("L'area non è presente all'interno della sala selezionata");
-        }
-    }
-
 
 
     // ------------------------------------------------------------------ UC7
@@ -310,7 +286,7 @@ public class GestorePrenotazioni {
      * prima della transizione fa partire la notifica automatica.
      */
     public void gestisciTerminePrenotazione() {
-        LocalDateTime adesso = LocalDateTime.now();
+        LocalDateTime adesso = LocalDateTime.now(ZoneId.of("Europe/Rome"));
         for (Prenotazione p : registroPrenotazioni.getPrenotazioniInScadenza()) {
             StatoEnum stato = p.getStato().getStatoEnum();
             LocalDateTime inizio = LocalDateTime.of(p.getData(), p.getFasciaOraria().getOraInizio());
@@ -333,7 +309,7 @@ public class GestorePrenotazioni {
     // ------------------------------------------------------------------ UC13
     /** Statistiche della giornata: prenotazioni, non confermate, tasso di occupazione. */
     public StatisticheDTO monitoraStatisticheServizio() {
-        LocalDate oggi = LocalDate.now();
+        LocalDate oggi = LocalDate.now(ZoneId.of("Europe/Rome"));
         List<Prenotazione> tutte = RegistroPrenotazioni.getInstance().getTutte();
 
         int prenotazioniOggi = 0;
@@ -376,7 +352,7 @@ public class GestorePrenotazioni {
         if(idFascia == null){
             throw new IllegalArgumentException("La fascia oraria è obbligatoria");
         }
-        if (data.isBefore(LocalDate.now())){
+        if (data.isBefore(LocalDate.now(ZoneId.of("Europe/Rome")))){
             throw new IllegalArgumentException("Non è possibile prenotare una fascia oraria già iniziata o passata");
         }
         for (FasciaOraria f : sala.getFasceOrariePrestabilite(data)){

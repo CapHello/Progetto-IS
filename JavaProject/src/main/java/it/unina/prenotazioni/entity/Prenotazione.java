@@ -4,6 +4,7 @@ import it.unina.prenotazioni.entity.state.*;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * <<entity>> Prenotazione di una postazione per una (data, fascia oraria).
@@ -138,12 +139,12 @@ public class Prenotazione extends Subject {
         if (getStato() == null || getStato().getStatoEnum() != StatoEnum.ATTIVA) {
             throw new IllegalStateException("La prenotazione non è in stato ATTIVA");
         }
-        if (!LocalDate.now().equals(data)) {
+        if (!LocalDate.now(ZoneId.of("Europe/Rome")).equals(data)) {
             throw new IllegalStateException("Il check-in è consentito solo nel giorno della prenotazione");
         }
         LocalDateTime limite = LocalDateTime.of(data, fasciaOraria.getOraInizio())
                 .plusMinutes(TOLLERANZA_CHECKIN_MINUTI);
-        if (LocalDateTime.now().isAfter(limite)) {
+        if (LocalDateTime.now(ZoneId.of("Europe/Rome")).isAfter(limite)) {
             throw new IllegalStateException("superata la tolleranza di " + TOLLERANZA_CHECKIN_MINUTI
                     + " minuti dall'inizio della fascia oraria");
         }
@@ -155,7 +156,7 @@ public class Prenotazione extends Subject {
             throw new IllegalStateException("Prenotazione priva di data o fascia oraria");
         }
         LocalDateTime inizio = LocalDateTime.of(data, fasciaOraria.getOraInizio());
-        if (LocalDateTime.now().isAfter(inizio.minusHours(6))) {
+        if (LocalDateTime.now(ZoneId.of("Europe/Rome")).isAfter(inizio.minusHours(6))) {
             throw new IllegalStateException(
                     "Annullamento non consentito: mancano meno di 6 ore all'inizio della fascia oraria");
         }

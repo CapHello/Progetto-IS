@@ -7,6 +7,7 @@ import it.unina.prenotazioni.dto.UtenteDTO;
 import it.unina.prenotazioni.entity.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * <<control>> Gestore (Singleton) di Registrazione (UC1), Autenticazione (UC2) e
@@ -220,7 +221,7 @@ public class GestoreUtenti {
     }
 
     private void bloccaAccountTemporaneamente(Utente utente, int durataMinuti) {
-        utente.setBloccatoFinoA(LocalDateTime.now().plusMinutes(durataMinuti));
+        utente.setBloccatoFinoA(LocalDateTime.now(ZoneId.of("Europe/Rome")).plusMinutes(durataMinuti));
         utente.setTentativiFalliti(0);
     }
 

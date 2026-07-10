@@ -124,7 +124,9 @@ public class Login {
                     return;
                 }
 
-                if (password.isBlank() || password.equalsIgnoreCase("Password")) {
+                // Se l'echo char è disattivato il campo sta ancora mostrando il placeholder:
+                // così una password che vale davvero "Password" resta accettata.
+                if (password.isBlank() || txtPassword.getEchoChar() == (char) 0) {
                     mostraErrore("Inserisci la password");
                     return;
                 }

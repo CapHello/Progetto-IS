@@ -2,6 +2,7 @@ package it.unina.prenotazioni.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 /**
  * <<entity>> Generalizzazione degli attori registrati (Studente, Bibliotecario).
@@ -50,6 +51,6 @@ public abstract class Utente{
 
     /** True se l'account risulta attualmente bloccato (blocco temporaneo non ancora scaduto). */
     public boolean isBloccato() {
-        return bloccatoFinoA != null && LocalDateTime.now().isBefore(bloccatoFinoA);
+        return bloccatoFinoA != null && LocalDateTime.now(ZoneId.of("Europe/Rome")).isBefore(bloccatoFinoA);
     }
 }

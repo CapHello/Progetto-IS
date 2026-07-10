@@ -101,10 +101,10 @@ public class SalaStudio {
         }
 
         // Calcoliamo quante postazioni sono già state assegnate alle altre aree
-        // TODO da rifare!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        int postazioniAssegnate = aree.stream()
-                .mapToInt(a -> a.getPostazioni().size())
-                .sum();
+        int postazioniAssegnate = 0;
+        for(Area a: aree) {
+            postazioniAssegnate+= a.getPostazioni().size();
+        }
 
         verificaNumeroPostazioni(postazioniAssegnate + numPostazioni);
 
