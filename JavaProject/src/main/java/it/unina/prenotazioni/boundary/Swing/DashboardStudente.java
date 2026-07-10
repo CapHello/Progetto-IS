@@ -156,13 +156,13 @@ public class DashboardStudente {
         lblAccessi.setText("Totale accessi: " + utente.getNumeroTotaleAccessi());
         carica();
 
-        frameCorrente.setSize(1000, 1000);
         frameCorrente.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // pack() dimensiona la finestra sulle preferred size dei componenti;
+        // va fatto prima di centrarla, così il centraggio usa la dimensione definitiva.
+        frameCorrente.pack();
         frameCorrente.setLocationRelativeTo(null);
-
         frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);
-        frameCorrente.pack();
         return frameCorrente;
     }
 

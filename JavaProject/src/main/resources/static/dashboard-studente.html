@@ -59,10 +59,12 @@
         const utente = richiediRuolo('Studente');
         let prenotazioni = [];
 
+        // Stesso formato usato dal wizard di prenotazione (es. "27 agosto 2026").
+        const MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
         function formattaData(iso) {
             if (!iso) return '';
             const [a, m, g] = iso.split('-');
-            return `${g}-${m}-${a}`;
+            return parseInt(g, 10) + ' ' + MESI[parseInt(m, 10) - 1].toLowerCase() + ' ' + a;
         }
 
         function render() {

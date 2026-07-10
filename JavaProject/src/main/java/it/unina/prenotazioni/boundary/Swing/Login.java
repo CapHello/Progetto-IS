@@ -124,7 +124,9 @@ public class Login {
                     return;
                 }
 
-                if (password.isBlank() || password.equalsIgnoreCase("Password")) {
+                // Se l'echo char è disattivato il campo sta ancora mostrando il placeholder:
+                // così una password che vale davvero "Password" resta accettata.
+                if (password.isBlank() || txtPassword.getEchoChar() == (char) 0) {
                     mostraErrore("Inserisci la password");
                     return;
                 }
@@ -161,7 +163,7 @@ public class Login {
         frameCorrente = new JFrame("Login");
         frameCorrente.setContentPane(loginPane);
         frameCorrente.setSize(1000, 1000);
-        frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameCorrente.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
         frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);

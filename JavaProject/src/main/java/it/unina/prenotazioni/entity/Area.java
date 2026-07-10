@@ -63,8 +63,8 @@ public class Area {
     /** Genera in memoria le postazioni dell'area; la persistenza avviene a cascata (UC3). */
     public void creaPostazioni(int numeroPostazioni) {
         for (int i = 0; i < numeroPostazioni; i++) {
-            // faccio i+1 per generare il codiceNumerico univoco all'interno della stessa Area
-            // poi aggiungo 1 perché 0 identifica l'assegnazione automatica
+            // i parte da 0, quindi il codice è i+1: le postazioni sono numerate da 1 a N
+            // (lo 0 è riservato come sentinella per l'assegnazione automatica)
             Postazione p = new Postazione(this, i+1);
             this.postazioni.add(p);
         }

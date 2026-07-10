@@ -12,6 +12,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
@@ -40,6 +42,7 @@ public class SelezionaDataAndSala {
     private JLabel lblTitoloSala;
     private JPanel pannelloSale;
     private JPanel pannelloBottom;
+    private JLabel lblIndietro;
     private JButton btnContinua;
 
     // Stato interno
@@ -72,6 +75,17 @@ public class SelezionaDataAndSala {
             new Login().apriLogin();
         });
         btnContinua.addActionListener(e -> continua());
+
+        // Torna alla dashboard studente senza perdere l'utente loggato.
+        StileWizard.stilizzaIndietro(lblIndietro);
+        lblIndietro.setText("← Dashboard");
+        lblIndietro.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frameCorrente.dispose();
+                new DashboardStudente().apriDashboard(stato.getStudente());
+            }
+        });
 
         costruisciCalendario();
         if (stato.getData() != null) {
@@ -246,7 +260,7 @@ public class SelezionaDataAndSala {
         frameCorrente = new JFrame("Nuova Prenotazione");
         frameCorrente.setContentPane(selezionaDataSalaPane);
         frameCorrente.setSize(1000, 1000);
-        frameCorrente.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frameCorrente.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frameCorrente.setLocationRelativeTo(null);
         frameCorrente.setResizable(false);
         frameCorrente.setVisible(true);
@@ -345,17 +359,21 @@ public class SelezionaDataAndSala {
         pannelloSale.setOpaque(true);
         cardSala.add(pannelloSale, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         pannelloBottom = new JPanel();
-        pannelloBottom.setLayout(new GridLayoutManager(1, 2, new Insets(10, 30, 20, 30), -1, -1));
+        pannelloBottom.setLayout(new GridLayoutManager(1, 3, new Insets(10, 30, 20, 30), -1, -1));
         pannelloBottom.setBackground(new Color(-5192482));
         pannelloBottom.setOpaque(true);
         selezionaDataSalaPane.add(pannelloBottom, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        lblIndietro = new JLabel();
+        lblIndietro.setForeground(new Color(-6710887));
+        lblIndietro.setText("← Dashboard");
+        pannelloBottom.add(lblIndietro, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer2 = new Spacer();
-        pannelloBottom.add(spacer2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        pannelloBottom.add(spacer2, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         btnContinua = new JButton();
         btnContinua.setBackground(new Color(-8621082));
         btnContinua.setForeground(new Color(-1));
         btnContinua.setText("Continua");
-        pannelloBottom.add(btnContinua, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        pannelloBottom.add(btnContinua, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**
