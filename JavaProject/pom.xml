@@ -22,12 +22,6 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.intellij</groupId>
-            <artifactId>forms_rt</artifactId>
-            <version>7.0.3</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.10.2</version>
@@ -75,6 +69,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>it.unina.prenotazioni.Launcher</mainClass>
+                </configuration>
             </plugin>
             <!-- Mantiene i nomi dei parametri nei class (necessario a Spring MVC per il
                  binding di @RequestParam/@PathVariable). Utile anche quando la build è
