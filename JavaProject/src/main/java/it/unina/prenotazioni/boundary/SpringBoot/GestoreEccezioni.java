@@ -1,4 +1,4 @@
-package it.unina.prenotazioni.boundary;
+package it.unina.prenotazioni.boundary.SpringBoot;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
