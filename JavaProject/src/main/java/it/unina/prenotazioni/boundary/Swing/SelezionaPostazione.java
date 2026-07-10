@@ -28,6 +28,7 @@ public class SelezionaPostazione {
     private JPanel cardPosti;
     private JLabel lblTitoloCard;
     private JLabel lblSottotitolo;
+    private JScrollPane scrollPosti;
     private JPanel pannelloPosti;
     private JPanel colonnaDestra;
     private JPanel cardDettaglio;
@@ -61,6 +62,11 @@ public class SelezionaPostazione {
         lblSteps.setText(StileWizard.htmlSteps(4));
         lblSottotitolo.setText(stato.getNomeSala() + " · " + stato.getTipologiaArea()
                 + " · " + StileWizard.formattaData(stato.getData()) + " · " + stato.getEtichettaFascia());
+
+        // Con molte postazioni la griglia supera l'altezza della card: si scorre in verticale.
+        scrollPosti.setBorder(null);
+        scrollPosti.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPosti.getVerticalScrollBar().setUnitIncrement(16);
 
         btnLogout.addActionListener(e -> {
             frameCorrente.dispose();
@@ -261,11 +267,13 @@ public class SelezionaPostazione {
         lblSottotitolo.setForeground(new Color(-6710887));
         lblSottotitolo.setText("sala · area · data · fascia");
         cardPosti.add(lblSottotitolo, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        scrollPosti = new JScrollPane();
+        cardPosti.add(scrollPosti, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         pannelloPosti = new JPanel();
         pannelloPosti.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         pannelloPosti.setBackground(new Color(-1));
         pannelloPosti.setOpaque(true);
-        cardPosti.add(pannelloPosti, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        scrollPosti.setViewportView(pannelloPosti);
         colonnaDestra = new JPanel();
         colonnaDestra.setLayout(new GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, 15));
         colonnaDestra.setBackground(new Color(-5192482));

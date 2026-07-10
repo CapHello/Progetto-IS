@@ -27,6 +27,7 @@ public class SelezionaArea {
     private JPanel cardArea;
     private JLabel lblTitoloCard;
     private JLabel lblSottotitolo;
+    private JScrollPane scrollAree;
     private JPanel pannelloAree;
     private JPanel pannelloAzioni;
     private JLabel lblIndietro;
@@ -48,6 +49,11 @@ public class SelezionaArea {
         lblSteps.setText(StileWizard.htmlSteps(3));
         lblSottotitolo.setText("<html>Scegli un'area della sala <b>" + stato.getNomeSala()
                 + "</b> (l'area <i>comune</i> è sempre disponibile).</html>");
+
+        // Con molte aree la lista supera l'altezza della card: si scorre in verticale.
+        scrollAree.setBorder(null);
+        scrollAree.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollAree.getVerticalScrollBar().setUnitIncrement(16);
 
         btnLogout.addActionListener(e -> {
             frameCorrente.dispose();
@@ -198,11 +204,13 @@ public class SelezionaArea {
         lblSottotitolo.setForeground(new Color(-6710887));
         lblSottotitolo.setText("Scegli un'area della sala.");
         cardArea.add(lblSottotitolo, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        scrollAree = new JScrollPane();
+        cardArea.add(scrollAree, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         pannelloAree = new JPanel();
         pannelloAree.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         pannelloAree.setBackground(new Color(-1));
         pannelloAree.setOpaque(true);
-        cardArea.add(pannelloAree, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        scrollAree.setViewportView(pannelloAree);
         pannelloAzioni = new JPanel();
         pannelloAzioni.setLayout(new GridLayoutManager(1, 3, new Insets(10, 0, 0, 0), -1, -1));
         pannelloAzioni.setBackground(new Color(-1));
