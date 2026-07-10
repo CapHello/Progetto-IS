@@ -153,6 +153,15 @@ public class GestoreSale {
      * prenotazioni che occupano slot e notifica gli studenti coinvolti.
      */
     public void eliminaSalaStudio(Long idSalaStudio) {
+
+        if (idSalaStudio == null) {
+            throw new IllegalArgumentException("L'ID della sala è obbligatorio.");
+        }
+
+        if (idSalaStudio < 1 || idSalaStudio > 100) {
+            throw new IllegalArgumentException("ID Sala non valido. Inserire un valore compreso tra 1 e 100.");
+        }
+
         SalaStudio sala = registroSale.cercaSalaPerId(idSalaStudio);
         if (sala == null) {
             throw new IllegalArgumentException("Sala studio non trovata");
