@@ -64,9 +64,8 @@ public class Prenotazione extends Subject {
 
     public Prenotazione() { /* Costruttore vuoto richiesto da JPA. */ }
 
-    // Getters and Setters
+    // Getters and Setters (l'id non ha setter: è assegnato dal DB al salvataggio)
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public LocalDate getData() { return data; }
     public void setData(LocalDate data) { this.data = data; }

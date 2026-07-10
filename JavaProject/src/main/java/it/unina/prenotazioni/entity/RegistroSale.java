@@ -50,7 +50,7 @@ public class RegistroSale {
     }
 
     /** Solo le sale non eliminate (attiva = true). */
-    public List<SalaStudio> getSaleAttive() {
+    private List<SalaStudio> getSaleAttive() {
         return gestorePersistenza.eseguiQueryCustom(
                 "SELECT s FROM SalaStudio s WHERE s.attiva = true",
                 SalaStudio.class,

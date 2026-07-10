@@ -23,13 +23,10 @@ public class Postazione {
         this.area = area;
     }
 
-    // Getters and Setters
+    // Getters (niente setter: i campi sono valorizzati dal costruttore e da JPA via field access)
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
 
     public Area getArea() { return area; }
-    public void setArea(Area area) { this.area = area; }
 
 
     /** Sala di appartenenza, raggiunta navigando l'area. */

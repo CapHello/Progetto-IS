@@ -56,9 +56,8 @@ public class SalaStudio {
         this.numeroPostazioniTotali = numeroPostazioniTotali;
     }
 
-    // Getters and Setters
+    // Getters and Setters (id e numeroPostazioniTotali non hanno setter: assegnati da DB/costruttore)
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
@@ -67,7 +66,6 @@ public class SalaStudio {
     public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
 
     public int getNumeroPostazioniTotali() { return numeroPostazioniTotali; }
-    public void setNumeroPostazioniTotali(int numeroPostazioniTotali) { this.numeroPostazioniTotali = numeroPostazioniTotali; }
 
     public boolean isAttiva() { return attiva; }
     public void setAttiva(boolean attiva) { this.attiva = attiva; }
@@ -141,7 +139,7 @@ public class SalaStudio {
      * Recupera l'orario lavorativo (apertura e chiusura) per una specifica data.
      * Sfrutta l'indice della lista per mappare i giorni feriali (Lunedì = 0, Venerdì = 4).
      */
-    public FasciaOraria getOrarioLavorativoPerData(LocalDate data) {
+    private FasciaOraria getOrarioLavorativoPerData(LocalDate data) {
         if (!verificaDataInGiorniApertura(data)) {
             return null; // Chiuso nel weekend
         }
