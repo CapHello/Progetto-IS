@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 // NOTE: i test case in cui si richiedeva che il codice della postazione, area e sala studio
 // dovesse trovarsi all'interno di un intervallo specificato in fase di analisi non è necessario implementarli
-// mi basta fare il test sull'id univoco di hybernate che deve esser necessariamente > 0 tranne nel caso di postazione che
+// mi basta fare il test sull'id univoco di hibernate che deve esser necessariamente > 0 tranne nel caso di postazione che
 // assume volutamente il valore 0 per indicare la strategia di assegnazione.
 
 // il motivo principale per cui non è necessario:
 // essendo che prenotazioni, area e sale sono già memorizzate all'interno del database allora il test sul codiceNumerico di ognuna
 // di queste è già svolto dalla test-suite di creaSaleStudio. Inoltre come parametri in input ad effettuaPrenotazione non
-// è presente il codiceNumerico di ognuno di questi oggetti citati, ma il codice identificativo generato attraverso hybernate.
+// è presente il codiceNumerico di ognuno di questi oggetti citati, ma il codice identificativo generato attraverso hibernate.
 
 @DisplayName("Suite di Test - Registrazione Utente")
 class RegistrazioneTest {
