@@ -67,7 +67,6 @@ class EffettuaPrenotazioneTest {
             this.FASCIA_09_30 = fascia.getId();
 
             SalaStudio sala = new SalaStudio("Sala Prenotazioni", "Sala per testare le prenotazioni", 20);
-
             sala.addFascia(fascia);
 
             for (int i = 0; i < 5; i++) {
@@ -275,7 +274,21 @@ class EffettuaPrenotazioneTest {
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, idFasciaNonPrevista, ID_STUDENTE
             ));
         });
-        assertEquals("La fascia oraria selezionata non è disponibile", exception.getMessage());
+        assertEquals("La fascia oraria selezionata non è disponibile o è già trascorsa", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("TC16: Fascia oraria già trascorsa nella giornata corrente")
+    void effettuaPrenotazione_FasciaTrascorsaOggi_LanciaEccezione() {
+        LocalDate dataOdierna = LocalDate.now();
+        Long idFasciaPassata = 0L; // id fittizio: il TC richiede una fascia già trascorsa oggi
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
+                    SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, dataOdierna, idFasciaPassata, ID_STUDENTE
+            ));
+        });
+        assertEquals("La fascia oraria selezionata non è disponibile o è già trascorsa", exception.getMessage());
     }
 
     // MOTIVO DEL TEST COMMENTATO: questo test non è deterministico a meno che non modifichi il clock. Il motivo sta che

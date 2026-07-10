@@ -28,6 +28,7 @@ public class SelezionaFascia {
     private JPanel cardFascia;
     private JLabel lblTitoloCard;
     private JLabel lblSottotitolo;
+    private JScrollPane scrollFasce;
     private JPanel pannelloFasce;
     private JPanel pannelloAzioni;
     private JLabel lblIndietro;
@@ -49,6 +50,11 @@ public class SelezionaFascia {
         lblSteps.setText(StileWizard.htmlSteps(2));
         lblSottotitolo.setText("<html>Sala selezionata: <b>" + stato.getNomeSala()
                 + "</b> &nbsp;|&nbsp; data: <b>" + StileWizard.formattaData(stato.getData()) + "</b></html>");
+
+        // Con molte fasce (grana fine) la lista supera l'altezza della card: si scorre in verticale.
+        scrollFasce.setBorder(null);
+        scrollFasce.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollFasce.getVerticalScrollBar().setUnitIncrement(16);
 
         btnLogout.addActionListener(e -> {
             frameCorrente.dispose();
@@ -199,11 +205,13 @@ public class SelezionaFascia {
         lblSottotitolo.setForeground(new Color(-6710887));
         lblSottotitolo.setText("Sala selezionata: —  |  data: —");
         cardFascia.add(lblSottotitolo, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        scrollFasce = new JScrollPane();
+        cardFascia.add(scrollFasce, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         pannelloFasce = new JPanel();
         pannelloFasce.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         pannelloFasce.setBackground(new Color(-1));
         pannelloFasce.setOpaque(true);
-        cardFascia.add(pannelloFasce, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        scrollFasce.setViewportView(pannelloFasce);
         pannelloAzioni = new JPanel();
         pannelloAzioni.setLayout(new GridLayoutManager(1, 3, new Insets(10, 0, 0, 0), -1, -1));
         pannelloAzioni.setBackground(new Color(-1));
