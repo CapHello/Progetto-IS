@@ -68,10 +68,13 @@ class ConsultazioneSaleDisponibiliTest {
             this.ID_FASCIA_VALIDA = fascia.getId();
 
             // 3. Setup Sala 1 (Valida e prenotabile). Creiamo 1 sola postazione per saturarla facilmente.
+            // Come in produzione (creaSalaStudio), ogni giorno ha una FasciaOraria distinta:
+            // Hibernate 6 deduplica i risultati JPQL per identità, quindi riusare la stessa
+            // istanza 5 volte farebbe risultare un solo orario lavorativo invece di cinque.
             SalaStudio sala1 = new SalaStudio("Sala Newton", "Disponibile", 1);
             Area area1 = sala1.aggiungiArea("Comune", 1);
             sala1.addFascia(fascia); // Aggiunta agli slot prenotabili
-            for (int i = 0; i < 5; i++) sala1.addOrarioLavorativo(fascia);
+            for (int i = 0; i < 5; i++) sala1.addOrarioLavorativo(new FasciaOraria(LocalTime.of(9, 0), LocalTime.of(11, 0)));
             em.persist(sala1);
             this.ID_SALA_VALIDA = sala1.getId();
 
@@ -79,7 +82,7 @@ class ConsultazioneSaleDisponibiliTest {
             SalaStudio sala2 = new SalaStudio("Sala Maxwell", "Senza Slot", 10);
             sala2.aggiungiArea("Comune", 10);
             // NON invochiamo sala2.addFascia(fascia);
-            for (int i = 0; i < 5; i++) sala2.addOrarioLavorativo(fascia);
+            for (int i = 0; i < 5; i++) sala2.addOrarioLavorativo(new FasciaOraria(LocalTime.of(9, 0), LocalTime.of(11, 0)));
             em.persist(sala2);
             this.ID_SALA_SENZA_FASCE = sala2.getId();
 
@@ -125,7 +128,7 @@ class ConsultazioneSaleDisponibiliTest {
     @Test
     @DisplayName("TC2: Nessuna sala disponibile per la data (Tutte sature)")
     void consultaSaleDisponibili_SaleSature_LanciaEccezione() {
-        Exception exception = assertThrows(RuntimeException.class, () -> {
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
             bibliotecaFacade.consultaSaleDisponibili(DATA_SATURA);
         });
         assertEquals("Nessuna Sala Studio disponibile per la data selezionata.", exception.getMessage());
@@ -134,7 +137,7 @@ class ConsultazioneSaleDisponibiliTest {
     @Test
     @DisplayName("TC3: Sala senza fasce prenotabili")
     void getFasceDisponibili_SenzaFasce_LanciaEccezione() {
-        Exception exception = assertThrows(RuntimeException.class, () -> {
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
             // Chiediamo le fasce per la Sala 2, che ha orari di apertura ma nessuno slot prenotabile
             bibliotecaFacade.getFasceDisponibili(ID_SALA_SENZA_FASCE, DATA_VALIDA);
         });
@@ -144,7 +147,7 @@ class ConsultazioneSaleDisponibiliTest {
     @Test
     @DisplayName("TC4: Sala/fascia senza postazioni libere (Area satura)")
     void selezionaDettaglioSala_NessunaPostazione_LanciaEccezione() {
-        Exception exception = assertThrows(RuntimeException.class, () -> {
+        Exception exception = assertThrows(IllegalStateException.class, () -> {
             // Andiamo al dettaglio della Sala 1 nella data satura
             bibliotecaFacade.selezionaDettaglioSala(ID_SALA_VALIDA, ID_FASCIA_VALIDA, DATA_SATURA);
         });
