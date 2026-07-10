@@ -277,13 +277,13 @@ class EffettuaPrenotazioneTest {
         });
         assertEquals("La fascia oraria selezionata non è disponibile", exception.getMessage());
     }
+
     // MOTIVO DEL TEST COMMENTATO: questo test non è deterministico a meno che non modifichi il clock. Il motivo sta che
     // in risolvi salaStudio verifico prima che il giorno corrente sia feriale o meno, in caso di Sabato o Domenica viene sollevata
     // la stessa eccezione di TC12.
     // Il test passa correttamente se il giorno corrente è feriale.
     //
     // Per modificare il clock dovrei aggiungere attributo privato Clock clock e il setter tramite cui modificarlo.
-    
 //    @Test
 //    @DisplayName("TC16: Fascia oraria già trascorsa nella giornata corrente")
 //    void effettuaPrenotazione_FasciaTrascorsaOggi_LanciaEccezione() {
@@ -297,6 +297,7 @@ class EffettuaPrenotazioneTest {
 //        });
 //        assertEquals("La fascia oraria selezionata è già trascorsa nella giornata corrente", exception.getMessage());
 //    }
+
 
     // ==========================================
     // CASI DI ERRORE - AREA
