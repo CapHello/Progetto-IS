@@ -3,9 +3,8 @@ package it.unina.prenotazioni.dto;
 import java.time.LocalDate;
 
 /**
- * Parameter object di UC7: raccoglie l'intera richiesta di prenotazione che attraversa
- * il confine boundary→controller (simmetrico a CreazioneSalaDTO per UC3).
- * idPostazione null o 0 indica la richiesta di assegnazione automatica della postazione.
+ * Parameter object di UC7: raggruppa i dati della richiesta di prenotazione,
+ * come CreazioneSalaDTO fa per UC3. idPostazione null o 0 = assegnazione automatica.
  */
 public class RichiestaPrenotazioneDTO {
     private Long idSala;

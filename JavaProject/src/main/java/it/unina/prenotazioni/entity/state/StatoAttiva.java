@@ -4,8 +4,8 @@ import it.unina.prenotazioni.entity.Prenotazione;
 
 /**
  * Stato iniziale (Singleton, senza campi: un'istanza condivisa basta).
- * Unico stato non terminale: ammette annulla → ANNULLATA, checkin → CONFERMATA,
- * gestisciTermine → SCADUTA.
+ * Unico stato non terminale: annulla porta in ANNULLATA, checkin in CONFERMATA,
+ * gestisciTermine in SCADUTA.
  */
 public class StatoAttiva implements StatoPrenotazione {
 

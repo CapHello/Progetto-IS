@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 /**
  * <<entity>> Prenotazione di una postazione per una (data, fascia oraria).
- * Il ciclo di vita segue il pattern State (ATTIVA → CONFERMATA/ANNULLATA/SCADUTA → CONCLUSA);
+ * Il ciclo di vita segue il pattern State (ATTIVA, CONFERMATA, ANNULLATA, SCADUTA, CONCLUSA);
  * come Subject del pattern Observer notifica GestoreNotifiche a ogni cambio di stato.
  */
 @Entity
@@ -64,7 +64,7 @@ public class Prenotazione extends Subject {
 
     public Prenotazione() { /* Costruttore vuoto richiesto da JPA. */ }
 
-    // Getters and Setters (l'id non ha setter: è assegnato dal DB al salvataggio)
+    // Getters and Setters (niente setId: lo assegna il DB al salvataggio)
     public Long getId() { return id; }
 
     public LocalDate getData() { return data; }
@@ -104,7 +104,7 @@ public class Prenotazione extends Subject {
         }
     }
 
-    /** Check-in: conferma la presenza dello studente (delega allo stato → CONFERMATA). */
+    /** Check-in: conferma la presenza dello studente (la transizione a CONFERMATA la decide lo stato). */
     public void effettuaCheckin() {
         boolean confermata = getStato().checkin(this);
         if (!confermata) {
@@ -113,7 +113,7 @@ public class Prenotazione extends Subject {
         }
     }
 
-    /** Gestione automatica del termine (delega allo stato → SCADUTA / CONCLUSA). */
+    /** Gestione automatica del termine (lo stato corrente decide se passare a SCADUTA o CONCLUSA). */
     public void gestisciTermine() {
         getStato().gestisciTermine(this);
     }

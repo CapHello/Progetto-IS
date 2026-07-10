@@ -28,7 +28,7 @@ public abstract class Utente{
 
     protected Utente() { /* Costruttore vuoto richiesto da JPA: l'istanza nasce dalle Factory (UC1). */ }
 
-    // Getters and Setters (l'id non ha setter: è assegnato dal DB al salvataggio)
+    // Getters and Setters (niente setId: lo assegna il DB al salvataggio)
     public Long getId() { return id; }
 
     public String getNome() { return nome; }
@@ -46,7 +46,6 @@ public abstract class Utente{
     public int getTentativiFalliti() { return tentativiFalliti; }
     public void setTentativiFalliti(int tentativiFalliti) { this.tentativiFalliti = tentativiFalliti; }
 
-    // Il momento di fine blocco si interroga solo tramite isBloccato(); nessun getter diretto.
     public void setBloccatoFinoA(LocalDateTime bloccatoFinoA) { this.bloccatoFinoA = bloccatoFinoA; }
 
     /** True se l'account risulta attualmente bloccato (blocco temporaneo non ancora scaduto). */

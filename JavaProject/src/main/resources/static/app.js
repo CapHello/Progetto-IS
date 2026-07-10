@@ -21,7 +21,7 @@ async function api(method, path, params, isJson = false) {
       Object.entries(params).forEach(([k, v]) => {
         if (v === undefined || v === null || v === '') return;
         if (Array.isArray(v)) {
-          // Liste (es. tipologie[], postazioniAree[]) → parametri ripetuti, ordine preservato.
+          // Le liste (es. tipologie[], postazioniAree[]) diventano parametri ripetuti, con ordine preservato.
           v.forEach(item => { if (item !== undefined && item !== null && item !== '') usp.append(k, item); });
         } else {
           usp.append(k, v);

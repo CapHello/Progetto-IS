@@ -2,7 +2,7 @@ package it.unina.prenotazioni.dto;
 
 import java.time.LocalDate;
 
-/** Prenotazione per le boundary (UC7, UC5, UC12): stato, fascia e postazione in forma leggibile dalla GUI. */
+/** Prenotazione per le boundary (UC7, UC12): stato, fascia e postazione in forma leggibile dalla GUI. */
 public class PrenotazioneDTO {
     private Long idPrenotazione;
     private LocalDate data;

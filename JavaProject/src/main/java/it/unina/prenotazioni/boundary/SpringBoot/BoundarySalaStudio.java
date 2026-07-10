@@ -12,8 +12,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * <<endpoint>> Gestione sale: crea (UC3), elimina (UC4), aggiungi area, consulta
- * disponibilità (UC6), fasce e dettaglio postazioni (drill-down del wizard).
+ * <<endpoint>> Gestione sale: crea (UC3), elimina (UC4), consulta disponibilità (UC6),
+ * fasce e dettaglio postazioni (passi del wizard di prenotazione).
  */
 @RestController
 @RequestMapping("/api/sale")

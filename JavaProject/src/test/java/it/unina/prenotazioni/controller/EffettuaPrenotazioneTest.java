@@ -24,7 +24,7 @@ class EffettuaPrenotazioneTest {
 
     private Long SALA_VALIDA;
     private Long AREA_VALIDA;
-    private Long AREA_COMUNE; // <-- Ora sarà popolato dinamicamente da DB
+    private Long AREA_COMUNE;
     private Long POSTAZIONE_VALIDA;
     private Long ID_STUDENTE;
     private Long FASCIA_09_30;
@@ -98,7 +98,7 @@ class EffettuaPrenotazioneTest {
     }
 
     @Test
-    @DisplayName("TC1: Tutti validi — area specifica, postazione specifica")
+    @DisplayName("TC1: Tutti validi - area specifica, postazione specifica")
     void effettuaPrenotazione_TuttiValidi_Successo() {
         PrenotazioneDTO risultato = bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                 SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
@@ -110,7 +110,7 @@ class EffettuaPrenotazioneTest {
     }
 
     @Test
-    @DisplayName("TC2: Tutti validi — area specifica, assegnazione automatica")
+    @DisplayName("TC2: Tutti validi - area specifica, assegnazione automatica")
     void effettuaPrenotazione_AreaSpecificaAuto_Successo() {
         PrenotazioneDTO risultato = bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                 SALA_VALIDA, AREA_VALIDA, ASSEGNAZIONE_AUTOMATICA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
@@ -123,7 +123,7 @@ class EffettuaPrenotazioneTest {
     }
 
     @Test
-    @DisplayName("TC3: Tutti validi — area comune, postazione specifica")
+    @DisplayName("TC3: Tutti validi - area comune, postazione specifica")
     void effettuaPrenotazione_AreaComuneSpecifica_Successo() {
         Long idPostazioneAreaComune = em.find(Area.class, AREA_COMUNE).getPostazioni().get(0).getId();
 
@@ -137,7 +137,7 @@ class EffettuaPrenotazioneTest {
     }
 
     @Test
-    @DisplayName("TC4: Tutti validi — area comune, assegnazione automatica")
+    @DisplayName("TC4: Tutti validi - area comune, assegnazione automatica")
     void effettuaPrenotazione_AreaComuneAuto_Successo() {
         PrenotazioneDTO risultato = bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                 SALA_VALIDA, AREA_COMUNE, ASSEGNAZIONE_AUTOMATICA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
@@ -261,7 +261,7 @@ class EffettuaPrenotazioneTest {
     @Test
     @DisplayName("TC15: Fascia non prevista dalla sala")
     void effettuaPrenotazione_FasciaNonPrevista_LanciaEccezione() {
-        Long idFasciaNonPrevista = 99L; // Fascia inesistente per la Sala 5
+        Long idFasciaNonPrevista = 99L; // id di una fascia che non appartiene alla sala
         Exception exception = assertThrows(RuntimeException.class, () -> {
             bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, idFasciaNonPrevista, ID_STUDENTE
@@ -274,7 +274,7 @@ class EffettuaPrenotazioneTest {
     @DisplayName("TC16: Fascia oraria già trascorsa nella giornata corrente")
     void effettuaPrenotazione_FasciaTrascorsaOggi_LanciaEccezione() {
         LocalDate dataOdierna = LocalDate.now();
-        Long idFasciaPassata = 0L; // Assumiamo che l'ID 0 corrisponda a una fascia mattutina già chiusa
+        Long idFasciaPassata = 0L; // id fittizio: il TC richiede una fascia già trascorsa oggi
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
@@ -339,8 +339,6 @@ class EffettuaPrenotazioneTest {
                     SALA_VALIDA, AREA_VALIDA, ASSEGNAZIONE_AUTOMATICA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
             ));
         });
-        // Nota: A livello logico, se la verifica viene fatta per data o fascia, il messaggio potrebbe variare.
-        // Assicurati che il tuo Facade lanci esattamente questa stringa se l'intero giorno è saturo.
         assertEquals("Non sono presenti delle postazioni disponibili per l'area selezionata",exception.getMessage());
     }
 
@@ -412,7 +410,7 @@ class EffettuaPrenotazioneTest {
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
             ));
         });
-        // N.B: Sostituisci "15" con l'accesso dinamico all'ID se il tuo Facade lo genera dinamicamente
+        
         assertTrue(exception.getMessage().contains("La postazione selezionata non è più disponibile"));
     }
 

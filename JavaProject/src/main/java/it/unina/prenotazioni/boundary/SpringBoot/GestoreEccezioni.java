@@ -15,13 +15,13 @@ import java.util.Map;
 @RestControllerAdvice
 public class GestoreEccezioni {
 
-    /** Dati non validi o operazione non consentita nello stato attuale → 400 Bad Request. */
+    /** Dati non validi o operazione non consentita nello stato attuale: risposta 400 Bad Request. */
     @ExceptionHandler({IllegalArgumentException.class, IllegalStateException.class})
     public ResponseEntity<Map<String, String>> gestisciRichiestaNonValida(RuntimeException e) {
         return ResponseEntity.badRequest().body(Map.of("errore", e.getMessage()));
     }
 
-    /** Credenziali errate o account bloccato → 401 Unauthorized. */
+    /** Credenziali errate o account bloccato: risposta 401 Unauthorized. */
     @ExceptionHandler(SecurityException.class)
     public ResponseEntity<Map<String, String>> gestisciNonAutorizzato(SecurityException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("errore", e.getMessage()));

@@ -199,10 +199,9 @@ public class GestorePrenotazioni {
 
     // ------------------------------------------------------------------ UC9
     /**
-     * Traduce il Sequence Diagram "AnnullaPrenotazione": la verifica del vincolo temporale
-     * (1.1.1, V07) e la transizione di stato (1.1.3) sono responsabilità dell'entity
-     * Prenotazione; il rilascio della postazione (1.1.4-1.1.5) è conseguenza dello stato
-     * ANNULLATA, che esclude la prenotazione dal calcolo della disponibilità.
+     * Segue il SD "AnnullaPrenotazione": il vincolo temporale (V07) e il cambio di stato
+     * li verifica l'entity Prenotazione. La postazione torna libera da sola, perché una
+     * prenotazione ANNULLATA non conta più nel calcolo della disponibilità.
      */
     public void annullaPrenotazione(Long idPrenotazione) {
         Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);
@@ -210,9 +209,8 @@ public class GestorePrenotazioni {
             throw new IllegalArgumentException("Prenotazione non trovata");
         }
 
-        // AnnullaPrenotazione() sull'entity → verificaIntervalloAnnullamentoPrenotazione(),
-        //      setStato("annullata") → flagIntervalloAnnullamentoPrenotazione
-        //      (l'esito negativo è comunicato dall'entity tramite eccezione).
+        // L'entity verifica l'intervallo di annullamento (V07) e cambia lo stato;
+        // se l'annullamento non è consentito lo comunica con un'eccezione.
         try {
             prenotazione.annullaPrenotazione();
         } catch (IllegalStateException e) {
@@ -231,9 +229,8 @@ public class GestorePrenotazioni {
 
     // ------------------------------------------------------------------ UC10
     /**
-     * Traduce il Sequence Diagram "EffettuaCheckIn": il check-in è consentito solo se la
-     * prenotazione è ATTIVA nella data corrente; la conferma (setStato "confermata") è
-     * responsabilità dell'entity Prenotazione.
+     * Segue il SD "EffettuaCheckIn": il check-in è consentito solo se la prenotazione
+     * è ATTIVA nella data corrente; il passaggio a CONFERMATA lo fa l'entity Prenotazione.
      */
     public void effettuaCheckIn(Long idPrenotazione) {
         Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);
@@ -244,8 +241,8 @@ public class GestorePrenotazioni {
         // attach del GestoreNotifiche per permettere di ricevere a questo gli update
         prenotazione.attach(GestoreNotifiche.getInstance());
 
-        // verificaPrenotazioneAttivaInDataCorrente() →  flagAttivaInDataCorrente
-        //      (l'esito negativo è comunicato dall'entity tramite eccezione).
+        // L'entity verifica che la prenotazione sia ATTIVA nella data corrente;
+        // se non lo è lancia un'eccezione col motivo.
         boolean flagAttivaInDataCorrente;
         String motivoNonConsentito = null;
         try {
@@ -257,8 +254,7 @@ public class GestorePrenotazioni {
         }
 
         if (flagAttivaInDataCorrente) {
-            // alt [Prenotazione attiva nella data corrente] — EffettuaCheckIn() sull'entity
-            //     → setStato("confermata") → prenotazioneConfermata → persistenza.
+            // Prenotazione attiva nella data corrente: check-in sull'entity e salvataggio.
             prenotazione.effettuaCheckin();
             registroPrenotazioni.aggiorna(prenotazione);
 
@@ -267,9 +263,7 @@ public class GestorePrenotazioni {
             Studente s = prenotazione.getStudente();
             s.setNumeroTotaleAccessi(s.getNumeroTotaleAccessi() + 1);
             registroUtenti.aggiorna(s);
-            //checkInEffettuato (ritorno regolare).
         } else {
-            // alt [Prenotazione non attiva nella data corrente] checkInNonConsentito.
             throw new IllegalStateException("Check-in non consentito: " + motivoNonConsentito);
         }
     }
@@ -303,12 +297,12 @@ public class GestorePrenotazioni {
             LocalDateTime fine = LocalDateTime.of(p.getData(), p.getFasciaOraria().getOraFine());
 
             if (stato == StatoEnum.ATTIVA && adesso.isAfter(inizio.plusMinutes(Prenotazione.TOLLERANZA_CHECKIN_MINUTI))) { // tolleranza check-in (V08)
-                // Check-in non effettuato entro la tolleranza → SCADUTA (RF18).
+                // Check-in non effettuato entro la tolleranza: diventa SCADUTA (RF18).
                 p.attach(GestoreNotifiche.getInstance());
                 p.gestisciTermine();
                 registroPrenotazioni.aggiorna(p);
             } else if (stato == StatoEnum.CONFERMATA && adesso.isAfter(fine)) {
-                // Slot terminato → CONCLUSA (RF19).
+                // Slot terminato: diventa CONCLUSA (RF19).
                 p.attach(GestoreNotifiche.getInstance());
                 p.gestisciTermine();
                 registroPrenotazioni.aggiorna(p);

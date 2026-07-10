@@ -26,7 +26,7 @@ public class Postazione {
         this.codiceNumerico = codiceNumerico;
     }
 
-    // Getters (niente setter: i campi sono valorizzati dal costruttore e da JPA via field access)
+    // Getters (niente setter: i campi li valorizzano il costruttore e JPA)
     public Long getId() { return id; }
 
     public Area getArea() { return area; }

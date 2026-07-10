@@ -40,6 +40,14 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- Runtime del GUI Designer di IntelliJ (GridLayoutManager ecc.): serve perché
+             le schermate Swing sono generate in modalità "Java source code". -->
+        <dependency>
+            <groupId>com.intellij</groupId>
+            <artifactId>forms_rt</artifactId>
+            <version>7.0.3</version>
+        </dependency>
+
         <!-- Driver MySQL (richiesto esplicitamente) -->
         <dependency>
             <groupId>com.mysql</groupId>

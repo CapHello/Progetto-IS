@@ -167,8 +167,8 @@
 
     <script src="app.js"></script>
     <script>
-        // Wizard di prenotazione (UC6+UC7) in 5 passi: data → sala → fascia → area/postazione
-        // → riepilogo e conferma. L'oggetto "stato" accumula le scelte tra i passi;
+        // Wizard di prenotazione (UC6+UC7) in 5 passi: data, sala, fascia, area/postazione,
+        // riepilogo e conferma. L'oggetto "stato" accumula le scelte tra i passi;
         // idPostazione = 0 significa "assegnazione automatica" (sentinella condivisa col backend).
         const utente = richiediRuolo('Studente');
         const MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
