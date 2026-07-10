@@ -30,7 +30,7 @@ class RegistrazioneTest {
         bibliotecaFacade = BibliotecaFacade.getInstance();
         em = JpaUtil.getInstance().getEntityManager();
 
-        // Pulizia totale del DB in-memory prima di ogni test
+        // Pulizia totale del DB di test prima di ogni test
         svuotaDatabase(em);
     }
 
@@ -91,9 +91,9 @@ class RegistrazioneTest {
         assertEquals(codice, risultato.getIdentificativo());
     }
 
-    // 
-    // CASI DI ERRORE [ERROR] - PARTIZIONE RUOLO
-    // 
+    // ==========================================
+    // CASI DI ERRORE - PARTIZIONE RUOLO
+    // ==========================================
 
     @Test
     @DisplayName("TC3: Fallimento con Ruolo vuoto")
@@ -119,9 +119,9 @@ class RegistrazioneTest {
         assertEquals("Il ruolo è obbligatorio e valido.", exception.getMessage());
     }
 
-    // 
-    // CASI DI ERRORE [ERROR] - PARTIZIONE NOME
-    // 
+    // ==========================================
+    // CASI DI ERRORE - PARTIZIONE NOME
+    // ==========================================
 
     @Test
     @DisplayName("TC5: Fallimento con Nome vuoto")
@@ -157,9 +157,9 @@ class RegistrazioneTest {
         assertEquals("Formato nome non valido (solo lettere, max 20 caratteri).", exception.getMessage());
     }
 
-    // 
-    // CASI DI ERRORE [ERROR] - PARTIZIONE COGNOME
-    // 
+    // ==========================================
+    // CASI DI ERRORE - PARTIZIONE COGNOME
+    // ==========================================
 
     @Test
     @DisplayName("TC8: Fallimento con Cognome vuoto")
@@ -195,9 +195,9 @@ class RegistrazioneTest {
         assertEquals("Formato cognome non valido (solo lettere, max 20 caratteri).", exception.getMessage());
     }
 
-    // 
-    // CASI DI ERRORE [ERROR] - PARTIZIONE EMAIL (Completamento)
-    // 
+    // ==========================================
+    // CASI DI ERRORE - PARTIZIONE EMAIL (Completamento)
+    // ==========================================
 
     @Test
     @DisplayName("TC11: Fallimento con Email vuota")
@@ -253,9 +253,9 @@ class RegistrazioneTest {
         assertEquals("Email già associata a un account.", exception.getMessage());
     }
 
-    // 
-    // CASI DI ERRORE [ERROR] - PARTIZIONE PASSWORD
-    // 
+    // ==========================================
+    // CASI DI ERRORE - PARTIZIONE PASSWORD
+    // ==========================================
 
     @Test
     @DisplayName("TC15: Fallimento con Password vuota")
@@ -291,9 +291,9 @@ class RegistrazioneTest {
         assertEquals("La password non può superare i 32 caratteri.", exception.getMessage());
     }
 
-    // 
-    // CASI DI ERRORE [ERROR] - PARTIZIONE IDENTIFICATIVO
-    // 
+    // ==========================================
+    // CASI DI ERRORE - PARTIZIONE IDENTIFICATIVO
+    // ==========================================
 
     @Test
     @DisplayName("TC18: Fallimento con Identificativo vuoto")
@@ -315,7 +315,7 @@ class RegistrazioneTest {
                     "Studente", "Mario", "Rossi", "m.iderrato@studenti.unina.it", "Password123!", "n86001234"
             );
         });
-        assertEquals("Formato identificativo non riconosciuto.", exception.getMessage());
+        assertEquals("Formato identificativo non riconosciuto: la matricola deve essere una lettera maiuscola seguita da 8 cifre (es. N86001234).", exception.getMessage());
     }
 
     @Test

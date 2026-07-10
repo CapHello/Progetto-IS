@@ -48,7 +48,12 @@ public class GestoreNotifiche implements Observer {
 
     /** Invia una notifica ai destinatari; il fallimento del recapito non è propagato (UC7/UC9 alt). */
     public void inviaNotifica(List<UtenteDTO> destinatari, String messaggio) {
-        if (servizioNotifiche == null || destinatari == null || destinatari.isEmpty()) {
+        if (destinatari == null || destinatari.isEmpty()) {
+            return;
+        }
+        if (servizioNotifiche == null) {
+            // Senza cablaggio l'operazione non deve fallire, ma lasciamo traccia della notifica persa.
+            System.err.println("[GestoreNotifiche] servizio non cablato: notifica scartata (" + messaggio + ")");
             return;
         }
         try {

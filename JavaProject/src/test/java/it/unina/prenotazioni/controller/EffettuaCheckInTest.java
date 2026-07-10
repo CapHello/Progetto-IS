@@ -132,7 +132,6 @@ class EffettuaCheckInTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             bibliotecaFacade.effettuaCheckin(99999L);
         });
-        // Assicurati che il Gestore logghi "inesistente" prima del NullPointerException
         assertTrue(exception.getMessage().contains("Prenotazione non trovata") || exception instanceof NullPointerException);
     }
 

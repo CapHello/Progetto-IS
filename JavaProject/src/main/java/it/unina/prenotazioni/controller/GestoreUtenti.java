@@ -2,6 +2,7 @@ package it.unina.prenotazioni.controller;
 
 import it.unina.prenotazioni.controller.factory.BibliotecarioFactory;
 import it.unina.prenotazioni.controller.factory.StudenteFactory;
+import it.unina.prenotazioni.controller.factory.UtenteFactory;
 import it.unina.prenotazioni.dto.UtenteDTO;
 import it.unina.prenotazioni.entity.*;
 
@@ -69,23 +70,20 @@ public class GestoreUtenti {
             verificaCorrettezzaBibliotecario(nome, cognome, email, identificativo);
         }
 
-        // Un solo RegistroUtenti per l'intera operazione.
         if (registroUtenti.esisteEmailIstituzionale(email)) {
             throw new IllegalArgumentException("Email già associata a un account.");
         }
 
-        Utente nuovoUtente;
-        if (studente) {
-            if (registroUtenti.cercaStudentePerMatricola(identificativo) != null) {
-                throw new IllegalArgumentException("Identificativo già in uso nel sistema.");
-            }
-            nuovoUtente = new StudenteFactory().creaUtente(nome, cognome, email, password, identificativo);
-        } else {
-            if (registroUtenti.cercaBibliotecarioPerCodice(identificativo) != null) {
-                throw new IllegalArgumentException("Identificativo già in uso nel sistema.");
-            }
-            nuovoUtente = new BibliotecarioFactory().creaUtente(nome, cognome, email, password, identificativo);
+        boolean identificativoGiaUsato = studente
+                ? registroUtenti.cercaStudentePerMatricola(identificativo) != null
+                : registroUtenti.cercaBibliotecarioPerCodice(identificativo) != null;
+        if (identificativoGiaUsato) {
+            throw new IllegalArgumentException("Identificativo già in uso nel sistema.");
         }
+
+        // Il ruolo decide la Factory; da qui in poi si lavora solo col tipo astratto Utente.
+        UtenteFactory factory = studente ? new StudenteFactory() : new BibliotecarioFactory();
+        Utente nuovoUtente = factory.creaUtente(nome, cognome, email, password, identificativo);
 
         registroUtenti.registraUtente(nuovoUtente);
         return toDTO(nuovoUtente);
@@ -137,10 +135,15 @@ public class GestoreUtenti {
      */
     private void verificaFormatoCredenziali(String email, String password) {
         richiedi(email != null && !email.isEmpty(), "L'email è obbligatoria.");
-        richiedi(email.length() < 255 && email.matches(REGEX_EMAIL_ISTITUZIONALE), "Formato email non valido.");
+        richiedi(emailBenFormata(email), "Formato email non valido.");
         richiedi(password != null && !password.isEmpty(), "La password è obbligatoria.");
         richiedi(password.length() >= 8, "La password deve contenere almeno 8 caratteri.");
         richiedi(password.length() <= 32, "Formato password non valido.");
+    }
+
+    /** Regola unica dell'email valida (V13), condivisa tra registrazione e autenticazione. */
+    private boolean emailBenFormata(String email) {
+        return email.length() < 255 && email.matches(REGEX_EMAIL_ISTITUZIONALE);
     }
 
     // -------------------------------------------------------------- UC8 (profilo)
@@ -163,7 +166,8 @@ public class GestoreUtenti {
         validaEmail(email);
         validaIdentificativo(matricola, "matricola");
         if (!matricola.matches(REGEX_MATRICOLA)) {
-            throw new IllegalArgumentException("Formato identificativo non riconosciuto.");
+            throw new IllegalArgumentException(
+                    "Formato identificativo non riconosciuto: la matricola deve essere una lettera maiuscola seguita da 8 cifre (es. N86001234).");
         }
     }
 
@@ -189,10 +193,11 @@ public class GestoreUtenti {
         if (email == null || email.isEmpty()) {
             throw new IllegalArgumentException("L'email è obbligatoria.");
         }
-        if (email.length() > 255) {
+        // Stesso limite dell'autenticazione: chi si registra deve poi potersi autenticare.
+        if (email.length() >= 255) {
             throw new IllegalArgumentException("Email troppo lunga (max 255 caratteri).");
         }
-        if (!email.matches(REGEX_EMAIL_ISTITUZIONALE)) {
+        if (!emailBenFormata(email)) {
             throw new IllegalArgumentException("Formato email non valido.");
         }
     }

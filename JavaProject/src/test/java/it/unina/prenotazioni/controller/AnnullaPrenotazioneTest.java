@@ -126,8 +126,6 @@ class AnnullaPrenotazioneTest {
         Exception exception = assertThrows(RuntimeException.class, () -> {
             bibliotecaFacade.annullaPrenotazione(99999L);
         });
-        // Assicurati che GestorePrenotazioni gestisca il NullPointerException o EntityNotFoundException
-        // e restituisca il messaggio indicato nel tuo documento.
         assertTrue(exception.getMessage().contains("Prenotazione non trovata") || exception instanceof NullPointerException);
     }
 
