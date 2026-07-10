@@ -15,17 +15,16 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <<control>> Gestore (Singleton) delle Sale Studio: creazione (UC3), eliminazione (UC4),
  * consultazione disponibilità (UC6), dettaglio postazioni e monitoraggio sale (UC11).
  */
 public class GestoreSale {
+
+    private static final int CODICE_MAX_SALE = 100;
+    private static final int CODICE_MIN_SALE = 1;
 
     private static GestoreSale istanza;
 
@@ -42,6 +41,7 @@ public class GestoreSale {
     }
 
     // ------------------------------------------------------------------ UC3
+
     /**
      * Crea la sala col suo intero aggregato: orari lavorativi, slot prenotabili e aree
      * (tipologie[i] + postazioniAree[i]; le postazioni non assegnate confluiscono
@@ -59,9 +59,11 @@ public class GestoreSale {
             throw new IllegalArgumentException("Dati delle aree incoerenti (tipologie e postazioni non corrispondono)");
         }
 
+        int codiceNumerico = assegnaCodiceNumerico();
+
         //Instanziazione
         SalaStudio sala = new SalaStudio(richiestaCreazione.getNome(), richiestaCreazione.getDescrizione(), richiestaCreazione.getNumeroPostazioni());
-
+        sala.setCodiceNumerico(codiceNumerico);
         //configurazione
         configuraOrariESlot(richiestaCreazione.getOrariApertura(), richiestaCreazione.getOrariChiusura(), richiestaCreazione.getGranaMinuti(), sala);
         configuraAree(richiestaCreazione.getNumeroPostazioni(), tipi, posti, sala);
@@ -70,6 +72,7 @@ public class GestoreSale {
         registroSale.salvaSala(sala);
         return toDTO(sala);
     }
+
 
     // ------------------------------------------------------------------ helper per UC3
 
@@ -384,6 +387,16 @@ public class GestoreSale {
             fine = inizio.plusMinutes(grana);
         }
         return slot;
+    }
+
+    private int assegnaCodiceNumerico(){
+        Set<Integer> occupati = new HashSet<>(registroSale.getCodiciNumericiOccupati());
+        for(int codice = CODICE_MIN_SALE; codice <= CODICE_MAX_SALE; codice++){
+            if(!occupati.contains(codice)){
+                return codice; // primo codice libero trovato
+            }
+        }
+        throw new IllegalArgumentException("Numero massimo di sale raggiunto (100 codici esauriti)");
     }
 
     /** Converte l'entity nel DTO per le boundary (nessun tipo entity attraversa il confine). */

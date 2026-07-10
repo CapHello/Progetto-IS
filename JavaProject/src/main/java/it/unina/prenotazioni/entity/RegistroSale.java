@@ -58,6 +58,14 @@ public class RegistroSale {
         );
     }
 
+    public List<Integer> getCodiciNumericiOccupati(){
+        return gestorePersistenza.eseguiQueryCustom(
+                "SELECT s.codiceNumerico FROM SalaStudio s WHERE s.attiva = true",
+                Integer.class,
+                null
+        );
+    }
+
     /**
      * Sale visibili/prenotabili in una certa data: quelle aperte
      * in cui esiste almeno una fascia oraria con posti disponibili.

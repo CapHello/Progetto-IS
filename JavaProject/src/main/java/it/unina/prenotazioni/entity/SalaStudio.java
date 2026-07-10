@@ -13,6 +13,9 @@ import java.util.List;
  */
 @Entity
 public class SalaStudio {
+
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,6 +23,8 @@ public class SalaStudio {
     private String nome;
     private String descrizione;
     private int numeroPostazioniTotali;
+    private int codiceNumerico;
+
 
     @Column(name = "attiva", nullable = false)
     private boolean attiva = true;
@@ -72,6 +77,14 @@ public class SalaStudio {
     public boolean isAttiva() { return attiva; }
     public void setAttiva(boolean attiva) { this.attiva = attiva; }
 
+    public int getCodiceNumerico() {
+        return codiceNumerico;
+    }
+
+    public void setCodiceNumerico(int codiceNumerico) {
+        this.codiceNumerico = codiceNumerico;
+    }
+
     // --- Costruzione in memoria (usata in CreaSalaStudio, prima della persistenza) ---
 
     /** Aggiunge una fascia oraria (slot prenotabile) all'orario della sala. */
@@ -98,13 +111,18 @@ public class SalaStudio {
         }
 
         // Calcoliamo quante postazioni sono già state assegnate alle altre aree
+        // TODO da rifare!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         int postazioniAssegnate = aree.stream()
                 .mapToInt(a -> a.getPostazioni().size())
                 .sum();
 
         verificaNumeroPostazioni(postazioniAssegnate + numPostazioni);
+        int codiceNumericoArea = 0;
+        if (!tipologia.equalsIgnoreCase("comune")){
+            codiceNumericoArea = aree.size() + 1;
+        }
 
-        Area area = new Area(tipologia, this);
+        Area area = new Area(tipologia, this, codiceNumericoArea);
 
         area.creaPostazioni(numPostazioni);
 
@@ -133,6 +151,9 @@ public class SalaStudio {
 
     /** V06: la sala è aperta nei giorni feriali (lunedì-venerdì). */
     public boolean verificaDataInGiorniApertura(LocalDate data) {
+        if(data == null){
+            throw new IllegalArgumentException("La data è obbligatoria");
+        }
         DayOfWeek giorno = data.getDayOfWeek();
         return !giorno.equals(DayOfWeek.SATURDAY) && !giorno.equals(DayOfWeek.SUNDAY);
     }
