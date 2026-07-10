@@ -11,6 +11,7 @@ import it.unina.prenotazioni.entity.SalaStudio;
 import it.unina.prenotazioni.entity.StatoEnum;
 import it.unina.prenotazioni.entity.Studente;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -153,6 +154,15 @@ public class GestoreSale {
      * prenotazioni che occupano slot e notifica gli studenti coinvolti.
      */
     public void eliminaSalaStudio(Long idSalaStudio) {
+
+        if (idSalaStudio == null) {
+            throw new IllegalArgumentException("L'ID della sala è obbligatorio.");
+        }
+
+        if (idSalaStudio < 1 || idSalaStudio > 100) {
+            throw new IllegalArgumentException("ID Sala non valido. Inserire un valore compreso tra 1 e 100.");
+        }
+
         SalaStudio sala = registroSale.cercaSalaPerId(idSalaStudio);
         if (sala == null) {
             throw new IllegalArgumentException("Sala studio non trovata");
@@ -185,11 +195,31 @@ public class GestoreSale {
     // ------------------------------------------------------------------ UC6
     /** Sale attive, aperte nella data e con almeno un posto libero. */
     public List<SalaStudioDTO> consultazioneSaleDisponibili(LocalDate data) {
+        verificaDataConsultabile(data);
+
         List<SalaStudioDTO> risultato = new ArrayList<>();
         for (SalaStudio sala : registroSale.getSaleDisponibili(data)) {
             risultato.add(toDTO(sala));
         }
+        if (risultato.isEmpty()) {
+            throw new IllegalStateException("Nessuna Sala Studio disponibile per la data selezionata.");
+        }
         return risultato;
+    }
+
+    /**
+     * La data di consultazione deve essere odierna o futura e cadere in un giorno di
+     * apertura (lun-ven). Il controllo sulla data passata precede quello di chiusura:
+     * un sabato già trascorso deve essere segnalato come data passata.
+     */
+    private void verificaDataConsultabile(LocalDate data) {
+        if (data.isBefore(LocalDate.now(ZoneId.of("Europe/Rome")))) {
+            throw new IllegalArgumentException("Data non valida: non è possibile consultare date passate.");
+        }
+        DayOfWeek giorno = data.getDayOfWeek();
+        if (giorno == DayOfWeek.SATURDAY || giorno == DayOfWeek.SUNDAY) {
+            throw new IllegalArgumentException("La biblioteca è chiusa nel giorno selezionato (apertura lun-ven).");
+        }
     }
 
     /** Fasce prenotabili nella data con conteggio dei posti liberi (wizard di prenotazione, step 2). */
@@ -215,6 +245,9 @@ public class GestoreSale {
         LocalTime chiusuraGiorno = orarioDelGiorno.getOraFine();
 
         List<FasciaOraria> slotOrario = registroSale.getFascePerSala(idSala);
+        if (slotOrario.isEmpty()) {
+            throw new IllegalStateException("Non sono presenti fasce orarie prenotabili per la Sala selezionata.");
+        }
 
         for (FasciaOraria f : slotOrario) {
             if (!f.getOraInizio().isBefore(aperturaGiorno) && !f.getOraFine().isAfter(chiusuraGiorno)) {
@@ -243,6 +276,7 @@ public class GestoreSale {
         dto.setIdFascia(idFascia);
         dto.setFasciaOraria(fascia.getEtichetta());
 
+        int postiLiberiTotali = 0;
         for (Area area : registroSale.getAreePerSala(idSala)) {
             AreaDettaglioDTO adto = new AreaDettaglioDTO(area.getId(), area.getTipologia());
             // Postazioni ordinate per id: la posizione (1..N) è il "numero" mostrato in GUI.
@@ -257,7 +291,11 @@ public class GestoreSale {
                 numero++;
             }
             adto.setPostiDisponibili(liberi);
+            postiLiberiTotali += liberi;
             dto.getAree().add(adto);
+        }
+        if (postiLiberiTotali == 0) {
+            throw new IllegalStateException("Nessuna Postazione disponibile: selezionare un'altra fascia o Sala.");
         }
         return dto;
     }
