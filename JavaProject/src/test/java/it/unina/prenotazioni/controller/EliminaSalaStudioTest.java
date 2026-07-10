@@ -54,6 +54,7 @@ class EliminaSalaStudioTest {
 
             // 3. Creazione Sala Studio con 30 postazioni divise in 2 aree (Pre-condizione TC1)
             SalaStudio sala = new SalaStudio("Sala da Eliminare", "Test Eliminazione", 30);
+            sala.setCodiceNumerico(1);
             Area area1 = sala.aggiungiArea("Area 1", 15);
             Area area2 = sala.aggiungiArea("Area 2", 15);
             em.persist(sala);
@@ -96,12 +97,11 @@ class EliminaSalaStudioTest {
     // ==========================================
 
     @Test
-    @DisplayName("TC1: Eliminazione valida (Soft delete e annullamento prenotazioni)")
+    @DisplayName("TC1: Eliminazione valida (Soft delete, reset codice e annullamento prenotazioni)")
     void eliminaSalaStudio_Valida_Successo() {
         // Act
         bibliotecaFacade.eliminaSalaStudio(SALA_VALIDA);
 
-        // Pulisco la cache di Hibernate per forzare una ri-lettura dal DB fisico
         em.clear();
 
         // Assert 1: La sala deve esistere ancora (soft delete), ma con attiva = false
@@ -136,17 +136,13 @@ class EliminaSalaStudioTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             bibliotecaFacade.eliminaSalaStudio(0L); // 0 o valori negativi
         });
-        assertEquals("ID Sala non valido. Inserire un valore compreso tra 1 e 100.", exception.getMessage());
+        assertEquals("ID Sala non valido. L'ID deve essere maggiore di zero.", exception.getMessage());
     }
 
-    @Test
-    @DisplayName("TC4: ID fuori range (superiore)")
-    void eliminaSalaStudio_IdSuperioreCento_LanciaEccezione() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bibliotecaFacade.eliminaSalaStudio(101L);
-        });
-        assertEquals("ID Sala non valido. Inserire un valore compreso tra 1 e 100.", exception.getMessage());
-    }
+    /*
+    * TC4: è possibile superare l'Id 100 in quanto vengono gestiti da Hibernate.
+    * Noi gestiamo il V10 con l'attributo codiceNumerico già verificato in creaSalaTest
+    */
 
     @Test
     @DisplayName("TC5: Sala inesistente")

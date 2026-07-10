@@ -58,7 +58,8 @@ class EffettuaPrenotazioneTest {
             em.persist(fascia);
             this.FASCIA_09_30 = fascia.getId();
 
-            SalaStudio sala = new SalaStudio("Sala Ingegneria", "Polo Federico II", 20);
+            SalaStudio sala = new SalaStudio("Sala Prenotazioni", "Sala per testare le prenotazioni", 20);
+            sala.setCodiceNumerico(1);
             sala.addFascia(fascia);
 
             for (int i = 0; i < 5; i++) {
@@ -171,14 +172,14 @@ class EffettuaPrenotazioneTest {
      */
 
     @Test
-    @DisplayName("TC7: idSala fuori dall'intervallo [1,100]")
+    @DisplayName("TC7: idSala fuori dall'intervallo")
     void effettuaPrenotazione_SalaFuoriRange_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
-                    150L, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
+                    0L, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
             ));
         });
-        assertEquals("Identificativo sala non valido (atteso intero tra 1 e 100)", exception.getMessage());
+        assertEquals("Identificativo sala non valido", exception.getMessage());
     }
 
     @Test
@@ -293,15 +294,16 @@ class EffettuaPrenotazioneTest {
      */
 
     @Test
-    @DisplayName("TC18: IdArea fuori dall'intervallo [0,10]")
+    @DisplayName("TC18: IdArea < 1")
     void effettuaPrenotazione_AreaFuoriRange_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
-                    SALA_VALIDA, 15L, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
+                    SALA_VALIDA, 0L, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
             ));
         });
-        assertEquals("Identificativo area non valido (atteso intero tra 0 e 10)", exception.getMessage());
+        assertEquals("Identificativo area non valido.", exception.getMessage());
     }
+
     @Test
     @DisplayName("TC19: idArea non esistente nella sala selezionata")
     void effettuaPrenotazione_AreaNonEsistente_LanciaEccezione() {
@@ -352,12 +354,12 @@ class EffettuaPrenotazioneTest {
     @DisplayName("TC23: idPostazione fuori dall'intervallo dell'area (V20)")
     void effettuaPrenotazione_PostazioneFuoriRange_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            // Simuliamo l'ID 99 (oppure 9999L per essere sicuri che non esista nel DB)
+
             bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
-                    SALA_VALIDA, AREA_VALIDA, 9999L, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
+                    SALA_VALIDA, AREA_VALIDA, -1L, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
             ));
         });
-        assertEquals("Identificativo postazione non valido (atteso intero tra 0 e il numero di postazioni dell'area)", exception.getMessage());
+        assertEquals("Identificativo postazione non valido.", exception.getMessage());
     }
 
     @Test
