@@ -43,7 +43,7 @@ public class GestoreNotifiche implements Observer {
         if (studente == null) {
             return;
         }
-        inviaNotifica(List.of(toDTO(studente)), messaggioPerStato(prenotazione));
+        inviaNotifica(List.of(toUtenteDTO(studente)), messaggioPerStato(prenotazione));
     }
 
     /** Invia una notifica ai destinatari; il fallimento del recapito non è propagato (UC7/UC9 alt). */
@@ -68,7 +68,7 @@ public class GestoreNotifiche implements Observer {
             if (p.getStato().getStatoEnum() == StatoEnum.ATTIVA && LocalDate.now().equals(p.getData()) && !p.isPromemoriaInviato()) {
                 Studente s = p.getStudente();
                 if (s != null) {
-                    inviaNotifica(List.of(toDTO(s)),
+                    inviaNotifica(List.of(toUtenteDTO(s)),
                             "Promemoria: prenotazione #" + p.getId() + " oggi nella fascia "
                                     + p.getFasciaOraria().getEtichetta());
                     p.setPromemoriaInviato(true);
@@ -89,8 +89,12 @@ public class GestoreNotifiche implements Observer {
         };
     }
 
-    /** Converte lo studente nel DTO destinatario delle notifiche. */
-    private UtenteDTO toDTO(Studente s) {
+    /**
+     * Converte lo studente nel DTO destinatario delle notifiche. Unico punto di
+     * conversione Studente→UtenteDTO del layer controller (visibilità di package):
+     * lo usano anche GestoreSale (UC4) e GestorePrenotazioni (UC9).
+     */
+    UtenteDTO toUtenteDTO(Studente s) {
         UtenteDTO dto = new UtenteDTO();
         dto.setId(s.getId());
         dto.setNome(s.getNome());

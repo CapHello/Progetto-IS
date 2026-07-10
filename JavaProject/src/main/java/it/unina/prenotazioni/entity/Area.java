@@ -31,18 +31,14 @@ public class Area {
         this.salaStudio = salaStudio;
     }
 
-    // Getters and Setters
+    // Getters (niente setter: i campi sono valorizzati dal costruttore e da JPA via field access)
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public String getTipologia() { return tipologia; }
-    public void setTipologia(String tipologia) { this.tipologia = tipologia; }
 
     public SalaStudio getSalaStudio() { return salaStudio; }
-    public void setSalaStudio(SalaStudio salaStudio) { this.salaStudio = salaStudio; }
 
     public List<Postazione> getPostazioni() { return postazioni; }
-    public void setPostazioni(List<Postazione> postazioni) { this.postazioni = postazioni; }
 
 
     /**

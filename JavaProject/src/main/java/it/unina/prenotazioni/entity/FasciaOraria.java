@@ -23,14 +23,12 @@ public class FasciaOraria {
         this.oraFine = oraFine;
     }
 
+    // Getters (niente setter: i campi sono valorizzati dal costruttore e da JPA via field access)
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public LocalTime getOraInizio() { return oraInizio; }
-    public void setOraInizio(LocalTime oraInizio) { this.oraInizio = oraInizio; }
 
     public LocalTime getOraFine() { return oraFine; }
-    public void setOraFine(LocalTime oraFine) { this.oraFine = oraFine; }
 
     /** Etichetta "HH:mm-HH:mm": chiave testuale per confronti tra fasce (equals di String) e per la GUI. */
     public String getEtichetta() {

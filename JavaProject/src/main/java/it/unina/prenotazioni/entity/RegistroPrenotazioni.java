@@ -68,7 +68,7 @@ public class RegistroPrenotazioni {
                 Map.of("postazione.id", idPostazione, "data", data, "fasciaOraria.id", idFascia));
     }
 
-    /** Prenotazioni della giornata corrente per una sala (monitoraggio bibliotecario, UC5). */
+    /** Prenotazioni della giornata corrente per una sala (monitoraggio bibliotecario, UC11). */
     public List<Prenotazione> cercaPrenotazioniPerSalaEData(Long idSala, LocalDate data) {
         List<Prenotazione> risultato = new ArrayList<>();
         List<Prenotazione> trovate = gestorePersistenza.cercaPerCampi(

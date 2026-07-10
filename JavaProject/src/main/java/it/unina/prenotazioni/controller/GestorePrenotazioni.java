@@ -11,8 +11,8 @@ import java.util.Set;
 import it.unina.prenotazioni.controller.strategy.AssegnazionePrimaLibera;
 import it.unina.prenotazioni.controller.strategy.StrategiaAssegnazione;
 import it.unina.prenotazioni.dto.PrenotazioneDTO;
+import it.unina.prenotazioni.dto.RichiestaPrenotazioneDTO;
 import it.unina.prenotazioni.dto.StatisticheDTO;
-import it.unina.prenotazioni.dto.UtenteDTO;
 import it.unina.prenotazioni.entity.Area;
 import it.unina.prenotazioni.entity.FasciaOraria;
 import it.unina.prenotazioni.entity.Postazione;
@@ -28,9 +28,9 @@ import it.unina.prenotazioni.entity.state.StatoAttiva;
 /**
  * <<control>> Gestore (Singleton) del ciclo di vita delle prenotazioni:
  * EffettuaPrenotazione (UC7), AnnullaPrenotazione (UC9), EffettuaCheckIn (UC10),
- * MonitoraPrenotazioni (UC5), ConsultaStorico (UC12), GestisciTermine (UC16),
- * Statistiche (UC13). La scelta automatica della postazione è delegata al
- * pattern Strategy ({@code strategiaAssegnazione}).
+ * ConsultaStorico (UC12), GestisciTermine (UC16), Statistiche (UC13).
+ * La scelta automatica della postazione è delegata al pattern Strategy
+ * ({@code strategiaAssegnazione}).
  */
 public class GestorePrenotazioni {
 
@@ -54,7 +54,7 @@ public class GestorePrenotazioni {
 
 
     /** Permette di sostituire l'algoritmo di assegnazione automatica (pattern Strategy). */
-    public void setStrategiaAssegnazione(StrategiaAssegnazione strategiaAssegnazione){
+    private void setStrategiaAssegnazione(StrategiaAssegnazione strategiaAssegnazione){
         this.strategiaAssegnazione = strategiaAssegnazione;
     }
 
@@ -129,9 +129,13 @@ public class GestorePrenotazioni {
      * Valida i dati, verifica unicità (V18) e disponibilità in mutua esclusione,
      * crea la prenotazione in stato ATTIVA e notifica lo studente a salvataggio riuscito.
      */
-    public PrenotazioneDTO effettuaPrenotazione(Long idSala, Long idArea, Long idPostazione,
-                                       LocalDate data, Long idFascia, Long idStudente) {
-
+    public PrenotazioneDTO effettuaPrenotazione(RichiestaPrenotazioneDTO richiesta) {
+        Long idSala = richiesta.getIdSala();
+        Long idArea = richiesta.getIdArea();
+        Long idPostazione = richiesta.getIdPostazione();
+        LocalDate data = richiesta.getData();
+        Long idFascia = richiesta.getIdFascia();
+        Long idStudente = richiesta.getIdStudente();
 
         // 1. Validità e coerenza dei dati.
         // verifico la correttezza e la coerenza dei parametri in ingresso per quanto riguarda sala, area, postazione, idFascia
@@ -216,7 +220,8 @@ public class GestorePrenotazioni {
         // inviaNotifica(destinatari, messaggio);
         Studente destinatario = prenotazione.getStudente();
         if (destinatario != null) {
-            GestoreNotifiche.getInstance().inviaNotifica(List.of(toUtenteDTO(destinatario)),
+            GestoreNotifiche gestoreNotifiche = GestoreNotifiche.getInstance();
+            gestoreNotifiche.inviaNotifica(List.of(gestoreNotifiche.toUtenteDTO(destinatario)),
                         "La prenotazione #" + prenotazione.getId() + " è stata annullata.");
         }
     }
@@ -264,17 +269,6 @@ public class GestorePrenotazioni {
             // alt [Prenotazione non attiva nella data corrente] checkInNonConsentito.
             throw new IllegalStateException("Check-in non consentito: " + motivoNonConsentito);
         }
-    }
-
-    // ------------------------------------------------------------------ UC5
-    /** Prenotazioni occupanti della giornata corrente per una sala (monitoraggio bibliotecario). */
-    public List<PrenotazioneDTO> monitoraPrenotazioni(Long idSalaStudio) {
-        List<PrenotazioneDTO> risultato = new ArrayList<>();
-        for (Prenotazione p : RegistroPrenotazioni.getInstance()
-                .cercaPrenotazioniPerSalaEData(idSalaStudio, LocalDate.now())) {
-            risultato.add(toDTO(p));
-        }
-        return risultato;
     }
 
     // ------------------------------------------------------------------ UC12
@@ -420,17 +414,5 @@ public class GestorePrenotazioni {
             }
         }
         return 0;
-    }
-
-    /** Converte lo studente nel DTO destinatario delle notifiche. */
-    private UtenteDTO toUtenteDTO(Studente s) {
-        UtenteDTO dto = new UtenteDTO();
-        dto.setId(s.getId());
-        dto.setNome(s.getNome());
-        dto.setCognome(s.getCognome());
-        dto.setEmailIstituzionale(s.getEmailIstituzionale());
-        dto.setRuolo("Studente");
-        dto.setIdentificativo(s.getMatricola());
-        return dto;
     }
 }

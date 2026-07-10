@@ -9,7 +9,6 @@ import it.unina.prenotazioni.entity.RegistroPrenotazioni;
 import it.unina.prenotazioni.entity.RegistroSale;
 import it.unina.prenotazioni.entity.SalaStudio;
 import it.unina.prenotazioni.entity.StatoEnum;
-import it.unina.prenotazioni.entity.Studente;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -182,7 +181,7 @@ public class GestoreSale {
                 registroPrenotazioni.aggiorna(p);
 
                 if (p.getStudente() != null) {
-                    destinatari.add(toUtenteDTO(p.getStudente()));
+                    destinatari.add(GestoreNotifiche.getInstance().toUtenteDTO(p.getStudente()));
                 }
             }
         }
@@ -453,15 +452,4 @@ public class GestoreSale {
         return dto;
     }
 
-    /** Converte lo studente nel DTO destinatario delle notifiche. */
-    private UtenteDTO toUtenteDTO(Studente s) {
-        UtenteDTO dto = new UtenteDTO();
-        dto.setId(s.getId());
-        dto.setNome(s.getNome());
-        dto.setCognome(s.getCognome());
-        dto.setEmailIstituzionale(s.getEmailIstituzionale());
-        dto.setRuolo("Studente");
-        dto.setIdentificativo(s.getMatricola());
-        return dto;
-    }
 }
