@@ -18,6 +18,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * commento
+ */
 public class DashboardBibliotecario {
 
     // Campi legati al .form
@@ -41,6 +44,9 @@ public class DashboardBibliotecario {
     // Frame corrente: serve per la navigazione verso CreaSala e per il logout
     private JFrame frameCorrente;
 
+    /**
+     * commento
+     */
     public DashboardBibliotecario() {
         // Styling non configurabile nel form designer
         StileWizard.stilizzaLogout(btnLogout);
@@ -145,6 +151,10 @@ public class DashboardBibliotecario {
 
     // --- APRI DASHBOARD ---
 
+    /**
+     * commento
+     * @return result
+     */
     public JFrame apriDashboard() {
         frameCorrente = new JFrame("Dashboard Bibliotecario");
         frameCorrente.setContentPane(dashboardPane);
@@ -157,6 +167,10 @@ public class DashboardBibliotecario {
         return frameCorrente;
     }
 
+    /**
+     * commento
+     * @param messaggio messaggio
+     */
     public void mostraErrore(String messaggio) {
         JOptionPane.showMessageDialog(dashboardPane, messaggio, "Errore", JOptionPane.ERROR_MESSAGE);
     }
@@ -249,7 +263,7 @@ public class DashboardBibliotecario {
         pannelloContenuto.add(btnCreaSala, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(-1, 60), null, 0, false));
     }
 
-    /**
+    /*
      * @noinspection ALL
      */
     private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
@@ -271,8 +285,12 @@ public class DashboardBibliotecario {
         return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
     }
 
-    /**
+    /*
      * @noinspection ALL
+     */
+    /**
+     * commento
+     * @return result
      */
     public JComponent $$$getRootComponent$$$() {
         return dashboardPane;

@@ -11,7 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 /**
- * <control> Gestore (Singleton) delle Sale Studio: creazione (UC3), eliminazione (UC4),
+ * Gestore (Singleton) delle Sale Studio: creazione (UC3), eliminazione (UC4),
  * consultazione disponibilità (UC6), dettaglio postazioni e monitoraggio sale (UC11).
  */
 public class GestoreSale {
@@ -36,6 +36,7 @@ public class GestoreSale {
      * Crea la sala col suo intero aggregato: orari lavorativi, slot prenotabili e aree
      * (tipologie[i] + postazioniAree[i]; le postazioni non assegnate confluiscono
      * nell'area di default "comune"). Il salvataggio è unico e a cascata.
+     * @param richiestaCreazione richiestaCreazione
      */
     public SalaStudioDTO creaSalaStudio(CreazioneSalaDTO richiestaCreazione) {
 
@@ -141,6 +142,7 @@ public class GestoreSale {
     /**
      * Soft delete: disattiva la sala (lo storico resta), annulla forzatamente le
      * prenotazioni che occupano slot e notifica gli studenti coinvolti.
+     * @param idSalaStudio idSalaStudio
      */
     public void eliminaSalaStudio(Long idSalaStudio) {
 
@@ -247,7 +249,12 @@ public class GestoreSale {
         return risultato;
     }
 
-    /** Dettaglio aree/postazioni di una sala per (data, fascia) (wizard step 3-4). */
+    /**
+     * Dettaglio aree/postazioni di una sala per (data, fascia) (wizard step 3-4).
+     * @param idSala idSala
+     * @param idFascia idFascia
+     * @param data data
+     */
     public DettaglioSalaDTO selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null) {
@@ -322,7 +329,7 @@ public class GestoreSale {
             if (p.getStato().getStatoEnum() == StatoEnum.CONFERMATA) {
                 statoPostazione.put(pid, 'C');
             } else {
-                statoPostazione.computeIfAbsent(pid, k -> 'A');
+                statoPostazione.putIfAbsent(pid, 'A');
             }
         }
         return statoPostazione;

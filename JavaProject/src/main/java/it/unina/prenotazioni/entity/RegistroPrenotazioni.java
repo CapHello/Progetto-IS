@@ -27,27 +27,43 @@ public class RegistroPrenotazioni {
         return instance;
     }
 
-    /** Salva una nuova prenotazione; false se il salvataggio fallisce. */
+    /**
+     * Salva una nuova prenotazione; false se il salvataggio fallisce.
+     * @param prenotazione prenotazione
+     */
     public boolean salvaPrenotazione(Prenotazione prenotazione) {
         return gestorePersistenza.salva(prenotazione);
     }
 
-    /** Aggiorna i dati di una Prenotazione esistente nel database. */
+    /**
+     * Aggiorna i dati di una Prenotazione esistente nel database.
+     * @param prenotazione prenotazione
+     */
     public Prenotazione aggiorna(Prenotazione prenotazione) {
         return gestorePersistenza.aggiorna(prenotazione);
     }
 
-    /** Carica una prenotazione per id; null se non esiste. */
+    /**
+     * Carica una prenotazione per id; null se non esiste.
+     * @param id id
+     */
     public Prenotazione trovaPerId(Long id) {
         return gestorePersistenza.trovaPerId(Prenotazione.class, id);
     }
 
-    /** Tutte le prenotazioni di uno studente (per matricola): storico / profilo personale. */
+    /**
+     * Tutte le prenotazioni di uno studente (per matricola): storico / profilo personale.
+     * @param matricola matricola
+     */
     public List<Prenotazione> cercaPrenotazioniPerStudente(String matricola) {
         return gestorePersistenza.cercaPerCampo(Prenotazione.class, "studente.matricola", matricola);
     }
 
-    /** Prenotazioni ATTIVE o CONFERMATE dello studente in una certa data (vincolo di unicità V18). */
+    /**
+     * Prenotazioni ATTIVE o CONFERMATE dello studente in una certa data (vincolo di unicità V18).
+     * @param matricola matricola
+     * @param data data
+     */
     public List<Prenotazione> cercaPrenotazioneAttiva(String matricola, LocalDate data) {
         List<Prenotazione> occupanti = new ArrayList<>();
         List<Prenotazione> trovate = gestorePersistenza.cercaPerCampi(
@@ -61,14 +77,23 @@ public class RegistroPrenotazioni {
         return occupanti;
     }
 
-    /** Prenotazioni che insistono su una postazione in una determinata data e fascia oraria. */
+    /**
+     * Prenotazioni che insistono su una postazione in una determinata data e fascia oraria.
+     * @param idPostazione idPostazione
+     * @param data data
+     * @param idFascia idFascia
+     */
     public List<Prenotazione> cercaPrenotazioniPerPostazione(Long idPostazione, LocalDate data, Long idFascia) {
         return gestorePersistenza.cercaPerCampi(
                 Prenotazione.class,
                 Map.of("postazione.id", idPostazione, "data", data, "fasciaOraria.id", idFascia));
     }
 
-    /** Prenotazioni della giornata corrente per una sala (monitoraggio bibliotecario, UC11). */
+    /**
+     * Prenotazioni della giornata corrente per una sala (monitoraggio bibliotecario, UC11).
+     * @param idSala idSala
+     * @param data data
+     */
     public List<Prenotazione> cercaPrenotazioniPerSalaEData(Long idSala, LocalDate data) {
         List<Prenotazione> risultato = new ArrayList<>();
         List<Prenotazione> trovate = gestorePersistenza.cercaPerCampi(
@@ -82,7 +107,10 @@ public class RegistroPrenotazioni {
         return risultato;
     }
 
-    /** Tutte le prenotazioni (qualsiasi stato) che insistono su postazioni di una sala. */
+    /**
+     * Tutte le prenotazioni (qualsiasi stato) che insistono su postazioni di una sala.
+     * @param idSala idSala
+     */
     public List<Prenotazione> cercaTuttePerSala(Long idSala) {
         return gestorePersistenza.cercaPerCampo(Prenotazione.class, "postazione.area.salaStudio.id", idSala);
     }

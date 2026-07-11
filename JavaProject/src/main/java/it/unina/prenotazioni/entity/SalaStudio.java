@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <entity> Radice dell'aggregato Sala Studio (Aree, Postazioni, Fasce orarie).
+ * Radice dell'aggregato Sala Studio (Aree, Postazioni, Fasce orarie).
  * L'eliminazione (UC4) è un soft delete tramite il flag {@code attiva}, per
  * preservare lo storico delle prenotazioni.
  */
@@ -73,12 +73,18 @@ public class SalaStudio {
 
     // --- Costruzione in memoria (usata in CreaSalaStudio, prima della persistenza) ---
 
-    /** Aggiunge una fascia oraria (slot prenotabile) all'orario della sala. */
+    /**
+     * Aggiunge una fascia oraria (slot prenotabile) all'orario della sala.
+     * @param fascia fascia
+     */
     public void addFascia(FasciaOraria fascia) {
         slotOrario.add(fascia);
     }
 
-    /** Aggiunge l'orario lavorativo del giorno successivo (max 5, Lunedì-Venerdì). */
+    /**
+     * Aggiunge l'orario lavorativo del giorno successivo (max 5, Lunedì-Venerdì).
+     * @param fascia fascia
+     */
     public void addOrarioLavorativo(FasciaOraria fascia) {
         if (this.orarioLavorativo.size() >= 5) {
             throw new IllegalStateException("Impossibile aggiungere un altro orario: limite massimo di 5 orari lavorativi raggiunto per questa sala.");
@@ -90,6 +96,8 @@ public class SalaStudio {
      * Aggiunge (in memoria) una nuova Area con le sue postazioni; la persistenza avviene
      * a cascata col salvataggio della sala (UC3). Verifica V04 (almeno una postazione)
      * e che il totale assegnato non superi la capienza della sala.
+     * @param tipologia tipologia
+     * @param numPostazioni numPostazioni
      */
     public Area aggiungiArea(String tipologia, int numPostazioni) {
         if (numPostazioni < 1) {
@@ -116,6 +124,7 @@ public class SalaStudio {
     /**
      * Crea l'area di default "comune" (V19) con le postazioni rimanenti non assegnate ad
      * aree specifiche (step 6 dello scenario CreaSalaStudio).
+     * @param postazioniRimanenti postazioniRimanenti
      */
     public void creaAreaDefault(int postazioniRimanenti) {
         aggiungiArea("comune", postazioniRimanenti);
@@ -131,7 +140,10 @@ public class SalaStudio {
 
     // --- Consultazione / disponibilità ---
 
-    /** V06: la sala è aperta nei giorni feriali (lunedì-venerdì). */
+    /**
+     * V06: la sala è aperta nei giorni feriali (lunedì-venerdì).
+     * @param data data
+     */
     public boolean verificaDataInGiorniApertura(LocalDate data) {
         if(data == null){
             throw new IllegalArgumentException("La data è obbligatoria");
@@ -160,6 +172,7 @@ public class SalaStudio {
     /**
      * Fasce prenotabili per la data indicata (V06): filtra gli slot della sala
      * tenendo solo quelli interni all'orario lavorativo del giorno specifico.
+     * @param data data
      */
     public List<FasciaOraria> getFasceOrariePrestabilite(LocalDate data) {
         FasciaOraria orarioDelGiorno = getOrarioLavorativoPerData(data);
@@ -182,7 +195,11 @@ public class SalaStudio {
         return slotDisponibiliOggi;
     }
 
-    /** True se esiste almeno una postazione libera nella sala per (data, fascia). */
+    /**
+     * True se esiste almeno una postazione libera nella sala per (data, fascia).
+     * @param data data
+     * @param fascia fascia
+     */
     public boolean verificaDisponibilita(LocalDate data, FasciaOraria fascia) {
         RegistroSale registro = RegistroSale.getInstance();
         for (Area area : registro.getAreePerSala(id)) {

@@ -12,7 +12,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 public class PrenotazioniApplication {
+/**
+ * Costruttore di default.
+ */
+public PrenotazioniApplication() {}
 
+    /**
+     * commento
+     * @param args args
+     */
     public static void main(String[] args) {
         SpringApplication.run(PrenotazioniApplication.class, args);
         System.out.println("=====================================================");

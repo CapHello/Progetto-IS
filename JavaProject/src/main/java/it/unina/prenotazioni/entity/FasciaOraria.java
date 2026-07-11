@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import java.time.LocalTime;
 
 /**
- * <entity> Intervallo orario riusabile: rappresenta sia gli slot prenotabili
+ * Intervallo orario riusabile: rappresenta sia gli slot prenotabili
  * sia gli orari lavorativi giornalieri delle sale (associazioni molti-a-molti).
  */
 @Entity

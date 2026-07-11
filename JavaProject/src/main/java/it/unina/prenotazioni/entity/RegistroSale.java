@@ -29,17 +29,26 @@ public class RegistroSale {
 
     // --- CRUD Sala ---
 
-    /** Salva la sala e, a cascata, aree, postazioni e fasce; false se il salvataggio fallisce. */
+    /**
+     * Salva la sala e, a cascata, aree, postazioni e fasce; false se il salvataggio fallisce.
+     * @param salaStudio salaStudio
+     */
     public boolean salvaSala(SalaStudio salaStudio) {
         return gestorePersistenza.salva(salaStudio);
     }
 
-    /** Aggiorna una sala esistente (es. soft delete di UC4). */
+    /**
+     * Aggiorna una sala esistente (es. soft delete di UC4).
+     * @param salaStudio salaStudio
+     */
     public SalaStudio aggiornaSala(SalaStudio salaStudio) {
         return gestorePersistenza.aggiorna(salaStudio);
     }
 
-    /** Carica una sala per id; null se non esiste. */
+    /**
+     * Carica una sala per id; null se non esiste.
+     * @param id id
+     */
     public SalaStudio cercaSalaPerId(Long id) {
         return gestorePersistenza.trovaPerId(SalaStudio.class, id);
     }
@@ -63,6 +72,7 @@ public class RegistroSale {
     /**
      * Sale visibili/prenotabili in una certa data: quelle aperte
      * in cui esiste almeno una fascia oraria con posti disponibili.
+     * @param data data
      */
     public List<SalaStudio> getSaleDisponibili(LocalDate data) {
         List<SalaStudio> risultato = new ArrayList<>();
@@ -90,24 +100,36 @@ public class RegistroSale {
 
     // --- Aree ---
 
-    /** Carica un'area per id; null se non esiste. */
+    /**
+     * Carica un'area per id; null se non esiste.
+     * @param idArea idArea
+     */
     public Area trovaAreaPerId(Long idArea) {
         return gestorePersistenza.trovaPerId(Area.class, idArea);
     }
 
-    /** Aree di una sala (query dedicata: evita la navigazione lazy su entità detached). */
+    /**
+     * Aree di una sala (query dedicata: evita la navigazione lazy su entità detached).
+     * @param idSala idSala
+     */
     public List<Area> getAreePerSala(Long idSala) {
         return gestorePersistenza.cercaPerCampo(Area.class, "salaStudio.id", idSala);
     }
 
     // --- Postazioni ---
 
-    /** Postazioni di un'area (query dedicata: evita la navigazione lazy su entità detached). */
+    /**
+     * Postazioni di un'area (query dedicata: evita la navigazione lazy su entità detached).
+     * @param idArea idArea
+     */
     public List<Postazione> getPostazioniPerArea(Long idArea) {
         return gestorePersistenza.cercaPerCampo(Postazione.class, "area.id", idArea);
     }
 
-    /** Carica una postazione per id; null se non esiste. */
+    /**
+     * Carica una postazione per id; null se non esiste.
+     * @param idPostazione idPostazione
+     */
     public Postazione trovaPostazionePerId(Long idPostazione) {
         return gestorePersistenza.trovaPerId(Postazione.class, idPostazione);
     }
@@ -115,6 +137,9 @@ public class RegistroSale {
     /**
      * Postazioni libere di un'area per (data, fascia): delega alla logica di
      * dominio dell'Area.
+     * @param idArea idArea
+     * @param data data
+     * @param idFascia idFascia
      */
     public List<Postazione> getPostazioniDisponibili(Long idArea, LocalDate data, Long idFascia) {
         Area area = trovaAreaPerId(idArea);
@@ -127,7 +152,10 @@ public class RegistroSale {
 
     // --- Fasce orarie (slot prenotabili) ---
 
-    /** Carica una fascia per id; null se non esiste. */
+    /**
+     * Carica una fascia per id; null se non esiste.
+     * @param id id
+     */
     public FasciaOraria trovaFasciaPerId(Long id) {
         return gestorePersistenza.trovaPerId(FasciaOraria.class, id);
     }
@@ -137,6 +165,7 @@ public class RegistroSale {
      * colonna giorno_settimana (0 = Lunedì ... 4 = Venerdì), quindi la posizione nella
      * lista corrisponde al giorno. Funziona perché creaSalaStudio crea una FasciaOraria
      * diversa per ogni giorno (se fosse condivisa, Hibernate la restituirebbe una sola volta).
+     * @param idSala idSala
      */
     public List<FasciaOraria> getOrariLavorativiPerSala(Long idSala) {
         String jpql = "SELECT f FROM SalaStudio s JOIN s.orarioLavorativo f WHERE s.id = :idSala ORDER BY INDEX(f)";
@@ -148,7 +177,10 @@ public class RegistroSale {
     }
 
 
-    /** Tutti gli slot prenotabili della sala (unione dei giorni, senza filtro per data). */
+    /**
+     * Tutti gli slot prenotabili della sala (unione dei giorni, senza filtro per data).
+     * @param idSala idSala
+     */
     public List<FasciaOraria> getFascePerSala(Long idSala) {
         String jpql = "SELECT f FROM SalaStudio s JOIN s.slotOrario f WHERE s.id = :idSala";
         return gestorePersistenza.eseguiQueryCustom(jpql, FasciaOraria.class, Map.of("idSala", idSala));

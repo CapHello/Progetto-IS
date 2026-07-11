@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 /**
- * <entity> Singolo posto a sedere prenotabile; appartiene a un'Area e non ha
+ * Singolo posto a sedere prenotabile; appartiene a un'Area e non ha
  * stato proprio: la sua disponibilità è derivata dalle prenotazioni che la impegnano.
  */
 @Entity
@@ -40,6 +40,8 @@ public class Postazione {
      * Vero se la postazione è LIBERA per la (data, fascia): non esiste alcuna
      * prenotazione ATTIVA o CONFERMATA che la impegni in quello slot. La disponibilità
      * è quindi DERIVATA dallo stato delle prenotazioni.
+     * @param data data
+     * @param fascia fascia
      */
     public boolean disponibilita(LocalDate data, FasciaOraria fascia) {
         RegistroPrenotazioni registro = RegistroPrenotazioni.getInstance();

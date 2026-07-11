@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <entity> Zona tipizzata di una sala (es. "silenziosa", "comune") che raggruppa
+ * Zona tipizzata di una sala (es. "silenziosa", "comune") che raggruppa
  * le postazioni; ogni sala ha sempre almeno l'area di default "comune" (V19).
  */
 @Entity
@@ -45,6 +45,9 @@ public class Area {
      * Postazioni libere dell'area per (data, fascia). Itera sulle proprie postazioni
      * (caricate dal Registro per evitare la navigazione lazy su entità distaccate) e
      * interroga ciascuna con disponibilita(data, fascia).
+     * @param data data
+     * @param fascia fascia
+     * @return result
      */
     public List<Postazione> getPostazioniDisponibili(LocalDate data, FasciaOraria fascia) {
         List<Postazione> disponibili = new ArrayList<>();
@@ -57,7 +60,10 @@ public class Area {
         return disponibili;
     }
 
-    /** Genera in memoria le postazioni dell'area; la persistenza avviene a cascata (UC3). */
+    /**
+     * Genera in memoria le postazioni dell'area; la persistenza avviene a cascata (UC3).
+     * @param numeroPostazioni numeroPostazioni
+     */
     public void creaPostazioni(int numeroPostazioni) {
         for (int i = 0; i < numeroPostazioni; i++) {
             Postazione p = new Postazione(this);

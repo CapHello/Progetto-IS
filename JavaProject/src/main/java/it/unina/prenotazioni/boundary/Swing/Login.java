@@ -16,8 +16,15 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Locale;
 
+/**
+ * commento
+ */
 public class Login {
 
+    /**
+     * commento
+     * @param args args
+     */
     public static void main(String[] args) {
         // Qui Spring non c'è, quindi il @PostConstruct di ConfigurazioneNotifiche non parte:
         // il cablaggio del servizio notifiche va fatto a mano, altrimenti le notifiche si perdono.
@@ -42,6 +49,9 @@ public class Login {
     private JButton btnLogin;
     private JLabel lblRegistrati;
 
+    /**
+     * commento
+     */
     public Login() {
         // Bordo card arrotondato (non configurabile nel form designer)
         cardLogin.setBorder(BorderFactory.createCompoundBorder(
@@ -154,6 +164,10 @@ public class Login {
     // --- APRI LOGIN ---
 
 
+    /**
+     * commento
+     * @return result
+     */
     public JFrame apriLogin() {
         frameCorrente = new JFrame("Login");
         frameCorrente.setContentPane(loginPane);
@@ -167,15 +181,27 @@ public class Login {
 
     // --- GETTER / LISTENER per il controller ---
 
+    /**
+     * commento
+     * @return result
+     */
     public String getEmail() {
         return txtEmail.getText();
     }
 
+    /**
+     * commento
+     * @return result
+     */
     public String getPassword() {
         return String.valueOf(txtPassword.getPassword());
     }
 
 
+    /**
+     * commento
+     * @param messaggio messaggio
+     */
     public void mostraErrore(String messaggio) {
         JOptionPane.showMessageDialog(loginPane, messaggio, "Errore login", JOptionPane.ERROR_MESSAGE);
     }
@@ -244,7 +270,7 @@ public class Login {
         loginPane.add(spacer4, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
-    /**
+    /*
      * @noinspection ALL
      */
     private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
@@ -266,8 +292,12 @@ public class Login {
         return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
     }
 
-    /**
+    /*
      * @noinspection ALL
+     */
+    /**
+     * commento
+     * @return result
      */
     public JComponent $$$getRootComponent$$$() {
         return loginPane;

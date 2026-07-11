@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * <control> Gestore (Singleton) di Registrazione (UC1), Autenticazione (UC2) e
+ * Gestore (Singleton) di Registrazione (UC1), Autenticazione (UC2) e
  * profilo personale (UC8). Usa le Factory per creare la sottoclasse corretta di
  * Utente e gestisce tentativi falliti e blocco temporaneo dell'account (V21).
  */
@@ -61,6 +61,12 @@ public class GestoreUtenti {
     /**
      * Valida i dati (V12-V14, V20), verifica l'unicità di email e identificativo,
      * crea l'utente tramite la Factory del ruolo e lo persiste.
+     * @param ruolo ruolo
+     * @param nome nome
+     * @param cognome cognome
+     * @param email email
+     * @param password password
+     * @param identificativo identificativo
      */
     public UtenteDTO registrazione(String ruolo, String nome, String cognome,
                                 String email, String password, String identificativo) {
@@ -99,6 +105,8 @@ public class GestoreUtenti {
      * falliti blocca temporaneamente l'account per 15 minuti (V21). L'errore di verifica è
      * lo stesso per email inesistente e password errata, per non rivelare quali email
      * sono registrate.
+     * @param email email
+     * @param password password
      */
     public UtenteDTO autenticazione(String email, String password) {
         verificaFormatoCredenziali(email, password);
@@ -151,7 +159,10 @@ public class GestoreUtenti {
     }
 
     // -------------------------------------------------------------- UC8 (profilo)
-    /** Profilo personale dello studente (dati anagrafici e totale accessi). */
+    /**
+     * Profilo personale dello studente (dati anagrafici e totale accessi).
+     * @param idStudente idStudente
+     */
     public UtenteDTO visualizzaProfilo(Long idStudente) {
         Studente studente = registroUtenti.trovaStudentePerId(idStudente);
         if (studente == null) {

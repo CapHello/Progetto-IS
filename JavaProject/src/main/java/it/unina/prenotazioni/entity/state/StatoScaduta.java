@@ -9,6 +9,10 @@ public class StatoScaduta implements StatoPrenotazione {
 
     private StatoScaduta() {}
 
+    /**
+     * commento
+     * @return result
+     */
     public static StatoScaduta getInstance() {
         if (instance == null) {
             instance = new StatoScaduta();

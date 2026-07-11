@@ -11,19 +11,25 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * <endpoint> Profilo personale (UC8) e storico prenotazioni (UC12) dello studente.
+ * Profilo personale (UC8) e storico prenotazioni (UC12) dello studente.
  */
 @RestController
 @RequestMapping("/api/studente")
 public class BoundaryStudente {
 
-    /** UC8: profilo personale dello studente. */
+    /**
+     * UC8: profilo personale dello studente.
+     * @param idStudente idStudente
+     */
     @GetMapping("/{idStudente}/profilo")
     public UtenteDTO visualizzaProfiloPersonale(@PathVariable("idStudente") Long idStudente) {
         return BibliotecaFacade.getInstance().visualizzaProfiloPersonale(idStudente);
     }
 
-    /** UC12: storico completo delle prenotazioni dello studente. */
+    /**
+     * UC12: storico completo delle prenotazioni dello studente.
+     * @param idStudente idStudente
+     */
     @GetMapping("/{idStudente}/storico")
     public List<PrenotazioneDTO> consultaStoricoPrenotazioni(@PathVariable("idStudente") Long idStudente) {
         return BibliotecaFacade.getInstance().consultaStoricoPrenotazioni(idStudente);

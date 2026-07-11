@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <entity> Utente che prenota le postazioni; identificato dalla matricola.
+ * Utente che prenota le postazioni; identificato dalla matricola.
  * numeroTotaleAccessi conta i check-in andati a buon fine (UC10).
  */
 @Entity
@@ -38,6 +38,8 @@ public class Studente extends Utente{
     /**
      * Vincolo di unicità (V18): true se lo studente possiede già una prenotazione in
      * stato ATTIVA o CONFERMATA nella stessa data e fascia oraria (qualsiasi sala).
+     * @param data data
+     * @param fasciaEtichetta fasciaEtichetta
      */
     public boolean verificaPrenotazioneAttivaOConfermataInDataFascia(LocalDate data, String fasciaEtichetta) {
         RegistroPrenotazioni registro = RegistroPrenotazioni.getInstance();
