@@ -3,7 +3,7 @@ package it.unina.prenotazioni;
 import it.unina.prenotazioni.boundary.Swing.Login;
 import org.springframework.boot.SpringApplication;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 public class Launcher {
 

@@ -1,14 +1,6 @@
 package it.unina.prenotazioni.controller;
 
-import it.unina.prenotazioni.dto.CreazioneSalaDTO;
-import it.unina.prenotazioni.dto.DettaglioSalaDTO;
-import it.unina.prenotazioni.dto.FasciaDisponibileDTO;
-import it.unina.prenotazioni.dto.PrenotazioneDTO;
-import it.unina.prenotazioni.dto.RichiestaPrenotazioneDTO;
-import it.unina.prenotazioni.dto.SalaMonitoraggioDTO;
-import it.unina.prenotazioni.dto.SalaStudioDTO;
-import it.unina.prenotazioni.dto.StatisticheDTO;
-import it.unina.prenotazioni.dto.UtenteDTO;
+import it.unina.prenotazioni.dto.*;
 
 import java.time.LocalDate;
 import java.util.List;

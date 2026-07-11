@@ -1,31 +1,18 @@
 package it.unina.prenotazioni.controller;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import it.unina.prenotazioni.controller.strategy.AssegnazionePrimaLibera;
 import it.unina.prenotazioni.controller.strategy.StrategiaAssegnazione;
 import it.unina.prenotazioni.dto.PrenotazioneDTO;
 import it.unina.prenotazioni.dto.RichiestaPrenotazioneDTO;
 import it.unina.prenotazioni.dto.StatisticheDTO;
-import it.unina.prenotazioni.entity.Area;
-import it.unina.prenotazioni.entity.FasciaOraria;
-import it.unina.prenotazioni.entity.Postazione;
-import it.unina.prenotazioni.entity.Prenotazione;
-import it.unina.prenotazioni.entity.RegistroPrenotazioni;
-import it.unina.prenotazioni.entity.RegistroSale;
-import it.unina.prenotazioni.entity.RegistroUtenti;
-import it.unina.prenotazioni.entity.SalaStudio;
-import it.unina.prenotazioni.entity.StatoEnum;
-import it.unina.prenotazioni.entity.Studente;
+import it.unina.prenotazioni.entity.*;
 import it.unina.prenotazioni.entity.state.StatoAttiva;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.*;
 
 /**
  * <<control>> Gestore (Singleton) del ciclo di vita delle prenotazioni:

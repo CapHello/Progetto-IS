@@ -1,14 +1,7 @@
 package it.unina.prenotazioni.controller;
 
 import it.unina.prenotazioni.dto.*;
-import it.unina.prenotazioni.entity.Area;
-import it.unina.prenotazioni.entity.FasciaOraria;
-import it.unina.prenotazioni.entity.Postazione;
-import it.unina.prenotazioni.entity.Prenotazione;
-import it.unina.prenotazioni.entity.RegistroPrenotazioni;
-import it.unina.prenotazioni.entity.RegistroSale;
-import it.unina.prenotazioni.entity.SalaStudio;
-import it.unina.prenotazioni.entity.StatoEnum;
+import it.unina.prenotazioni.entity.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

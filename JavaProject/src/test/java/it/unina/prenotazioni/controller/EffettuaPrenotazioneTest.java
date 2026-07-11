@@ -1,18 +1,15 @@
 package it.unina.prenotazioni.controller;
 
-import it.unina.prenotazioni.controller.factory.StudenteFactory;
 import it.unina.prenotazioni.database.JpaUtil;
-import it.unina.prenotazioni.dto.*;
+import it.unina.prenotazioni.dto.PrenotazioneDTO;
+import it.unina.prenotazioni.dto.RichiestaPrenotazioneDTO;
 import it.unina.prenotazioni.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 

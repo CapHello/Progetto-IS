@@ -3,7 +3,9 @@ package it.unina.prenotazioni.boundary.SpringBoot;
 import it.unina.prenotazioni.controller.BibliotecaFacade;
 import it.unina.prenotazioni.dto.SalaMonitoraggioDTO;
 import it.unina.prenotazioni.dto.StatisticheDTO;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 

@@ -2,7 +2,10 @@ package it.unina.prenotazioni.boundary.SpringBoot;
 
 import it.unina.prenotazioni.controller.BibliotecaFacade;
 import it.unina.prenotazioni.dto.UtenteDTO;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * <<endpoint>> Registrazione (UC1) e Autenticazione (UC2). Nessuna logica applicativa:
