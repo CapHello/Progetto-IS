@@ -122,12 +122,14 @@ public class GestorePrenotazioni {
         if(idPostazione == null){
             throw new IllegalArgumentException("Postazione non inserita");
         }
-        Postazione postazione = registroSale.trovaPostazionePerId(idPostazione);
-        if(postazione == null){
-            throw new IllegalArgumentException("Postazione non trovata");
-        }
-        if(!area.getId().equals(postazione.getArea().getId())){
-            throw new IllegalArgumentException("La postazione non si trova all'interno dell'area selezionata");
+        if(idPostazione != 0){
+            Postazione postazione = registroSale.trovaPostazionePerId(idPostazione);
+            if(postazione == null){
+                throw new IllegalArgumentException("Identificativo postazione non valido.");
+            }
+            if(!area.getId().equals(postazione.getArea().getId())){
+                throw new IllegalArgumentException("La postazione non si trova all'interno dell'area selezionata");
+            }
         }
         if(!sala.getId().equals(area.getSalaStudio().getId())){
             throw new IllegalArgumentException("L'area non si trova all'interno della sala studio selezionata");
