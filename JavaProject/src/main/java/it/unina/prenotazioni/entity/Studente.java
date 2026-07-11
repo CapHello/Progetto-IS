@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <<entity>> Utente che prenota le postazioni; identificato dalla matricola.
+ * <entity> Utente che prenota le postazioni; identificato dalla matricola.
  * numeroTotaleAccessi conta i check-in andati a buon fine (UC10).
  */
 @Entity

@@ -8,7 +8,7 @@ import java.time.ZoneId;
 import java.util.List;
 
 /**
- * <<control>> Gestore (Singleton) delle notifiche. Realizza Observer (entity): a ogni
+ * <control> Gestore (Singleton) delle notifiche. Realizza Observer (entity): a ogni
  * cambio di stato della Prenotazione riceve update() e inoltra il recapito a
  * ServizioNotifiche. Il fornitore concreto (AdapterServizioNotifiche) è iniettato dal boundary.
  */

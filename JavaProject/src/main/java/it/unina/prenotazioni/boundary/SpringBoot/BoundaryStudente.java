@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * <<endpoint>> Profilo personale (UC8) e storico prenotazioni (UC12) dello studente.
+ * <endpoint> Profilo personale (UC8) e storico prenotazioni (UC12) dello studente.
  */
 @RestController
 @RequestMapping("/api/studente")

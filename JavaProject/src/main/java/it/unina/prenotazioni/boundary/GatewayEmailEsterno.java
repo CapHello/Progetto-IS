@@ -1,7 +1,7 @@
 package it.unina.prenotazioni.boundary;
 
 /**
- * <<external>> Gateway del servizio di messaggistica esterno (V01).
+ * <external> Gateway del servizio di messaggistica esterno (V01).
  *
  * STUB volutamente non implementato: per requisito di progetto l'integrazione reale con
  * il gateway esterno NON va sviluppata. Simula l'invio stampando a console e restituendo

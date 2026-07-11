@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * <<Facade>> <<Singleton>>: unico punto d'accesso al controller per le boundary.
+ * <Facade> <Singleton> Unico punto d'accesso al controller per le boundary.
  * Espone un'operazione per caso d'uso e delega ai quattro gestori; le firme usano
  * solo tipi primitivi e DTO (nessun tipo entity attraversa il confine del layer).
  */

@@ -11,7 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 /**
- * <<control>> Gestore (Singleton) delle Sale Studio: creazione (UC3), eliminazione (UC4),
+ * <control> Gestore (Singleton) delle Sale Studio: creazione (UC3), eliminazione (UC4),
  * consultazione disponibilità (UC6), dettaglio postazioni e monitoraggio sale (UC11).
  */
 public class GestoreSale {

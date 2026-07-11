@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * <<endpoint>> Registrazione (UC1) e Autenticazione (UC2). Nessuna logica applicativa:
+ * <endpoint> Registrazione (UC1) e Autenticazione (UC2). Nessuna logica applicativa:
  * raccoglie l'input e lo inoltra alla BibliotecaFacade.
  */
 

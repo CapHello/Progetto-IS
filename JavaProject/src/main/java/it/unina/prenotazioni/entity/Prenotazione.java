@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * <<entity>> Prenotazione di una postazione per una (data, fascia oraria).
+ * <entity> Prenotazione di una postazione per una (data, fascia oraria).
  * Il ciclo di vita segue il pattern State (ATTIVA, CONFERMATA, ANNULLATA, SCADUTA, CONCLUSA);
  * come Subject del pattern Observer notifica GestoreNotifiche a ogni cambio di stato.
  */

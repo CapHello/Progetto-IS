@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <<entity>> Radice dell'aggregato Sala Studio (Aree, Postazioni, Fasce orarie).
+ * <entity> Radice dell'aggregato Sala Studio (Aree, Postazioni, Fasce orarie).
  * L'eliminazione (UC4) è un soft delete tramite il flag {@code attiva}, per
  * preservare lo storico delle prenotazioni.
  */

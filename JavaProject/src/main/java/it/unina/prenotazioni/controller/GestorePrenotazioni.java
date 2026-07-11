@@ -15,7 +15,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 /**
- * <<control>> Gestore (Singleton) del ciclo di vita delle prenotazioni:
+ * <control> Gestore (Singleton) del ciclo di vita delle prenotazioni:
  * EffettuaPrenotazione (UC7), AnnullaPrenotazione (UC9), EffettuaCheckIn (UC10),
  * ConsultaStorico (UC12), GestisciTermine (UC16), Statistiche (UC13).
  * La scelta automatica della postazione è delegata al pattern Strategy

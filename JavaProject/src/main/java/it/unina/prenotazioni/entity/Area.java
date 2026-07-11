@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <<entity>> Zona tipizzata di una sala (es. "silenziosa", "comune") che raggruppa
+ * <entity> Zona tipizzata di una sala (es. "silenziosa", "comune") che raggruppa
  * le postazioni; ogni sala ha sempre almeno l'area di default "comune" (V19).
  */
 @Entity

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * <<control>> Gestore (Singleton) di Registrazione (UC1), Autenticazione (UC2) e
+ * <control> Gestore (Singleton) di Registrazione (UC1), Autenticazione (UC2) e
  * profilo personale (UC8). Usa le Factory per creare la sottoclasse corretta di
  * Utente e gestisce tentativi falliti e blocco temporaneo dell'account (V21).
  */

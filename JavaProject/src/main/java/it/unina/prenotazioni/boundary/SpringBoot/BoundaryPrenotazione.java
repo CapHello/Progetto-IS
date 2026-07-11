@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 /**
- * <<endpoint>> Effettua (UC7), Annulla (UC9) ed Effettua Check-in (UC10) delle prenotazioni.
+ * <endpoint> Effettua (UC7), Annulla (UC9) ed Effettua Check-in (UC10) delle prenotazioni.
  */
 @RestController
 @RequestMapping("/api/prenotazioni")

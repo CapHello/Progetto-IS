@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.Map;
 
 /**
- * <<endpoint>> Handler globale delle eccezioni: traduce le eccezioni di dominio in
+ * <endpoint> Handler globale delle eccezioni: traduce le eccezioni di dominio in
  * risposte HTTP con corpo JSON {"errore": "..."}, che la GUI mostra all'utente.
  * I gestori comunicano gli esiti negativi tramite eccezioni, mai tramite codici HTTP.
  */
