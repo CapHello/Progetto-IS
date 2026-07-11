@@ -1,6 +1,5 @@
 package it.unina.prenotazioni.controller;
 
-
 import it.unina.prenotazioni.database.JpaUtil;
 import it.unina.prenotazioni.entity.*;
 import it.unina.prenotazioni.entity.state.StatoAttiva;
@@ -20,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Test strutturali - gestisciTerminePrenotazione")
-public class GestisciTerminePrenotazioneTest {
+class GestisciTerminePrenotazioneTest {
 
     private BibliotecaFacade bibliotecaFacade;
     private EntityManager em;
@@ -31,10 +30,8 @@ public class GestisciTerminePrenotazioneTest {
     private static final LocalTime INIZIO = LocalTime.of(10, 0);
     private static final LocalTime FINE   = LocalTime.of(12, 0);
 
-    // AAA: Arrange, Act, Assert
-
     @BeforeEach
-    void setUP() {
+    void setUp() {
         bibliotecaFacade = BibliotecaFacade.getInstance();
         em = JpaUtil.getInstance().getEntityManager();
         prepareDatabase();
@@ -103,7 +100,7 @@ public class GestisciTerminePrenotazioneTest {
             pren.setFasciaOraria(fascia);
             pren.setPostazione(em.find(Postazione.class, ID_POSTAZIONE));
             pren.setStudente(em.find(Studente.class, ID_STUDENTE));
-            pren.setStato(stato);              // imposta anche nomeStato -> lo vede getPrenotazioniInScadenza
+            pren.setStato(stato);              // imposta anche nomeStato, così getPrenotazioniInScadenza la trova
 
             em.persist(pren);
             tx.commit();
@@ -114,37 +111,35 @@ public class GestisciTerminePrenotazioneTest {
         }
     }
 
-    // ricerca dello stato
-    StatoEnum statoDellaPrenotazione(Long idPrenotazione){
+    // Rilegge lo stato dal DB: em.clear() evita di pescare dalla cache di primo livello.
+    private StatoEnum statoDellaPrenotazione(Long idPrenotazione){
         em.clear();
         return em.find(Prenotazione.class, idPrenotazione).getStato().getStatoEnum();
     }
 
     @Test
-    @DisplayName("TC_1 [1-2-3-4-5-8-2-9]: Prenotazione ATTIVA oltre la tolleranza: SCADUTA")
+    @DisplayName("TC1 [1-2-3-4-5-8-2-9]: Prenotazione ATTIVA oltre la tolleranza diventa SCADUTA")
     void prenotazioneAttivaOltreTolleranza(){
         // Data di ieri: adesso.isAfter(inizio + 10) = true
         Long id = creaPrenotazione(StatoAttiva.getInstance(), LocalDate.now().minusDays(1));
 
         bibliotecaFacade.gestisciTerminePrenotazioni();
 
-        assertEquals(StatoEnum.SCADUTA, statoDellaPrenotazione(id), "Una prenotazione ATTIVA non confermata entra la tolleranza deve diventare -> SCADUTA");
+        assertEquals(StatoEnum.SCADUTA, statoDellaPrenotazione(id), "Una prenotazione ATTIVA oltre la tolleranza di check-in deve diventare SCADUTA");
     }
 
     @Test
-    @DisplayName("TC_2 [1-2-3-4-6-7-8-2-9]: Prenotazione CONFERMATA con slot terminato -> CONCLUSA")
+    @DisplayName("TC2 [1-2-3-4-6-7-8-2-9]: Prenotazione CONFERMATA con slot terminato diventa CONCLUSA")
     void prenotazioneConfermataSlotTerminato(){
-
         Long id = creaPrenotazione(StatoConfermata.getInstance(), LocalDate.now().minusDays(1));
 
         bibliotecaFacade.gestisciTerminePrenotazioni();
 
         assertEquals(StatoEnum.CONCLUSA, statoDellaPrenotazione(id), "Una prenotazione CONFERMATA con slot terminato deve diventare CONCLUSA");
-
     }
 
     @Test
-    @DisplayName("TC_3 [1-2-3-4-6-8-2-9] In scadenza ma nessuna condizione vera -> nessuna transizione")
+    @DisplayName("TC3 [1-2-3-4-6-8-2-9]: In scadenza ma nessuna condizione vera, nessuna transizione")
     void prenotazioneInScadenzaNessunaCondizioneVerificata(){
         Long id = creaPrenotazione(StatoAttiva.getInstance(), LocalDate.now().plusDays(1));
 
@@ -153,15 +148,10 @@ public class GestisciTerminePrenotazioneTest {
         assertEquals(StatoEnum.ATTIVA, statoDellaPrenotazione(id), "Nessuna soglia temporale superata, la prenotazione non ha cambiato stato");
     }
 
-
     @Test
-    @DisplayName("TC_4 [1-2-9]: Nessuna prenotazione in scadenza -> corpo del ciclo mai eseguito")
+    @DisplayName("TC4 [1-2-9]: Nessuna prenotazione in scadenza, corpo del ciclo mai eseguito")
     void nessunaPrenotazioneInScadenza(){
-        // prepareDatabase non crea prenotazioni
-
+        // prepareDatabase non crea prenotazioni: il metodo deve solo terminare senza errori.
         bibliotecaFacade.gestisciTerminePrenotazioni();
-
-
-
     }
 }
