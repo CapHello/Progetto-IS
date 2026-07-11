@@ -90,8 +90,10 @@ public class GestorePrenotazioni {
         // verifico la correttezza e la coerenza dei parametri in ingresso per quanto riguarda sala, area, postazione, idFascia
         Studente studente = risolviStudente(idStudente);
         SalaStudio sala = risolviSala(idSala, data);
-        risolviArea(sala,idArea);
+        Area area = risolviArea(sala,idArea);
         FasciaOraria fascia = risolviFascia(sala, idFascia, data);
+
+        verificaPostazioneInAreaEAreaInSala(sala, area, idPostazione);
 
         // aggiunto il blocco synchronized per gestire la concorrenza tra accessi multipli
         // in tal modo due studenti sono impossibilitati di avere la stessa postazione prenotata per lo stesso giorno e data
@@ -114,6 +116,22 @@ public class GestorePrenotazioni {
             return toDTO(prenotazione);
         }
 
+    }
+
+    private void verificaPostazioneInAreaEAreaInSala(SalaStudio sala, Area area, Long idPostazione) {
+        if(idPostazione == null){
+            throw new IllegalArgumentException("Postazione non inserita");
+        }
+        Postazione postazione = registroSale.trovaPostazionePerId(idPostazione);
+        if(postazione == null){
+            throw new IllegalArgumentException("Postazione non trovata");
+        }
+        if(!area.getId().equals(postazione.getArea().getId())){
+            throw new IllegalArgumentException("La postazione non si trova all'interno dell'area selezionata");
+        }
+        if(!sala.getId().equals(area.getSalaStudio().getId())){
+            throw new IllegalArgumentException("L'area non si trova all'interno della sala studio selezionata");
+        }
     }
 
     private void notifica(Prenotazione prenotazione) {
@@ -380,6 +398,10 @@ public class GestorePrenotazioni {
         } else if (idPostazione > 0) {
             // Postazione scelta esplicitamente dallo studente.
             Postazione scelta = registroSale.trovaPostazionePerId(idPostazione);
+            if(scelta == null){
+                throw new IllegalArgumentException("Postazione non trovata");
+            }
+
             if (!scelta.disponibilita(data, fascia)) {
                 throw new IllegalStateException("La postazione selezionata non è più disponibile");
             }
