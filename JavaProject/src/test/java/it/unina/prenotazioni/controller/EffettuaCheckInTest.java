@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -65,8 +66,8 @@ class EffettuaCheckInTest {
             em.persist(studente);
 
             // 3. Setup Tempistiche Dinamiche
-            LocalTime oraAttuale = LocalTime.now();
-            LocalDate dataOggi = LocalDate.now();
+            LocalTime oraAttuale = LocalTime.now(ZoneId.of("Europe/Rome"));
+            LocalDate dataOggi = LocalDate.now(ZoneId.of("Europe/Rome"));
 
             // Fascia valida: iniziata da 2 minuti (rientra nei 10 min di tolleranza V08)
             FasciaOraria fasciaValida = new FasciaOraria(oraAttuale.minusMinutes(2), oraAttuale.plusHours(2));

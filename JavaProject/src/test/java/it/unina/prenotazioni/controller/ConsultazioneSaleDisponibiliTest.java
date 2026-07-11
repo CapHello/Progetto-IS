@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
@@ -39,10 +40,10 @@ class ConsultazioneSaleDisponibiliTest {
         em = JpaUtil.getInstance().getEntityManager();
 
         // Calcolo date dinamiche
-        DATA_VALIDA = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.TUESDAY));
-        DATA_SATURA = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
-        DATA_PASSATA = LocalDate.now().minusDays(1);
-        DATA_CHIUSURA = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.SATURDAY));
+        DATA_VALIDA = LocalDate.now(ZoneId.of("Europe/Rome")).with(TemporalAdjusters.next(DayOfWeek.TUESDAY));
+        DATA_SATURA = LocalDate.now(ZoneId.of("Europe/Rome")).with(TemporalAdjusters.next(DayOfWeek.WEDNESDAY));
+        DATA_PASSATA = LocalDate.now(ZoneId.of("Europe/Rome")).minusDays(1);
+        DATA_CHIUSURA = LocalDate.now(ZoneId.of("Europe/Rome")).with(TemporalAdjusters.next(DayOfWeek.SATURDAY));
 
         preparaDatabase();
     }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +62,7 @@ class EliminaSalaStudioTest {
             this.SALA_VALIDA = sala.getId();
 
             // 4. Creazione di 5 Studenti e 5 Prenotazioni ATTIVE (Pre-condizione TC1)
-            LocalDate dataPrenotazione = LocalDate.now().plusDays(2); // Data futura
+            LocalDate dataPrenotazione = LocalDate.now(ZoneId.of("Europe/Rome")).plusDays(2); // Data futura
 
             for (int i = 0; i < 5; i++) {
                 // Creiamo uno studente univoco
