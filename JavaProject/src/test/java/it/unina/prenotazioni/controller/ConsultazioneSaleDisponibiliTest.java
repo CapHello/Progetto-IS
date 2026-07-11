@@ -1,7 +1,7 @@
 package it.unina.prenotazioni.controller;
 
 import it.unina.prenotazioni.database.JpaUtil;
-import it.unina.prenotazioni.dto.*;
+import it.unina.prenotazioni.dto.SalaStudioDTO;
 import it.unina.prenotazioni.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;

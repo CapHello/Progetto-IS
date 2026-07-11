@@ -1,11 +1,7 @@
 package it.unina.prenotazioni.controller;
 
 import it.unina.prenotazioni.dto.UtenteDTO;
-import it.unina.prenotazioni.entity.Observer;
-import it.unina.prenotazioni.entity.Prenotazione;
-import it.unina.prenotazioni.entity.RegistroPrenotazioni;
-import it.unina.prenotazioni.entity.StatoEnum;
-import it.unina.prenotazioni.entity.Studente;
+import it.unina.prenotazioni.entity.*;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
