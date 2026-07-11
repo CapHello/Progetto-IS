@@ -7,22 +7,21 @@ import it.unina.prenotazioni.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// NOTE: i test case in cui si richiedeva che il codice della postazione, area e sala studio
-// dovesse trovarsi all'interno di un intervallo specificato in fase di analisi non è necessario implementarli
-// mi è basta fare il test sull'id univoco di hibernate che deve esser necessariamente > 0 tranne nel caso di postazione che
-// assume volutamente il valore 0 per indicare la strategia di assegnazione.
-
-
-
+// NOTE: i test case in cui si richiedeva che il codice di postazione, area e sala studio
+// dovesse trovarsi in un intervallo specificato in fase di analisi non è necessario implementarli:
+// mi è bastato il test sull'id univoco di Hibernate, che è necessariamente > 0, tranne per la
+// postazione dove il valore 0 indica volutamente l'assegnazione automatica.
 
 @DisplayName("Suite di Test - Effettua Prenotazione (Parte 1)")
 class EffettuaPrenotazioneTest {
@@ -277,10 +276,14 @@ class EffettuaPrenotazioneTest {
         assertEquals("La fascia oraria selezionata non è disponibile o è già trascorsa", exception.getMessage());
     }
 
+    // Il TC ha senso solo nei giorni feriali: di sabato o domenica risolviSala solleverebbe
+    // prima l'eccezione di chiusura (la stessa di TC12), quindi nel weekend il test viene saltato.
     @Test
     @DisplayName("TC16: Fascia oraria già trascorsa nella giornata corrente")
     void effettuaPrenotazione_FasciaTrascorsaOggi_LanciaEccezione() {
         LocalDate dataOdierna = LocalDate.now();
+        Assumptions.assumeTrue(dataOdierna.getDayOfWeek() != DayOfWeek.SATURDAY
+                && dataOdierna.getDayOfWeek() != DayOfWeek.SUNDAY);
         Long idFasciaPassata = 0L; // id fittizio: il TC richiede una fascia già trascorsa oggi
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -290,27 +293,6 @@ class EffettuaPrenotazioneTest {
         });
         assertEquals("La fascia oraria selezionata non è disponibile o è già trascorsa", exception.getMessage());
     }
-
-    // MOTIVO DEL TEST COMMENTATO: questo test non è deterministico a meno che non modifichi il clock. Il motivo sta che
-    // in risolvi salaStudio verifico prima che il giorno corrente sia feriale o meno, in caso di Sabato o Domenica viene sollevata
-    // la stessa eccezione di TC12.
-    // Il test passa correttamente se il giorno corrente è feriale.
-    //
-    // Per modificare il clock dovrei aggiungere attributo privato Clock clock e il setter tramite cui modificarlo.
-//    @Test
-//    @DisplayName("TC16: Fascia oraria già trascorsa nella giornata corrente")
-//    void effettuaPrenotazione_FasciaTrascorsaOggi_LanciaEccezione() {
-//        LocalDate dataOdierna = LocalDate.now();
-//        Long idFasciaPassata = 0L; // id fittizio: il TC richiede una fascia già trascorsa oggi
-//
-//        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-//            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
-//                    SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, dataOdierna, idFasciaPassata, ID_STUDENTE
-//            ));
-//        });
-//        assertEquals("La fascia oraria selezionata è già trascorsa nella giornata corrente", exception.getMessage());
-//    }
-
 
     // ==========================================
     // CASI DI ERRORE - AREA
@@ -342,7 +324,6 @@ class EffettuaPrenotazioneTest {
         });
         assertEquals("L'area non è presente all'interno della sala selezionata", exception.getMessage());
     }
-
 
     @Test
     @DisplayName("TC20: Area selezionata satura per la fascia oraria")
@@ -381,7 +362,6 @@ class EffettuaPrenotazioneTest {
     @DisplayName("TC23: idPostazione fuori dall'intervallo dell'area (V20)")
     void effettuaPrenotazione_PostazioneFuoriRange_LanciaEccezione() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-
             bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
                     SALA_VALIDA, AREA_VALIDA, -1L, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
             ));
@@ -403,9 +383,9 @@ class EffettuaPrenotazioneTest {
         assertEquals("La postazione selezionata non è più disponibile", exception.getMessage());
     }
 
-// ==========================================
-// CASI DI ERRORE - VINCOLI DI DOMINIO (V09, V18)
-// ==========================================
+    // ==========================================
+    // CASI DI ERRORE - VINCOLI DI DOMINIO (V09, V18)
+    // ==========================================
 
     @Test
     @DisplayName("TC25: Studente con prenotazione già esistente nella stessa data e fascia (V18)")
@@ -429,9 +409,9 @@ class EffettuaPrenotazioneTest {
     @Test
     @DisplayName("TC26: Postazione non più disponibile (Race Condition V09)")
     void effettuaPrenotazione_RaceCondition_LanciaEccezione() {
-        // In un test sincrono (single-thread), la race condition si simula impostando
-        // lo stato della postazione su "occupato" un attimo prima della chiamata,
-        // fingendo che una transazione concorrente abbia committato millisecondi prima.
+        // In un test sincrono (single-thread) la race condition si simula creando, un attimo
+        // prima della chiamata, una prenotazione attiva di un altro studente sulla stessa
+        // postazione: come se una transazione concorrente avesse committato per prima.
         occupaPostazione(POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30);
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
@@ -443,9 +423,9 @@ class EffettuaPrenotazioneTest {
         assertTrue(exception.getMessage().contains("La postazione selezionata non è più disponibile"));
     }
 
-    //
+    // ==========================================
     // METODI DI SUPPORTO PER IL SETUP DEL DB
-    //
+    // ==========================================
 
     /**
      * Occupa fisicamente una postazione nel database simulando la prenotazione

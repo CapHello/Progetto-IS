@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class RegistroSale {
 
-    private static RegistroSale istance;
+    private static RegistroSale instance;
     private final GestorePersistenza gestorePersistenza;
 
     private RegistroSale() {
@@ -21,10 +21,10 @@ public class RegistroSale {
     }
 
     public static RegistroSale getInstance() {
-        if (istance == null) {
-            istance = new RegistroSale();
+        if (instance == null) {
+            instance = new RegistroSale();
         }
-        return istance;
+        return instance;
     }
 
     // --- CRUD Sala ---

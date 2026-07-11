@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class RegistroUtenti {
 
-    private static RegistroUtenti istance;
+    private static RegistroUtenti instance;
     private final GestorePersistenza gestorePersistenza;
 
     private RegistroUtenti() {
@@ -17,10 +17,10 @@ public class RegistroUtenti {
     }
 
     public static RegistroUtenti getInstance() {
-        if (istance == null) {
-            istance = new RegistroUtenti();
+        if (instance == null) {
+            instance = new RegistroUtenti();
         }
-        return istance;
+        return instance;
     }
 
     public boolean registraUtente(Utente nuovoUtente) {

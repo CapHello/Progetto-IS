@@ -27,15 +27,15 @@ public class GestoreUtenti {
 
     private final RegistroUtenti registroUtenti = RegistroUtenti.getInstance();
 
-    private static GestoreUtenti istanza;
+    private static GestoreUtenti instance;
 
     private GestoreUtenti() {}
 
     public static GestoreUtenti getInstance() {
-        if (istanza == null) {
-            istanza = new GestoreUtenti();
+        if (instance == null) {
+            instance = new GestoreUtenti();
         }
-        return istanza;
+        return instance;
     }
 
     /** Guardia di validazione: lancia IllegalArgumentException col messaggio dato se la condizione è falsa. */

@@ -5,15 +5,15 @@ import it.unina.prenotazioni.entity.Prenotazione;
 /** Stato terminale (Singleton): fascia terminata dopo il check-in, nessuna transizione ammessa. */
 public class StatoConclusa implements StatoPrenotazione {
 
-    private static StatoConclusa istanza;
+    private static StatoConclusa instance;
 
     private StatoConclusa() {}
 
     public static StatoConclusa getInstance() {
-        if (istanza == null) {
-            istanza = new StatoConclusa();
+        if (instance == null) {
+            instance = new StatoConclusa();
         }
-        return istanza;
+        return instance;
     }
 
     @Override

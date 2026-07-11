@@ -8,15 +8,15 @@ import it.unina.prenotazioni.entity.Prenotazione;
  */
 public class StatoConfermata implements StatoPrenotazione {
 
-    private static StatoConfermata istanza;
+    private static StatoConfermata instance;
 
     private StatoConfermata() {}
 
     public static StatoConfermata getInstance() {
-        if (istanza == null) {
-            istanza = new StatoConfermata();
+        if (instance == null) {
+            instance = new StatoConfermata();
         }
-        return istanza;
+        return instance;
     }
 
     @Override

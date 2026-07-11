@@ -5,15 +5,15 @@ import it.unina.prenotazioni.entity.Prenotazione;
 /** Stato terminale (Singleton): prenotazione annullata, nessuna transizione ammessa. */
 public class StatoAnnullata implements StatoPrenotazione {
 
-    private static StatoAnnullata istanza;
+    private static StatoAnnullata instance;
 
     private StatoAnnullata() {}
 
     public static StatoAnnullata getInstance() {
-        if (istanza == null) {
-            istanza = new StatoAnnullata();
+        if (instance == null) {
+            instance = new StatoAnnullata();
         }
-        return istanza;
+        return instance;
     }
 
     @Override
