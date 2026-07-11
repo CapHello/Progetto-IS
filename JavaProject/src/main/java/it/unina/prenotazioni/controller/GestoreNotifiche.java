@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class GestoreNotifiche implements Observer {
 
-    private static GestoreNotifiche istanza;
+    private static GestoreNotifiche instance;
     private final RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
     // Iniettato dal boundary (ConfigurazioneNotifiche): così il controller non dipende dal boundary.
     private ServizioNotifiche servizioNotifiche;
@@ -26,10 +26,10 @@ public class GestoreNotifiche implements Observer {
     private GestoreNotifiche() {}
 
     public static GestoreNotifiche getInstance() {
-        if (istanza == null) {
-            istanza = new GestoreNotifiche();
+        if (instance == null) {
+            instance = new GestoreNotifiche();
         }
-        return istanza;
+        return instance;
     }
 
     /** Iniettato all'avvio da ConfigurazioneNotifiche (boundary): il controller conosce solo l'interfaccia. */

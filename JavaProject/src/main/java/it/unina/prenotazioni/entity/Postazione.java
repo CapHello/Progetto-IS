@@ -17,8 +17,6 @@ public class Postazione {
     @JoinColumn(name = "area_id", nullable = false)
     private Area area;
 
-
-
     public Postazione() {}
 
     public Postazione(Area area) {
@@ -29,7 +27,6 @@ public class Postazione {
     public Long getId() { return id; }
 
     public Area getArea() { return area; }
-
 
     /** Sala di appartenenza, raggiunta navigando l'area. */
     public SalaStudio getSalaStudio() {

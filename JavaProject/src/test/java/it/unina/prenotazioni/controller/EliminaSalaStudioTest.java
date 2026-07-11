@@ -140,8 +140,9 @@ class EliminaSalaStudioTest {
     }
 
     /*
-    * TC4: è possibile superare l'Id 100 in quanto vengono gestiti da Hibernate.
-    * Noi gestiamo il V10 con l'attributo codiceNumerico, già verificato in CreaSalaStudioTest.
+    * TC4: ID fuori range (superiore, > 100)
+    * NON IMPLEMENTABILE sull'id del database: lo genera Hibernate (auto-increment)
+    * e può legittimamente superare 100.
     */
 
     @Test

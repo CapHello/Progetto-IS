@@ -23,9 +23,7 @@ import java.util.*;
  */
 public class GestoreSale {
 
-
-
-    private static GestoreSale istanza;
+    private static GestoreSale instance;
 
     private final RegistroSale registroSale = RegistroSale.getInstance();
     private final RegistroPrenotazioni registroPrenotazioni = RegistroPrenotazioni.getInstance();
@@ -33,10 +31,10 @@ public class GestoreSale {
     private GestoreSale() {}
 
     public static GestoreSale getInstance() {
-        if (istanza == null) {
-            istanza = new GestoreSale();
+        if (instance == null) {
+            instance = new GestoreSale();
         }
-        return istanza;
+        return instance;
     }
 
     // ------------------------------------------------------------------ UC3
@@ -58,9 +56,7 @@ public class GestoreSale {
             throw new IllegalArgumentException("Dati delle aree incoerenti (tipologie e postazioni non corrispondono)");
         }
 
-
-
-        //Instanziazione
+        //Istanziazione
         SalaStudio sala = new SalaStudio(richiestaCreazione.getNome(), richiestaCreazione.getDescrizione(), richiestaCreazione.getNumeroPostazioni());
 
         //configurazione
@@ -71,7 +67,6 @@ public class GestoreSale {
         registroSale.salvaSala(sala);
         return toDTO(sala);
     }
-
 
     // ------------------------------------------------------------------ helper per UC3
 
@@ -424,8 +419,6 @@ public class GestoreSale {
         }
         return slot;
     }
-
-
 
     /** Converte l'entity nel DTO per le boundary (nessun tipo entity attraversa il confine). */
     private SalaStudioDTO toDTO(SalaStudio sala) {

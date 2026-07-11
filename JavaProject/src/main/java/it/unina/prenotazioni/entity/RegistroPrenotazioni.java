@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class RegistroPrenotazioni {
 
-    private static RegistroPrenotazioni istance;
+    private static RegistroPrenotazioni instance;
     private final GestorePersistenza gestorePersistenza;
 
     private RegistroPrenotazioni() {
@@ -21,10 +21,10 @@ public class RegistroPrenotazioni {
     }
 
     public static RegistroPrenotazioni getInstance() {
-        if (istance == null) {
-            istance = new RegistroPrenotazioni();
+        if (instance == null) {
+            instance = new RegistroPrenotazioni();
         }
-        return istance;
+        return instance;
     }
 
     /** Salva una nuova prenotazione; false se il salvataggio fallisce. */

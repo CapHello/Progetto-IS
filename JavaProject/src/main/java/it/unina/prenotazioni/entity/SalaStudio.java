@@ -14,8 +14,6 @@ import java.util.List;
 @Entity
 public class SalaStudio {
 
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,8 +21,6 @@ public class SalaStudio {
     private String nome;
     private String descrizione;
     private int numeroPostazioniTotali;
-
-
 
     @Column(name = "attiva", nullable = false)
     private boolean attiva = true;
@@ -107,7 +103,6 @@ public class SalaStudio {
         }
 
         verificaNumeroPostazioni(postazioniAssegnate + numPostazioni);
-
 
         Area area = new Area(tipologia, this);
 

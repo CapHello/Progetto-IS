@@ -20,15 +20,15 @@ import java.util.List;
  */
 public class BibliotecaFacade {
 
-    private static BibliotecaFacade istanza;
+    private static BibliotecaFacade instance;
 
     private BibliotecaFacade() {}
 
     public static BibliotecaFacade getInstance() {
-        if (istanza == null) {
-            istanza = new BibliotecaFacade();
+        if (instance == null) {
+            instance = new BibliotecaFacade();
         }
-        return istanza;
+        return instance;
     }
 
     // --- GestoreUtenti (UC1, UC2, UC8) ---

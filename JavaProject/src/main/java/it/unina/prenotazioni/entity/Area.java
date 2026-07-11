@@ -18,7 +18,6 @@ public class Area {
 
     private String tipologia;
 
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sala_studio_id", nullable = false)
     private SalaStudio salaStudio;
@@ -31,7 +30,6 @@ public class Area {
     public Area(String tipologia, SalaStudio salaStudio) {
         this.tipologia = tipologia;
         this.salaStudio = salaStudio;
-
     }
 
     // Getters (niente setter: i campi sono valorizzati dal costruttore e da JPA via field access)
@@ -42,7 +40,6 @@ public class Area {
     public SalaStudio getSalaStudio() { return salaStudio; }
 
     public List<Postazione> getPostazioni() { return postazioni; }
-
 
     /**
      * Postazioni libere dell'area per (data, fascia). Itera sulle proprie postazioni

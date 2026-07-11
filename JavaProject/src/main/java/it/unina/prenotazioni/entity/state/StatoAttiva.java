@@ -9,15 +9,15 @@ import it.unina.prenotazioni.entity.Prenotazione;
  */
 public class StatoAttiva implements StatoPrenotazione {
 
-    private static StatoAttiva istanza;
+    private static StatoAttiva instance;
 
     private StatoAttiva() {}
 
     public static StatoAttiva getInstance() {
-        if (istanza == null) {
-            istanza = new StatoAttiva();
+        if (instance == null) {
+            instance = new StatoAttiva();
         }
-        return istanza;
+        return instance;
     }
 
     @Override
