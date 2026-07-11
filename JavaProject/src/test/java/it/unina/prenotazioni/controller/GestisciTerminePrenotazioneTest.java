@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -120,7 +121,7 @@ class GestisciTerminePrenotazioneTest {
     @DisplayName("TC1 [1-2-3-4-5-8-2-9]: Prenotazione ATTIVA oltre la tolleranza diventa SCADUTA")
     void prenotazioneAttivaOltreTolleranza(){
         // Data di ieri: adesso.isAfter(inizio + 10) = true
-        Long id = creaPrenotazione(StatoAttiva.getInstance(), LocalDate.now().minusDays(1));
+        Long id = creaPrenotazione(StatoAttiva.getInstance(), LocalDate.now(ZoneId.of("Europe/Rome")).minusDays(1));
 
         bibliotecaFacade.gestisciTerminePrenotazioni();
 
@@ -130,7 +131,7 @@ class GestisciTerminePrenotazioneTest {
     @Test
     @DisplayName("TC2 [1-2-3-4-6-7-8-2-9]: Prenotazione CONFERMATA con slot terminato diventa CONCLUSA")
     void prenotazioneConfermataSlotTerminato(){
-        Long id = creaPrenotazione(StatoConfermata.getInstance(), LocalDate.now().minusDays(1));
+        Long id = creaPrenotazione(StatoConfermata.getInstance(), LocalDate.now(ZoneId.of("Europe/Rome")).minusDays(1));
 
         bibliotecaFacade.gestisciTerminePrenotazioni();
 
@@ -140,7 +141,7 @@ class GestisciTerminePrenotazioneTest {
     @Test
     @DisplayName("TC3 [1-2-3-4-6-8-2-9]: In scadenza ma nessuna condizione vera, nessuna transizione")
     void prenotazioneInScadenzaNessunaCondizioneVerificata(){
-        Long id = creaPrenotazione(StatoAttiva.getInstance(), LocalDate.now().plusDays(1));
+        Long id = creaPrenotazione(StatoAttiva.getInstance(), LocalDate.now(ZoneId.of("Europe/Rome")).plusDays(1));
 
         bibliotecaFacade.gestisciTerminePrenotazioni();
 

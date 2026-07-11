@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -67,12 +68,12 @@ class AnnullaPrenotazioneTest {
 
             // 3. Setup Fasce Orarie e Date per la simulazione temporale
             // Fascia sicura: tra 10 giorni
-            LocalDate dataFutura = LocalDate.now().plusDays(10);
+            LocalDate dataFutura = LocalDate.now(ZoneId.of("Europe/Rome")).plusDays(10);
             FasciaOraria fasciaFutura = new FasciaOraria(LocalTime.of(9, 0), LocalTime.of(11, 0));
             em.persist(fasciaFutura);
 
             // Fascia critica: inizio tra esattamente 2 ore da adesso (Scatta il vincolo < 6h)
-            LocalDateTime traDueOre = LocalDateTime.now().plusHours(2);
+            LocalDateTime traDueOre = LocalDateTime.now(ZoneId.of("Europe/Rome")).plusHours(2);
             LocalDate dataOggi = traDueOre.toLocalDate();
             FasciaOraria fasciaVicino = new FasciaOraria(traDueOre.toLocalTime(), traDueOre.toLocalTime().plusHours(2));
             em.persist(fasciaVicino);

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -222,7 +223,7 @@ class AutenticazioneTest {
         EntityTransaction tx = em.getTransaction();
         tx.begin();
         em.createQuery("UPDATE Utente u SET u.bloccatoFinoA = :vecchioTempo WHERE u.emailIstituzionale = :email")
-                .setParameter("vecchioTempo", LocalDateTime.now().minusMinutes(16))
+                .setParameter("vecchioTempo", LocalDateTime.now(ZoneId.of("Europe/Rome")).minusMinutes(16))
                 .setParameter("email", EMAIL_STUDENTE)
                 .executeUpdate();
         tx.commit();
