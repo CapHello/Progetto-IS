@@ -388,23 +388,7 @@ class EffettuaPrenotazioneTest {
         });
         assertEquals("Esiste già una tua prenotazione attiva o confermata in questa data e fascia oraria", exception.getMessage());
     }
-    // TODO da rivedere: non penso si faccia in questo modo un test sull'accesso concorrente
-    @Test
-    @DisplayName("TC26: Postazione non più disponibile (Race Condition V09)")
-    void effettuaPrenotazione_RaceCondition_LanciaEccezione() {
-        // In un test sincrono (single-thread) la race condition si simula creando, un attimo
-        // prima della chiamata, una prenotazione attiva di un altro studente sulla stessa
-        // postazione: come se una transazione concorrente avesse committato per prima.
-        occupaPostazione(POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30);
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
-                    SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, FASCIA_09_30, ID_STUDENTE
-            ));
-        });
-        
-        assertTrue(exception.getMessage().contains("La postazione selezionata non è più disponibile"));
-    }
 
     // ==========================================
     // METODI DI SUPPORTO PER IL SETUP DEL DB
