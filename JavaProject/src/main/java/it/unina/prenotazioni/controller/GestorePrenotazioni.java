@@ -369,12 +369,12 @@ public class GestorePrenotazioni {
         for (FasciaOraria f : sala.getFasceOrariePrestabilite(data)){
             if(f.getId().equals(idFascia)){
                 if(data.isEqual(oggi) && !f.getOraInizio().isAfter(LocalTime.now(ZoneId.of("Europe/Rome")))){
-                    throw new IllegalArgumentException("La fascia oraria selezionata non è disponibile o è già trascorsa");
+                    throw new IllegalArgumentException("La fascia oraria selezionata non è disponibile");
                 }
                 return f;
             }
         }
-        throw new IllegalArgumentException("La fascia oraria selezionata non è disponibile o è già trascorsa");
+        throw new IllegalArgumentException("La fascia oraria selezionata non è disponibile");
     }
 
     /** Postazione scelta esplicitamente (se indicata e ancora libera) oppure assegnazione automatica via Strategy. */
