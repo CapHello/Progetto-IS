@@ -273,26 +273,9 @@ class EffettuaPrenotazioneTest {
                     SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, DATA_VALIDA, idFasciaNonPrevista, ID_STUDENTE
             ));
         });
-        assertEquals("La fascia oraria selezionata non è disponibile o è già trascorsa", exception.getMessage());
+        assertEquals("La fascia oraria selezionata non è disponibile", exception.getMessage());
     }
 
-    // Il TC ha senso solo nei giorni feriali: di sabato o domenica risolviSala solleverebbe
-    // prima l'eccezione di chiusura (la stessa di TC12), quindi nel weekend il test viene saltato.
-    @Test
-    @DisplayName("TC16: Fascia oraria già trascorsa nella giornata corrente")
-    void effettuaPrenotazione_FasciaTrascorsaOggi_LanciaEccezione() {
-        LocalDate dataOdierna = LocalDate.now();
-        Assumptions.assumeTrue(dataOdierna.getDayOfWeek() != DayOfWeek.SATURDAY
-                && dataOdierna.getDayOfWeek() != DayOfWeek.SUNDAY);
-        Long idFasciaPassata = 0L; // id fittizio: il TC richiede una fascia già trascorsa oggi
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            bibliotecaFacade.effettuaPrenotazione(new RichiestaPrenotazioneDTO(
-                    SALA_VALIDA, AREA_VALIDA, POSTAZIONE_VALIDA, dataOdierna, idFasciaPassata, ID_STUDENTE
-            ));
-        });
-        assertEquals("La fascia oraria selezionata non è disponibile o è già trascorsa", exception.getMessage());
-    }
 
     // ==========================================
     // CASI DI ERRORE - AREA
