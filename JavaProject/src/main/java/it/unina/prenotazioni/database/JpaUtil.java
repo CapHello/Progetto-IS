@@ -5,7 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
 /**
- * <<database>> <<Singleton>> Incapsula l'EntityManagerFactory, oggetto costoso creato
+ * Incapsula l'EntityManagerFactory, oggetto costoso creato
  * una sola volta dalla persistence unit "prenotazioniPU" (persistence.xml).
  * Gli EntityManager, al contrario, sono usa-e-getta: uno nuovo per ogni operazione.
  */

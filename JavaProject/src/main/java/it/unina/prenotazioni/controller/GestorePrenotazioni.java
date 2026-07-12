@@ -15,7 +15,7 @@ import java.time.ZoneId;
 import java.util.*;
 
 /**
- * <<control>> Gestore (Singleton) del ciclo di vita delle prenotazioni:
+ * Gestore (Singleton) del ciclo di vita delle prenotazioni:
  * EffettuaPrenotazione (UC7), AnnullaPrenotazione (UC9), EffettuaCheckIn (UC10),
  * ConsultaStorico (UC12), GestisciTermine (UC16), Statistiche (UC13).
  * La scelta automatica della postazione è delegata al pattern Strategy
@@ -201,7 +201,6 @@ public class GestorePrenotazioni {
      * Segue il SD "AnnullaPrenotazione": il vincolo temporale (V07) e il cambio di stato
      * li verifica l'entity Prenotazione. La postazione torna libera da sola, perché una
      * prenotazione ANNULLATA non conta più nel calcolo della disponibilità.
-     * L'annullamento è consentito solo allo studente che ha effettuato la prenotazione.
      */
     public void annullaPrenotazione(Long idPrenotazione, Long idStudente) {
         Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);
@@ -237,7 +236,6 @@ public class GestorePrenotazioni {
     /**
      * Segue il SD "EffettuaCheckIn": il check-in è consentito solo se la prenotazione
      * è ATTIVA nella data corrente; il passaggio a CONFERMATA lo fa l'entity Prenotazione.
-     * Il check-in è consentito solo allo studente che ha effettuato la prenotazione.
      */
     public void effettuaCheckIn(Long idPrenotazione, Long idStudente) {
         Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);

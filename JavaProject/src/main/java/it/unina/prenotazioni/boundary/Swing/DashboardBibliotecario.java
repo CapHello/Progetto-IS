@@ -249,7 +249,7 @@ public class DashboardBibliotecario {
         pannelloContenuto.add(btnCreaSala, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(-1, 60), null, 0, false));
     }
 
-    /**
+    /*
      * @noinspection ALL
      */
     private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
@@ -271,7 +271,7 @@ public class DashboardBibliotecario {
         return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
     }
 
-    /**
+    /*
      * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {

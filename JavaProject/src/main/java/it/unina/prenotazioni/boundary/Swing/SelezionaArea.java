@@ -229,7 +229,7 @@ public class SelezionaArea {
         pannelloAzioni.add(btnContinua, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
-    /**
+    /*
      * @noinspection ALL
      */
     private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
@@ -251,7 +251,7 @@ public class SelezionaArea {
         return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
     }
 
-    /**
+    /*
      * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {

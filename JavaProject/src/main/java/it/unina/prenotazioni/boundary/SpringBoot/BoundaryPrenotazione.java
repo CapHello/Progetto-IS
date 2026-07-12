@@ -9,13 +9,15 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 /**
- * <<endpoint>> Effettua (UC7), Annulla (UC9) ed Effettua Check-in (UC10) delle prenotazioni.
+ * Effettua (UC7), Annulla (UC9) ed Effettua Check-in (UC10) delle prenotazioni.
  */
 @RestController
 @RequestMapping("/api/prenotazioni")
 public class BoundaryPrenotazione {
 
-    /** UC7: effettua una prenotazione (idPostazione = 0 richiede l'assegnazione automatica). */
+    /**
+     * UC7: effettua una prenotazione (idPostazione = 0 richiede l'assegnazione automatica).
+     */
     @PostMapping("/effettua")
     public PrenotazioneDTO effettuaPrenotazione(
             @RequestParam("idSala") Long idSala,
@@ -28,14 +30,18 @@ public class BoundaryPrenotazione {
                 new RichiestaPrenotazioneDTO(idSala, idArea, idPostazione, data, idFascia, idStudente));
     }
 
-    /** UC9: annulla la prenotazione dello studente (consentito fino a 6 ore prima dell'inizio, V07). */
+    /**
+     * UC9: annulla la prenotazione dello studente (consentito fino a 6 ore prima dell'inizio, V07).
+     */
     @PutMapping("/{idPrenotazione}/annulla")
     public void annullaPrenotazione(@PathVariable("idPrenotazione") Long idPrenotazione,
                                     @RequestParam("idStudente") Long idStudente) {
         BibliotecaFacade.getInstance().annullaPrenotazione(idPrenotazione, idStudente);
     }
 
-    /** UC10: check-in nel giorno della prenotazione, entro inizio fascia + tolleranza (V08). */
+    /**
+     * UC10: check-in nel giorno della prenotazione, entro inizio fascia + tolleranza (V08).
+     */
     @PutMapping("/{idPrenotazione}/checkin")
     public void effettuaCheckIn(@PathVariable("idPrenotazione") Long idPrenotazione,
                                 @RequestParam("idStudente") Long idStudente) {

@@ -31,27 +31,37 @@ public class RegistroUtenti {
         return gestorePersistenza.aggiorna(utente);
     }
 
-    /** Cerca un utente (polimorfo) per e-mail istituzionale; null se non esiste. */
+    /**
+     * Cerca un utente (polimorfo) per e-mail istituzionale; null se non esiste.
+     */
     public Utente cercaUtentePerEmail(String email) {
         return gestorePersistenza.cercaPrimoPerCampi(Utente.class, Map.of("emailIstituzionale", email));
     }
 
-    /** Cerca uno studente per matricola; null se non esiste. */
+    /**
+     * Cerca uno studente per matricola; null se non esiste.
+     */
     public Studente cercaStudentePerMatricola(String matricola) {
         return gestorePersistenza.cercaPrimoPerCampi(Studente.class, Map.of("matricola", matricola));
     }
 
-    /** Carica uno studente per id surrogato; null se non esiste. */
+    /**
+     * Carica uno studente per id surrogato; null se non esiste.
+     */
     public Studente trovaStudentePerId(Long id) {
         return gestorePersistenza.trovaPerId(Studente.class, id);
     }
 
-    /** Cerca un bibliotecario per codice identificativo interno; null se non esiste. */
+    /**
+     * Cerca un bibliotecario per codice identificativo interno; null se non esiste.
+     */
     public Bibliotecario cercaBibliotecarioPerCodice(String codice) {
         return gestorePersistenza.cercaPrimoPerCampi(Bibliotecario.class, Map.of("codiceIdentificativoInterno", codice));
     }
 
-    /** True se esiste già un utente con quella e-mail istituzionale (unicità, RD01/V14). */
+    /**
+     * True se esiste già un utente con quella e-mail istituzionale (unicità, RD01/V14).
+     */
     public boolean esisteEmailIstituzionale(String email) {
         return cercaUtentePerEmail(email) != null;
     }

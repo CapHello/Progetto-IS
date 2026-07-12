@@ -11,7 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 /**
- * <<control>> Gestore (Singleton) delle Sale Studio: creazione (UC3), eliminazione (UC4),
+ * Gestore (Singleton) delle Sale Studio: creazione (UC3), eliminazione (UC4),
  * consultazione disponibilità (UC6), dettaglio postazioni e monitoraggio sale (UC11).
  */
 public class GestoreSale {
@@ -247,7 +247,9 @@ public class GestoreSale {
         return risultato;
     }
 
-    /** Dettaglio aree/postazioni di una sala per (data, fascia) (wizard step 3-4). */
+    /**
+     * Dettaglio aree/postazioni di una sala per (data, fascia) (wizard step 3-4).
+     */
     public DettaglioSalaDTO selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null) {
@@ -322,7 +324,7 @@ public class GestoreSale {
             if (p.getStato().getStatoEnum() == StatoEnum.CONFERMATA) {
                 statoPostazione.put(pid, 'C');
             } else {
-                statoPostazione.computeIfAbsent(pid, k -> 'A');
+                statoPostazione.putIfAbsent(pid, 'A');
             }
         }
         return statoPostazione;

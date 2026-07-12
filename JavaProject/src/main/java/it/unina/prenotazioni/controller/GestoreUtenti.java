@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * <<control>> Gestore (Singleton) di Registrazione (UC1), Autenticazione (UC2) e
+ * Gestore (Singleton) di Registrazione (UC1), Autenticazione (UC2) e
  * profilo personale (UC8). Usa le Factory per creare la sottoclasse corretta di
  * Utente e gestisce tentativi falliti e blocco temporaneo dell'account (V21).
  */
@@ -151,7 +151,9 @@ public class GestoreUtenti {
     }
 
     // -------------------------------------------------------------- UC8 (profilo)
-    /** Profilo personale dello studente (dati anagrafici e totale accessi). */
+    /**
+     * Profilo personale dello studente (dati anagrafici e totale accessi).
+     */
     public UtenteDTO visualizzaProfilo(Long idStudente) {
         Studente studente = registroUtenti.trovaStudentePerId(idStudente);
         if (studente == null) {

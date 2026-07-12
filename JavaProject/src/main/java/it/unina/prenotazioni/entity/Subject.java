@@ -12,14 +12,18 @@ public abstract class Subject {
 
     protected List<Observer> observers = new ArrayList<>();
 
-    /** Registra un osservatore, evitando i duplicati. */
+    /**
+     * Registra un osservatore, evitando i duplicati.
+     */
     public void attach(Observer observer) {
         if (!observers.contains(observer)) {
             observers.add(observer);
         }
     }
 
-    /** Rimuove un osservatore. Non usato nei flussi attuali: mantenuto per completezza del pattern. */
+    /**
+     * Rimuove un osservatore. Non usato nei flussi attuali: mantenuto per completezza del pattern.
+     */
     public void detach(Observer observer) {
         observers.remove(observer);
     }

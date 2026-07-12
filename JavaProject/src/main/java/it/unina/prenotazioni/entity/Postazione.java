@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 /**
- * <<entity>> Singolo posto a sedere prenotabile; appartiene a un'Area e non ha
+ * Singolo posto a sedere prenotabile; appartiene a un'Area e non ha
  * stato proprio: la sua disponibilità è derivata dalle prenotazioni che la impegnano.
  */
 @Entity
