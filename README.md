@@ -39,13 +39,13 @@ Lo stato di avanzamento è tracciato su GitHub Projects:
 `[████████████████████] 100%`  (7/7 issue chiuse)
 
 ### M3 - Progettazione · scadenza 2026-07-07
-`[███████░░░░░░░░░░░░░] 33%`  (5/15 issue chiuse)
+`[████████████████████] 100%`  (16/16 issue chiuse)
 
 ### M4 - Implementazione · scadenza 2026-07-12
-`[███████████████████░] 94%`  (15/16 issue chiuse)
+`[████████████████████] 100%`  (41/41 issue chiuse)
 
 ### M5 - Testing · scadenza 2026-07-13
-`[░░░░░░░░░░░░░░░░░░░░] 0%`  (0/0 issue chiuse)
+`[████████████████████] 100%`  (10/10 issue chiuse)
 
 <!-- MILESTONES:END -->
 
@@ -54,6 +54,8 @@ Lo stato di avanzamento è tracciato su GitHub Projects:
 | Componente | Tecnologia |
 |------------|------------|
 | Linguaggio | Java |
+| Framework | Hibernate/SpringBoot |
 | Modellazione UML | Visual Paradigm |
 | Documentazione | Microsoft Word / PDF |
 | Versioning | GitHub |
+
