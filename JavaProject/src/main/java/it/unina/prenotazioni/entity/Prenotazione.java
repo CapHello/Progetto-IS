@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * <<entity>> Prenotazione di una postazione per una (data, fascia oraria).
+ * Prenotazione di una postazione per una (data, fascia oraria).
  * Il ciclo di vita segue il pattern State (ATTIVA, CONFERMATA, ANNULLATA, SCADUTA, CONCLUSA);
  * come Subject del pattern Observer notifica GestoreNotifiche a ogni cambio di stato.
  */
@@ -76,7 +76,9 @@ public class Prenotazione extends Subject {
         return stato;
     }
 
-    /** Transizione di stato: aggiorna il nome persistibile e notifica gli osservatori (pattern Observer). */
+    /**
+     * Transizione di stato: aggiorna il nome persistibile e notifica gli osservatori (pattern Observer).
+     */
     public void setStato(StatoPrenotazione stato) {
         if (stato == null) {
             throw new IllegalArgumentException("Lo stato della prenotazione non può essere null");

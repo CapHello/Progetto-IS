@@ -11,7 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 /**
- * <<control>> Gestore (Singleton) delle Sale Studio: creazione (UC3), eliminazione (UC4),
+ * Gestore (Singleton) delle Sale Studio: creazione (UC3), eliminazione (UC4),
  * consultazione disponibilità (UC6), dettaglio postazioni e monitoraggio sale (UC11).
  */
 public class GestoreSale {
@@ -57,7 +57,10 @@ public class GestoreSale {
         configuraAree(richiestaCreazione.getNumeroPostazioni(), tipi, posti, sala);
 
         //Persistenza
-        registroSale.salvaSala(sala);
+        boolean esito = registroSale.salvaSala(sala);
+        if (!esito){
+            throw new RuntimeException("Errore Lato Server: non è stato possibile salvare la sala studio, riprova");
+        }
         return toDTO(sala);
     }
 
@@ -163,6 +166,7 @@ public class GestoreSale {
 
         List<Prenotazione> prenotazioniSala = registroPrenotazioni.cercaTuttePerSala(idSalaStudio);
         List<UtenteDTO> destinatari = new ArrayList<>();
+        Set<Long> destinatariIds = new HashSet<>();
 
         for (Prenotazione p : prenotazioniSala) {
             if (RegistroPrenotazioni.occupaSlot(p)) {
@@ -171,14 +175,20 @@ public class GestoreSale {
                 registroPrenotazioni.aggiorna(p);
 
                 if (p.getStudente() != null) {
-                    destinatari.add(GestoreNotifiche.getInstance().toUtenteDTO(p.getStudente()));
+                    Long idStudente = p.getStudente().getId();
+                    if (!destinatariIds.contains(idStudente)) {
+                        destinatari.add(GestoreNotifiche.getInstance().toUtenteDTO(p.getStudente()));
+                        destinatariIds.add(idStudente);
+                    }
                 }
             }
         }
 
-        GestoreNotifiche.getInstance().inviaNotifica(destinatari,
-                "La sala '" + sala.getNome() + "' è stata chiusa o rimossa definitivamente. " +
-                        "Le tue prenotazioni ancora attive sono state annullate automaticamente.");
+        if(!destinatari.isEmpty()) {
+            GestoreNotifiche.getInstance().inviaNotifica(destinatari,
+                    "La sala '" + sala.getNome() + "' è stata chiusa o rimossa definitivamente. " +
+                            "Le tue prenotazioni ancora attive sono state annullate automaticamente.");
+        }
     }
 
     // ------------------------------------------------------------------ UC6
@@ -247,7 +257,9 @@ public class GestoreSale {
         return risultato;
     }
 
-    /** Dettaglio aree/postazioni di una sala per (data, fascia) (wizard step 3-4). */
+    /**
+     * Dettaglio aree/postazioni di una sala per (data, fascia) (wizard step 3-4).
+     */
     public DettaglioSalaDTO selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
         SalaStudio sala = registroSale.cercaSalaPerId(idSala);
         if (sala == null) {
@@ -322,7 +334,7 @@ public class GestoreSale {
             if (p.getStato().getStatoEnum() == StatoEnum.CONFERMATA) {
                 statoPostazione.put(pid, 'C');
             } else {
-                statoPostazione.computeIfAbsent(pid, k -> 'A');
+                statoPostazione.putIfAbsent(pid, 'A');
             }
         }
         return statoPostazione;

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <<database>> Accesso generico alla persistenza (CRUD + query JPQL): lavora per
+ * Accesso generico alla persistenza (CRUD + query JPQL): lavora per
  * Class&lt;T&gt; e non conosce le classi di dominio, quindi il layer database non
  * dipende da nessun altro layer. Ogni operazione apre un proprio EntityManager
  * (chiuso nel finally) e una propria transazione; sugli errori di scrittura

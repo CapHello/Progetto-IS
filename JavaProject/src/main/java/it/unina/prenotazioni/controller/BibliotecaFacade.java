@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * <<Facade>> <<Singleton>>: unico punto d'accesso al controller per le boundary.
+ * Unico punto d'accesso al controller per le boundary.
  * Espone un'operazione per caso d'uso e delega ai quattro gestori; le firme usano
  * solo tipi primitivi e DTO (nessun tipo entity attraversa il confine del layer).
  */
@@ -25,72 +25,121 @@ public class BibliotecaFacade {
 
     // --- GestoreUtenti (UC1, UC2, UC8) ---
 
-    /** UC1: registra un nuovo Studente o Bibliotecario. */
+    /**
+     * UC1: registra un nuovo Studente o Bibliotecario.
+     * @param ruolo "Studente" o "Bibliotecario"
+     * @param nome nome anagrafico
+     * @param cognome cognome anagrafico
+     * @param email email istituzionale (dominio unina.it)
+     * @param password password (8-32 caratteri)
+     * @param identificativo matricola dello studente o codice interno del bibliotecario
+     */
     public UtenteDTO registrazione(String ruolo, String nome, String cognome,
                                    String email, String password, String identificativo) {
         return GestoreUtenti.getInstance().registrazione(ruolo, nome, cognome, email, password, identificativo);
     }
 
-    /** UC2: autentica un utente tramite email istituzionale e password. */
+    /**
+     * UC2: autentica un utente tramite email istituzionale e password.
+     * @param email email istituzionale dell'account
+     * @param password password dell'account
+     */
     public UtenteDTO autenticazione(String email, String password) {
         return GestoreUtenti.getInstance().autenticazione(email, password);
     }
 
-    /** UC8: profilo personale dello studente. */
+    /**
+     * UC8: profilo personale dello studente.
+     * @param idStudente id dello studente di cui mostrare il profilo
+     */
     public UtenteDTO visualizzaProfiloPersonale(Long idStudente) {
         return GestoreUtenti.getInstance().visualizzaProfilo(idStudente);
     }
 
     // --- GestoreSale (UC3, UC4, UC6, UC11) ---
 
-    /** UC3: crea una sala studio con orari, slot e aree. */
+    /**
+     * UC3: crea una sala studio con orari, slot e aree.
+     * @param richiesta dati completi della sala da creare (nome, orari, grana slot, aree)
+     */
     public SalaStudioDTO creaSalaStudio(CreazioneSalaDTO richiesta) {
         return GestoreSale.getInstance().creaSalaStudio(richiesta);
     }
 
-    /** UC4: elimina (disattiva) una sala studio, annullando le prenotazioni occupanti. */
+    /**
+     * UC4: elimina (disattiva) una sala studio, annullando le prenotazioni occupanti.
+     * @param idSalaStudio id della sala da disattivare
+     */
     public void eliminaSalaStudio(Long idSalaStudio) {
         GestoreSale.getInstance().eliminaSalaStudio(idSalaStudio);
     }
 
-    /** UC6: sale disponibili (aperte e con posti liberi) nella data indicata. */
+    /**
+     * UC6: sale disponibili (aperte e con posti liberi) nella data indicata.
+     * @param data giorno richiesto (feriale e non passato)
+     */
     public List<SalaStudioDTO> consultaSaleDisponibili(LocalDate data) {
         return GestoreSale.getInstance().consultazioneSaleDisponibili(data);
     }
 
-    /** UC6/UC7: fasce prenotabili della sala nella data, con posti liberi. */
+    /**
+     * UC6/UC7: fasce prenotabili della sala nella data, con posti liberi.
+     * @param idSala id della sala scelta
+     * @param data giorno della prenotazione
+     */
     public List<FasciaDisponibileDTO> getFasceDisponibili(Long idSala, LocalDate data) {
         return GestoreSale.getInstance().getFasceDisponibili(idSala, data);
     }
 
-    /** UC7: dettaglio aree/postazioni di una sala per (data, fascia). */
+    /**
+     * UC7: dettaglio aree/postazioni di una sala per (data, fascia).
+     * @param idSala id della sala scelta
+     * @param idFascia id della fascia oraria scelta
+     * @param data giorno della prenotazione
+     */
     public DettaglioSalaDTO selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
         return GestoreSale.getInstance().selezionaDettaglioSala(idSala, idFascia, data);
     }
 
-    /** UC11: stato in tempo reale di tutte le sale (posti liberi/attivi/confermati). */
+    /**
+     * UC11: stato in tempo reale di tutte le sale (posti liberi/attivi/confermati).
+     */
     public List<SalaMonitoraggioDTO> monitoraSale() {
         return GestoreSale.getInstance().monitoraSale();
     }
 
     // --- GestorePrenotazioni (UC7, UC9, UC10, UC12, UC13, UC16) ---
 
-    /** UC7: effettua una prenotazione (postazione specifica o assegnata automaticamente). */
+    /**
+     * UC7: effettua una prenotazione (postazione specifica o assegnata automaticamente).
+     * @param richiesta dati della prenotazione (sala, area, postazione, data, fascia, studente)
+     */
     public PrenotazioneDTO effettuaPrenotazione(RichiestaPrenotazioneDTO richiesta) {
         return GestorePrenotazioni.getInstance().effettuaPrenotazione(richiesta);
     }
 
-    /** UC9: annulla una prenotazione dello studente (entro il vincolo temporale V07). */
+    /**
+     * UC9: annulla una prenotazione dello studente (entro il vincolo temporale V07).
+     * @param idPrenotazione id della prenotazione da annullare
+     * @param idStudente id dello studente proprietario della prenotazione
+     */
     public void annullaPrenotazione(Long idPrenotazione, Long idStudente) {
         GestorePrenotazioni.getInstance().annullaPrenotazione(idPrenotazione, idStudente);
     }
 
-    /** UC10: check-in di una prenotazione dello studente nel giorno e nella finestra consentita (V08). */
+    /**
+     * UC10: check-in della prenotazione dello studente nel giorno e nella finestra consentita (V08).
+     * @param idPrenotazione id della prenotazione su cui fare il check-in
+     * @param idStudente id dello studente proprietario della prenotazione
+     */
     public void effettuaCheckin(Long idPrenotazione, Long idStudente) {
         GestorePrenotazioni.getInstance().effettuaCheckIn(idPrenotazione, idStudente);
     }
 
-    /** UC12: storico prenotazioni dello studente. */
+    /**
+     * UC12: storico prenotazioni dello studente.
+     * @param idStudente id dello studente di cui elencare le prenotazioni
+     */
     public List<PrenotazioneDTO> consultaStoricoPrenotazioni(Long idStudente) {
         return GestorePrenotazioni.getInstance().consultaStoricoPrenotazioni(idStudente);
     }
@@ -100,7 +149,9 @@ public class BibliotecaFacade {
         GestorePrenotazioni.getInstance().gestisciTerminePrenotazione();
     }
 
-    /** UC13: statistiche di servizio della giornata. */
+    /**
+     * UC13: statistiche di servizio della giornata.
+     */
     public StatisticheDTO monitoraStatisticheServizio() {
         return GestorePrenotazioni.getInstance().monitoraStatisticheServizio();
     }

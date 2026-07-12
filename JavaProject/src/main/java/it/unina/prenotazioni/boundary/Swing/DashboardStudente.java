@@ -245,7 +245,7 @@ public class DashboardStudente {
         contentPanel.add(btnNuovaPrenotazione, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
-    /**
+    /*
      * @noinspection ALL
      */
     private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
@@ -267,7 +267,7 @@ public class DashboardStudente {
         return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
     }
 
-    /**
+    /*
      * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {

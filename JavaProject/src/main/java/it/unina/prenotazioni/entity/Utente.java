@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * <<entity>> Generalizzazione degli attori registrati (Studente, Bibliotecario).
+ * Generalizzazione degli attori registrati (Studente, Bibliotecario).
  * Strategia JOINED: una tabella per la superclasse e una per ogni sottoclasse.
  */
 @Entity

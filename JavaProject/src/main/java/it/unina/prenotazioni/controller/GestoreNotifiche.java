@@ -8,7 +8,7 @@ import java.time.ZoneId;
 import java.util.List;
 
 /**
- * <<control>> Gestore (Singleton) delle notifiche. Realizza Observer (entity): a ogni
+ * Gestore (Singleton) delle notifiche. Realizza Observer (entity): a ogni
  * cambio di stato della Prenotazione riceve update() e inoltra il recapito a
  * ServizioNotifiche. Il fornitore concreto (AdapterServizioNotifiche) è iniettato dal boundary.
  */
@@ -28,7 +28,9 @@ public class GestoreNotifiche implements Observer {
         return instance;
     }
 
-    /** Iniettato all'avvio da ConfigurazioneNotifiche (boundary): il controller conosce solo l'interfaccia. */
+    /**
+     * Iniettato all'avvio da ConfigurazioneNotifiche (boundary): il controller conosce solo l'interfaccia.
+     */
     public void setServizioNotifiche(ServizioNotifiche servizioNotifiche) {
         this.servizioNotifiche = servizioNotifiche;
     }
@@ -43,7 +45,9 @@ public class GestoreNotifiche implements Observer {
         inviaNotifica(List.of(toUtenteDTO(studente)), messaggioPerStato(prenotazione));
     }
 
-    /** Invia una notifica ai destinatari; il fallimento del recapito non è propagato (UC7/UC9 alt). */
+    /**
+     * Invia una notifica ai destinatari; il fallimento del recapito non è propagato (UC7/UC9 alt).
+     */
     public void inviaNotifica(List<UtenteDTO> destinatari, String messaggio) {
         if (destinatari == null || destinatari.isEmpty()) {
             return;

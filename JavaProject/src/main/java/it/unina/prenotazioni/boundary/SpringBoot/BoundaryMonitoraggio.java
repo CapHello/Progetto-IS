@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * <<endpoint>> Monitoraggio del bibliotecario: stato sale (UC11) e statistiche
+ * Monitoraggio del bibliotecario: stato sale (UC11) e statistiche
  * di servizio (UC13).
  */
 

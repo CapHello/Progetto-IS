@@ -231,7 +231,7 @@ public class Registrazione {
         registrazionePane.add(spacer4, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
     }
 
-    /**
+    /*
      * @noinspection ALL
      */
     private Font $$$getFont$$$(String fontName, int style, int size, Font currentFont) {
@@ -253,7 +253,7 @@ public class Registrazione {
         return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
     }
 
-    /**
+    /*
      * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {

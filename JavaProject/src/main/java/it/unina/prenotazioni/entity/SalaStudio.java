@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <<entity>> Radice dell'aggregato Sala Studio (Aree, Postazioni, Fasce orarie).
+ * Radice dell'aggregato Sala Studio (Aree, Postazioni, Fasce orarie).
  * L'eliminazione (UC4) è un soft delete tramite il flag {@code attiva}, per
  * preservare lo storico delle prenotazioni.
  */
@@ -73,12 +73,16 @@ public class SalaStudio {
 
     // --- Costruzione in memoria (usata in CreaSalaStudio, prima della persistenza) ---
 
-    /** Aggiunge una fascia oraria (slot prenotabile) all'orario della sala. */
+    /**
+     * Aggiunge una fascia oraria (slot prenotabile) all'orario della sala.
+     */
     public void addFascia(FasciaOraria fascia) {
         slotOrario.add(fascia);
     }
 
-    /** Aggiunge l'orario lavorativo del giorno successivo (max 5, Lunedì-Venerdì). */
+    /**
+     * Aggiunge l'orario lavorativo del giorno successivo (max 5, Lunedì-Venerdì).
+     */
     public void addOrarioLavorativo(FasciaOraria fascia) {
         if (this.orarioLavorativo.size() >= 5) {
             throw new IllegalStateException("Impossibile aggiungere un altro orario: limite massimo di 5 orari lavorativi raggiunto per questa sala.");
@@ -131,7 +135,9 @@ public class SalaStudio {
 
     // --- Consultazione / disponibilità ---
 
-    /** V06: la sala è aperta nei giorni feriali (lunedì-venerdì). */
+    /**
+     * V06: la sala è aperta nei giorni feriali (lunedì-venerdì).
+     */
     public boolean verificaDataInGiorniApertura(LocalDate data) {
         if(data == null){
             throw new IllegalArgumentException("La data è obbligatoria");
@@ -182,7 +188,9 @@ public class SalaStudio {
         return slotDisponibiliOggi;
     }
 
-    /** True se esiste almeno una postazione libera nella sala per (data, fascia). */
+    /**
+     * True se esiste almeno una postazione libera nella sala per (data, fascia).
+     */
     public boolean verificaDisponibilita(LocalDate data, FasciaOraria fascia) {
         RegistroSale registro = RegistroSale.getInstance();
         for (Area area : registro.getAreePerSala(id)) {

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <<entity>> Zona tipizzata di una sala (es. "silenziosa", "comune") che raggruppa
+ * Zona tipizzata di una sala (es. "silenziosa", "comune") che raggruppa
  * le postazioni; ogni sala ha sempre almeno l'area di default "comune" (V19).
  */
 @Entity
@@ -57,7 +57,9 @@ public class Area {
         return disponibili;
     }
 
-    /** Genera in memoria le postazioni dell'area; la persistenza avviene a cascata (UC3). */
+    /**
+     * Genera in memoria le postazioni dell'area; la persistenza avviene a cascata (UC3).
+     */
     public void creaPostazioni(int numeroPostazioni) {
         for (int i = 0; i < numeroPostazioni; i++) {
             Postazione p = new Postazione(this);
