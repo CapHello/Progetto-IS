@@ -33,7 +33,6 @@ public class BibliotecaFacade {
      * @param email email
      * @param password password
      * @param identificativo identificativo
-     * @return result
      */
     public UtenteDTO registrazione(String ruolo, String nome, String cognome,
                                    String email, String password, String identificativo) {
@@ -44,7 +43,6 @@ public class BibliotecaFacade {
      * UC2: autentica un utente tramite email istituzionale e password.
      * @param email email
      * @param password password
-     * @return result
      */
     public UtenteDTO autenticazione(String email, String password) {
         return GestoreUtenti.getInstance().autenticazione(email, password);
@@ -53,7 +51,6 @@ public class BibliotecaFacade {
     /**
      * UC8: profilo personale dello studente.
      * @param idStudente idStudente
-     * @return result
      */
     public UtenteDTO visualizzaProfiloPersonale(Long idStudente) {
         return GestoreUtenti.getInstance().visualizzaProfilo(idStudente);
@@ -64,7 +61,6 @@ public class BibliotecaFacade {
     /**
      * UC3: crea una sala studio con orari, slot e aree.
      * @param richiesta richiesta
-     * @return result
      */
     public SalaStudioDTO creaSalaStudio(CreazioneSalaDTO richiesta) {
         return GestoreSale.getInstance().creaSalaStudio(richiesta);
@@ -81,7 +77,6 @@ public class BibliotecaFacade {
     /**
      * UC6: sale disponibili (aperte e con posti liberi) nella data indicata.
      * @param data data
-     * @return result
      */
     public List<SalaStudioDTO> consultaSaleDisponibili(LocalDate data) {
         return GestoreSale.getInstance().consultazioneSaleDisponibili(data);
@@ -91,7 +86,6 @@ public class BibliotecaFacade {
      * UC6/UC7: fasce prenotabili della sala nella data, con posti liberi.
      * @param idSala idSala
      * @param data data
-     * @return result
      */
     public List<FasciaDisponibileDTO> getFasceDisponibili(Long idSala, LocalDate data) {
         return GestoreSale.getInstance().getFasceDisponibili(idSala, data);
@@ -102,7 +96,6 @@ public class BibliotecaFacade {
      * @param idSala idSala
      * @param idFascia idFascia
      * @param data data
-     * @return result
      */
     public DettaglioSalaDTO selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
         return GestoreSale.getInstance().selezionaDettaglioSala(idSala, idFascia, data);
@@ -110,7 +103,6 @@ public class BibliotecaFacade {
 
     /**
      * UC11: stato in tempo reale di tutte le sale (posti liberi/attivi/confermati).
-     * @return result
      */
     public List<SalaMonitoraggioDTO> monitoraSale() {
         return GestoreSale.getInstance().monitoraSale();
@@ -121,7 +113,6 @@ public class BibliotecaFacade {
     /**
      * UC7: effettua una prenotazione (postazione specifica o assegnata automaticamente).
      * @param richiesta richiesta
-     * @return result
      */
     public PrenotazioneDTO effettuaPrenotazione(RichiestaPrenotazioneDTO richiesta) {
         return GestorePrenotazioni.getInstance().effettuaPrenotazione(richiesta);
@@ -148,7 +139,6 @@ public class BibliotecaFacade {
     /**
      * UC12: storico prenotazioni dello studente.
      * @param idStudente idStudente
-     * @return result
      */
     public List<PrenotazioneDTO> consultaStoricoPrenotazioni(Long idStudente) {
         return GestorePrenotazioni.getInstance().consultaStoricoPrenotazioni(idStudente);
@@ -161,7 +151,6 @@ public class BibliotecaFacade {
 
     /**
      * UC13: statistiche di servizio della giornata.
-     * @return result
      */
     public StatisticheDTO monitoraStatisticheServizio() {
         return GestorePrenotazioni.getInstance().monitoraStatisticheServizio();

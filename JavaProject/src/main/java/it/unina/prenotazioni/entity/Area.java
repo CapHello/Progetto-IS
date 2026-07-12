@@ -47,7 +47,6 @@ public class Area {
      * interroga ciascuna con disponibilita(data, fascia).
      * @param data data
      * @param fascia fascia
-     * @return result
      */
     public List<Postazione> getPostazioniDisponibili(LocalDate data, FasciaOraria fascia) {
         List<Postazione> disponibili = new ArrayList<>();

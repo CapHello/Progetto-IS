@@ -23,18 +23,10 @@ public class RegistroUtenti {
         return instance;
     }
 
-    /**
-     * commento
-     * @param nuovoUtente nuovoUtente
-     */
     public boolean registraUtente(Utente nuovoUtente) {
         return gestorePersistenza.salva(nuovoUtente);
     }
 
-    /**
-     * commento
-     * @param utente utente
-     */
     public Utente aggiorna(Utente utente) {
         return gestorePersistenza.aggiorna(utente);
     }

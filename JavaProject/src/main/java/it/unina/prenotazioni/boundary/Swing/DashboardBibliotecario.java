@@ -18,9 +18,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * commento
- */
 public class DashboardBibliotecario {
 
     // Campi legati al .form
@@ -44,9 +41,6 @@ public class DashboardBibliotecario {
     // Frame corrente: serve per la navigazione verso CreaSala e per il logout
     private JFrame frameCorrente;
 
-    /**
-     * commento
-     */
     public DashboardBibliotecario() {
         // Styling non configurabile nel form designer
         StileWizard.stilizzaLogout(btnLogout);
@@ -151,10 +145,6 @@ public class DashboardBibliotecario {
 
     // --- APRI DASHBOARD ---
 
-    /**
-     * commento
-     * @return result
-     */
     public JFrame apriDashboard() {
         frameCorrente = new JFrame("Dashboard Bibliotecario");
         frameCorrente.setContentPane(dashboardPane);
@@ -167,10 +157,6 @@ public class DashboardBibliotecario {
         return frameCorrente;
     }
 
-    /**
-     * commento
-     * @param messaggio messaggio
-     */
     public void mostraErrore(String messaggio) {
         JOptionPane.showMessageDialog(dashboardPane, messaggio, "Errore", JOptionPane.ERROR_MESSAGE);
     }
@@ -287,10 +273,6 @@ public class DashboardBibliotecario {
 
     /*
      * @noinspection ALL
-     */
-    /**
-     * commento
-     * @return result
      */
     public JComponent $$$getRootComponent$$$() {
         return dashboardPane;
