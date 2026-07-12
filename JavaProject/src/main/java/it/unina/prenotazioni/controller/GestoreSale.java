@@ -162,7 +162,7 @@ public class GestoreSale {
         registroSale.aggiornaSala(sala);
 
         List<Prenotazione> prenotazioniSala = registroPrenotazioni.cercaTuttePerSala(idSalaStudio);
-        List<UtenteDTO> destinatari = new ArrayList<>();
+        Set<UtenteDTO> destinatari = new HashSet<>();
 
         for (Prenotazione p : prenotazioniSala) {
             if (RegistroPrenotazioni.occupaSlot(p)) {
@@ -176,9 +176,11 @@ public class GestoreSale {
             }
         }
 
-        GestoreNotifiche.getInstance().inviaNotifica(destinatari,
-                "La sala '" + sala.getNome() + "' è stata chiusa o rimossa definitivamente. " +
-                        "Le tue prenotazioni ancora attive sono state annullate automaticamente.");
+        if(!destinatari.isEmpty()) {
+            GestoreNotifiche.getInstance().inviaNotifica(new ArrayList<>(destinatari),
+                    "La sala '" + sala.getNome() + "' è stata chiusa o rimossa definitivamente. " +
+                            "Le tue prenotazioni ancora attive sono state annullate automaticamente.");
+        }
     }
 
     // ------------------------------------------------------------------ UC6
