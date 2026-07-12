@@ -17,12 +17,6 @@ public class BoundaryPrenotazione {
 
     /**
      * UC7: effettua una prenotazione (idPostazione = 0 richiede l'assegnazione automatica).
-     * @param idSala idSala
-     * @param idArea idArea
-     * @param idPostazione idPostazione
-     * @param data data
-     * @param idFascia idFascia
-     * @param idStudente idStudente
      */
     @PostMapping("/effettua")
     public PrenotazioneDTO effettuaPrenotazione(
@@ -38,8 +32,6 @@ public class BoundaryPrenotazione {
 
     /**
      * UC9: annulla la prenotazione dello studente (consentito fino a 6 ore prima dell'inizio, V07).
-     * @param idPrenotazione idPrenotazione
-     * @param idStudente idStudente
      */
     @PutMapping("/{idPrenotazione}/annulla")
     public void annullaPrenotazione(@PathVariable("idPrenotazione") Long idPrenotazione,
@@ -49,7 +41,6 @@ public class BoundaryPrenotazione {
 
     /**
      * UC10: check-in nel giorno della prenotazione, entro inizio fascia + tolleranza (V08).
-     * @param idPrenotazione idPrenotazione
      */
     @PutMapping("/{idPrenotazione}/checkin")
     public void effettuaCheckIn(@PathVariable("idPrenotazione") Long idPrenotazione,

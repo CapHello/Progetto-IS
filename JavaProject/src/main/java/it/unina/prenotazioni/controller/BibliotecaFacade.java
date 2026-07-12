@@ -27,12 +27,12 @@ public class BibliotecaFacade {
 
     /**
      * UC1: registra un nuovo Studente o Bibliotecario.
-     * @param ruolo ruolo
-     * @param nome nome
-     * @param cognome cognome
-     * @param email email
-     * @param password password
-     * @param identificativo identificativo
+     * @param ruolo "Studente" o "Bibliotecario"
+     * @param nome nome anagrafico
+     * @param cognome cognome anagrafico
+     * @param email email istituzionale (dominio unina.it)
+     * @param password password (8-32 caratteri)
+     * @param identificativo matricola dello studente o codice interno del bibliotecario
      */
     public UtenteDTO registrazione(String ruolo, String nome, String cognome,
                                    String email, String password, String identificativo) {
@@ -41,8 +41,8 @@ public class BibliotecaFacade {
 
     /**
      * UC2: autentica un utente tramite email istituzionale e password.
-     * @param email email
-     * @param password password
+     * @param email email istituzionale dell'account
+     * @param password password dell'account
      */
     public UtenteDTO autenticazione(String email, String password) {
         return GestoreUtenti.getInstance().autenticazione(email, password);
@@ -50,7 +50,7 @@ public class BibliotecaFacade {
 
     /**
      * UC8: profilo personale dello studente.
-     * @param idStudente idStudente
+     * @param idStudente id dello studente di cui mostrare il profilo
      */
     public UtenteDTO visualizzaProfiloPersonale(Long idStudente) {
         return GestoreUtenti.getInstance().visualizzaProfilo(idStudente);
@@ -60,7 +60,7 @@ public class BibliotecaFacade {
 
     /**
      * UC3: crea una sala studio con orari, slot e aree.
-     * @param richiesta richiesta
+     * @param richiesta dati completi della sala da creare (nome, orari, grana slot, aree)
      */
     public SalaStudioDTO creaSalaStudio(CreazioneSalaDTO richiesta) {
         return GestoreSale.getInstance().creaSalaStudio(richiesta);
@@ -68,7 +68,7 @@ public class BibliotecaFacade {
 
     /**
      * UC4: elimina (disattiva) una sala studio, annullando le prenotazioni occupanti.
-     * @param idSalaStudio idSalaStudio
+     * @param idSalaStudio id della sala da disattivare
      */
     public void eliminaSalaStudio(Long idSalaStudio) {
         GestoreSale.getInstance().eliminaSalaStudio(idSalaStudio);
@@ -76,7 +76,7 @@ public class BibliotecaFacade {
 
     /**
      * UC6: sale disponibili (aperte e con posti liberi) nella data indicata.
-     * @param data data
+     * @param data giorno richiesto (feriale e non passato)
      */
     public List<SalaStudioDTO> consultaSaleDisponibili(LocalDate data) {
         return GestoreSale.getInstance().consultazioneSaleDisponibili(data);
@@ -84,8 +84,8 @@ public class BibliotecaFacade {
 
     /**
      * UC6/UC7: fasce prenotabili della sala nella data, con posti liberi.
-     * @param idSala idSala
-     * @param data data
+     * @param idSala id della sala scelta
+     * @param data giorno della prenotazione
      */
     public List<FasciaDisponibileDTO> getFasceDisponibili(Long idSala, LocalDate data) {
         return GestoreSale.getInstance().getFasceDisponibili(idSala, data);
@@ -93,9 +93,9 @@ public class BibliotecaFacade {
 
     /**
      * UC7: dettaglio aree/postazioni di una sala per (data, fascia).
-     * @param idSala idSala
-     * @param idFascia idFascia
-     * @param data data
+     * @param idSala id della sala scelta
+     * @param idFascia id della fascia oraria scelta
+     * @param data giorno della prenotazione
      */
     public DettaglioSalaDTO selezionaDettaglioSala(Long idSala, Long idFascia, LocalDate data) {
         return GestoreSale.getInstance().selezionaDettaglioSala(idSala, idFascia, data);
@@ -112,7 +112,7 @@ public class BibliotecaFacade {
 
     /**
      * UC7: effettua una prenotazione (postazione specifica o assegnata automaticamente).
-     * @param richiesta richiesta
+     * @param richiesta dati della prenotazione (sala, area, postazione, data, fascia, studente)
      */
     public PrenotazioneDTO effettuaPrenotazione(RichiestaPrenotazioneDTO richiesta) {
         return GestorePrenotazioni.getInstance().effettuaPrenotazione(richiesta);
@@ -120,8 +120,8 @@ public class BibliotecaFacade {
 
     /**
      * UC9: annulla una prenotazione dello studente (entro il vincolo temporale V07).
-     * @param idPrenotazione idPrenotazione
-     * @param idStudente idStudente
+     * @param idPrenotazione id della prenotazione da annullare
+     * @param idStudente id dello studente proprietario della prenotazione
      */
     public void annullaPrenotazione(Long idPrenotazione, Long idStudente) {
         GestorePrenotazioni.getInstance().annullaPrenotazione(idPrenotazione, idStudente);
@@ -129,8 +129,8 @@ public class BibliotecaFacade {
 
     /**
      * UC10: check-in della prenotazione dello studente nel giorno e nella finestra consentita (V08).
-     * @param idPrenotazione idPrenotazione
-     * @param idStudente idStudente
+     * @param idPrenotazione id della prenotazione su cui fare il check-in
+     * @param idStudente id dello studente proprietario della prenotazione
      */
     public void effettuaCheckin(Long idPrenotazione, Long idStudente) {
         GestorePrenotazioni.getInstance().effettuaCheckIn(idPrenotazione, idStudente);
@@ -138,7 +138,7 @@ public class BibliotecaFacade {
 
     /**
      * UC12: storico prenotazioni dello studente.
-     * @param idStudente idStudente
+     * @param idStudente id dello studente di cui elencare le prenotazioni
      */
     public List<PrenotazioneDTO> consultaStoricoPrenotazioni(Long idStudente) {
         return GestorePrenotazioni.getInstance().consultaStoricoPrenotazioni(idStudente);

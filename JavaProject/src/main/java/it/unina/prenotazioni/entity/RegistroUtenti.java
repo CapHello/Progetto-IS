@@ -33,7 +33,6 @@ public class RegistroUtenti {
 
     /**
      * Cerca un utente (polimorfo) per e-mail istituzionale; null se non esiste.
-     * @param email email
      */
     public Utente cercaUtentePerEmail(String email) {
         return gestorePersistenza.cercaPrimoPerCampi(Utente.class, Map.of("emailIstituzionale", email));
@@ -41,7 +40,6 @@ public class RegistroUtenti {
 
     /**
      * Cerca uno studente per matricola; null se non esiste.
-     * @param matricola matricola
      */
     public Studente cercaStudentePerMatricola(String matricola) {
         return gestorePersistenza.cercaPrimoPerCampi(Studente.class, Map.of("matricola", matricola));
@@ -49,7 +47,6 @@ public class RegistroUtenti {
 
     /**
      * Carica uno studente per id surrogato; null se non esiste.
-     * @param id id
      */
     public Studente trovaStudentePerId(Long id) {
         return gestorePersistenza.trovaPerId(Studente.class, id);
@@ -57,7 +54,6 @@ public class RegistroUtenti {
 
     /**
      * Cerca un bibliotecario per codice identificativo interno; null se non esiste.
-     * @param codice codice
      */
     public Bibliotecario cercaBibliotecarioPerCodice(String codice) {
         return gestorePersistenza.cercaPrimoPerCampi(Bibliotecario.class, Map.of("codiceIdentificativoInterno", codice));
@@ -65,7 +61,6 @@ public class RegistroUtenti {
 
     /**
      * True se esiste già un utente con quella e-mail istituzionale (unicità, RD01/V14).
-     * @param email email
      */
     public boolean esisteEmailIstituzionale(String email) {
         return cercaUtentePerEmail(email) != null;

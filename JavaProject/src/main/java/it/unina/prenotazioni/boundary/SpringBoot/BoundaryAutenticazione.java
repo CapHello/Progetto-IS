@@ -18,12 +18,6 @@ public class BoundaryAutenticazione {
 
     /**
      * UC1: registrazione di uno Studente o Bibliotecario (parametri form url-encoded).
-     * @param ruolo ruolo
-     * @param nome nome
-     * @param cognome cognome
-     * @param email email
-     * @param password password
-     * @param identificativo identificativo
      */
     @PostMapping("/registrazione")
     public UtenteDTO registrazione(@RequestParam("ruolo") String ruolo,
@@ -38,8 +32,6 @@ public class BoundaryAutenticazione {
 
     /**
      * UC2: login con email istituzionale e password.
-     * @param email email
-     * @param password password
      */
     @PostMapping("/login")
     public UtenteDTO autenticazione(@RequestParam("email") String email,

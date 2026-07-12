@@ -45,8 +45,6 @@ public class Area {
      * Postazioni libere dell'area per (data, fascia). Itera sulle proprie postazioni
      * (caricate dal Registro per evitare la navigazione lazy su entità distaccate) e
      * interroga ciascuna con disponibilita(data, fascia).
-     * @param data data
-     * @param fascia fascia
      */
     public List<Postazione> getPostazioniDisponibili(LocalDate data, FasciaOraria fascia) {
         List<Postazione> disponibili = new ArrayList<>();
@@ -61,7 +59,6 @@ public class Area {
 
     /**
      * Genera in memoria le postazioni dell'area; la persistenza avviene a cascata (UC3).
-     * @param numeroPostazioni numeroPostazioni
      */
     public void creaPostazioni(int numeroPostazioni) {
         for (int i = 0; i < numeroPostazioni; i++) {

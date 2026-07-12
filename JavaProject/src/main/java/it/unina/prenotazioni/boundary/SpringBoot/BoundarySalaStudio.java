@@ -21,7 +21,6 @@ public class BoundarySalaStudio {
 
     /**
      * UC3: crea una sala; il corpo JSON viene mappato da Spring sui campi di CreazioneSalaDTO.
-     * @param dto dto
      */
     @PostMapping("/crea")
     public SalaStudioDTO creaSalaStudio(@RequestBody CreazioneSalaDTO dto) {
@@ -30,7 +29,6 @@ public class BoundarySalaStudio {
 
     /**
      * UC4: elimina (disattiva) la sala indicata nella rotta.
-     * @param idSalaStudio idSalaStudio
      */
     @DeleteMapping("/{idSalaStudio}")
     public void eliminaSalaStudio(@PathVariable("idSalaStudio") Long idSalaStudio) {
@@ -39,7 +37,6 @@ public class BoundarySalaStudio {
 
     /**
      * UC6: sale disponibili nella data indicata.
-     * @param data data
      */
     @GetMapping("/disponibili")
     public List<SalaStudioDTO> consultazioneSaleDisponibili(
@@ -49,8 +46,6 @@ public class BoundarySalaStudio {
 
     /**
      * Wizard step 2: fasce prenotabili della sala nella data, con posti liberi.
-     * @param idSala idSala
-     * @param data data
      */
     @GetMapping("/{idSala}/fasce")
     public List<FasciaDisponibileDTO> getFasceDisponibili(
@@ -61,9 +56,6 @@ public class BoundarySalaStudio {
 
     /**
      * Wizard step 3-4: dettaglio aree/postazioni per (data, fascia).
-     * @param idSala idSala
-     * @param idFascia idFascia
-     * @param data data
      */
     @GetMapping("/{idSala}/dettaglio")
     public DettaglioSalaDTO selezionaDettaglioSala(

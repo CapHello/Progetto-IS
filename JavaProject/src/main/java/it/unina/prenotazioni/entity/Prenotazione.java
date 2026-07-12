@@ -78,7 +78,6 @@ public class Prenotazione extends Subject {
 
     /**
      * Transizione di stato: aggiorna il nome persistibile e notifica gli osservatori (pattern Observer).
-     * @param stato stato
      */
     public void setStato(StatoPrenotazione stato) {
         if (stato == null) {

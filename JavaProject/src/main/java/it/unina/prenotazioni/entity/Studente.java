@@ -38,8 +38,6 @@ public class Studente extends Utente{
     /**
      * Vincolo di unicità (V18): true se lo studente possiede già una prenotazione in
      * stato ATTIVA o CONFERMATA nella stessa data e fascia oraria (qualsiasi sala).
-     * @param data data
-     * @param fasciaEtichetta fasciaEtichetta
      */
     public boolean verificaPrenotazioneAttivaOConfermataInDataFascia(LocalDate data, String fasciaEtichetta) {
         RegistroPrenotazioni registro = RegistroPrenotazioni.getInstance();

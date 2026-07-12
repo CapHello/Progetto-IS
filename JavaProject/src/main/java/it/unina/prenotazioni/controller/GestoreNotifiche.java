@@ -30,7 +30,6 @@ public class GestoreNotifiche implements Observer {
 
     /**
      * Iniettato all'avvio da ConfigurazioneNotifiche (boundary): il controller conosce solo l'interfaccia.
-     * @param servizioNotifiche servizioNotifiche
      */
     public void setServizioNotifiche(ServizioNotifiche servizioNotifiche) {
         this.servizioNotifiche = servizioNotifiche;
@@ -48,8 +47,6 @@ public class GestoreNotifiche implements Observer {
 
     /**
      * Invia una notifica ai destinatari; il fallimento del recapito non è propagato (UC7/UC9 alt).
-     * @param destinatari destinatari
-     * @param messaggio messaggio
      */
     public void inviaNotifica(List<UtenteDTO> destinatari, String messaggio) {
         if (destinatari == null || destinatari.isEmpty()) {

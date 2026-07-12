@@ -75,7 +75,6 @@ public class SalaStudio {
 
     /**
      * Aggiunge una fascia oraria (slot prenotabile) all'orario della sala.
-     * @param fascia fascia
      */
     public void addFascia(FasciaOraria fascia) {
         slotOrario.add(fascia);
@@ -83,7 +82,6 @@ public class SalaStudio {
 
     /**
      * Aggiunge l'orario lavorativo del giorno successivo (max 5, Lunedì-Venerdì).
-     * @param fascia fascia
      */
     public void addOrarioLavorativo(FasciaOraria fascia) {
         if (this.orarioLavorativo.size() >= 5) {
@@ -96,8 +94,6 @@ public class SalaStudio {
      * Aggiunge (in memoria) una nuova Area con le sue postazioni; la persistenza avviene
      * a cascata col salvataggio della sala (UC3). Verifica V04 (almeno una postazione)
      * e che il totale assegnato non superi la capienza della sala.
-     * @param tipologia tipologia
-     * @param numPostazioni numPostazioni
      */
     public Area aggiungiArea(String tipologia, int numPostazioni) {
         if (numPostazioni < 1) {
@@ -124,7 +120,6 @@ public class SalaStudio {
     /**
      * Crea l'area di default "comune" (V19) con le postazioni rimanenti non assegnate ad
      * aree specifiche (step 6 dello scenario CreaSalaStudio).
-     * @param postazioniRimanenti postazioniRimanenti
      */
     public void creaAreaDefault(int postazioniRimanenti) {
         aggiungiArea("comune", postazioniRimanenti);
@@ -142,7 +137,6 @@ public class SalaStudio {
 
     /**
      * V06: la sala è aperta nei giorni feriali (lunedì-venerdì).
-     * @param data data
      */
     public boolean verificaDataInGiorniApertura(LocalDate data) {
         if(data == null){
@@ -172,7 +166,6 @@ public class SalaStudio {
     /**
      * Fasce prenotabili per la data indicata (V06): filtra gli slot della sala
      * tenendo solo quelli interni all'orario lavorativo del giorno specifico.
-     * @param data data
      */
     public List<FasciaOraria> getFasceOrariePrestabilite(LocalDate data) {
         FasciaOraria orarioDelGiorno = getOrarioLavorativoPerData(data);
@@ -197,8 +190,6 @@ public class SalaStudio {
 
     /**
      * True se esiste almeno una postazione libera nella sala per (data, fascia).
-     * @param data data
-     * @param fascia fascia
      */
     public boolean verificaDisponibilita(LocalDate data, FasciaOraria fascia) {
         RegistroSale registro = RegistroSale.getInstance();

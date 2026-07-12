@@ -19,7 +19,6 @@ public class BoundaryStudente {
 
     /**
      * UC8: profilo personale dello studente.
-     * @param idStudente idStudente
      */
     @GetMapping("/{idStudente}/profilo")
     public UtenteDTO visualizzaProfiloPersonale(@PathVariable("idStudente") Long idStudente) {
@@ -28,7 +27,6 @@ public class BoundaryStudente {
 
     /**
      * UC12: storico completo delle prenotazioni dello studente.
-     * @param idStudente idStudente
      */
     @GetMapping("/{idStudente}/storico")
     public List<PrenotazioneDTO> consultaStoricoPrenotazioni(@PathVariable("idStudente") Long idStudente) {

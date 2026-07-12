@@ -201,8 +201,6 @@ public class GestorePrenotazioni {
      * Segue il SD "AnnullaPrenotazione": il vincolo temporale (V07) e il cambio di stato
      * li verifica l'entity Prenotazione. La postazione torna libera da sola, perché una
      * prenotazione ANNULLATA non conta più nel calcolo della disponibilità.
-     * @param idPrenotazione idPrenotazione
-     * @param idStudente idStudente
      */
     public void annullaPrenotazione(Long idPrenotazione, Long idStudente) {
         Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);
@@ -238,8 +236,6 @@ public class GestorePrenotazioni {
     /**
      * Segue il SD "EffettuaCheckIn": il check-in è consentito solo se la prenotazione
      * è ATTIVA nella data corrente; il passaggio a CONFERMATA lo fa l'entity Prenotazione.
-     * @param idPrenotazione idPrenotazione
-     * @param idStudente idStudente
      */
     public void effettuaCheckIn(Long idPrenotazione, Long idStudente) {
         Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);

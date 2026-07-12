@@ -14,7 +14,6 @@ public abstract class Subject {
 
     /**
      * Registra un osservatore, evitando i duplicati.
-     * @param observer observer
      */
     public void attach(Observer observer) {
         if (!observers.contains(observer)) {
@@ -24,7 +23,6 @@ public abstract class Subject {
 
     /**
      * Rimuove un osservatore. Non usato nei flussi attuali: mantenuto per completezza del pattern.
-     * @param observer observer
      */
     public void detach(Observer observer) {
         observers.remove(observer);
