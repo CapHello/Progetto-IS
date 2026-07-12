@@ -1,0 +1,11 @@
+it.unina.prenotazioni
+it.unina.prenotazioni.boundary
+it.unina.prenotazioni.boundary.SpringBoot
+it.unina.prenotazioni.boundary.Swing
+it.unina.prenotazioni.controller
+it.unina.prenotazioni.controller.factory
+it.unina.prenotazioni.controller.strategy
+it.unina.prenotazioni.database
+it.unina.prenotazioni.dto
+it.unina.prenotazioni.entity
+it.unina.prenotazioni.entity.state
