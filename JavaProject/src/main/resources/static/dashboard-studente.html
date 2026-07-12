@@ -121,12 +121,12 @@
         }
 
         async function checkin(id) {
-            try { await api('PUT', '/prenotazioni/' + id + '/checkin'); carica(); }
+            try { await api('PUT', '/prenotazioni/' + id + '/checkin', { idStudente: utente.id }); carica(); }
             catch (err) { alert(err.message); }
         }
         async function annulla(id) {
             if (!confirm('Confermi l\'annullamento della prenotazione?')) return;
-            try { await api('PUT', '/prenotazioni/' + id + '/annulla'); carica(); }
+            try { await api('PUT', '/prenotazioni/' + id + '/annulla', { idStudente: utente.id }); carica(); }
             catch (err) { alert(err.message); }
         }
 
