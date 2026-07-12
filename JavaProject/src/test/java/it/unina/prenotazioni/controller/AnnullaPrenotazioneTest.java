@@ -23,7 +23,9 @@ class AnnullaPrenotazioneTest {
     private EntityManager em;
 
     // ID delle prenotazioni pre-configurate nel DB
+    private Long ID_STUDENTE;
     private Long ID_PREN_ATTIVA_VALIDA;
+    private Long ID_PREN_ALTRO_UTENTE;
     private Long ID_PREN_ANNULLATA;
     private Long ID_PREN_SCADUTA;
     private Long ID_PREN_CONCLUSA;
@@ -65,6 +67,16 @@ class AnnullaPrenotazioneTest {
             studente.setPassword("Pass123!");
             studente.setMatricola("N86001234");
             em.persist(studente);
+            ID_STUDENTE = studente.getId();
+
+            // Secondo studente per il TC3 (prenotazione di un altro utente)
+            Studente altroStudente = new Studente();
+            altroStudente.setNome("Luigi");
+            altroStudente.setCognome("Bianchi");
+            altroStudente.setEmailIstituzionale("l.bianchi@studenti.unina.it");
+            altroStudente.setPassword("Pass123!");
+            altroStudente.setMatricola("N86005678");
+            em.persist(altroStudente);
 
             // 3. Setup Fasce Orarie e Date per la simulazione temporale
             // Fascia sicura: tra 10 giorni
@@ -80,6 +92,7 @@ class AnnullaPrenotazioneTest {
 
             // 4. Creazione delle prenotazioni per coprire tutti i test case del Pattern State
             ID_PREN_ATTIVA_VALIDA = creaPrenotazione(studente, postazione, fasciaFutura, dataFutura, StatoAttiva.getInstance());
+            ID_PREN_ALTRO_UTENTE = creaPrenotazione(altroStudente, postazione, fasciaFutura, dataFutura, StatoAttiva.getInstance());
             ID_PREN_ANNULLATA = creaPrenotazione(studente, postazione, fasciaFutura, dataFutura, StatoAnnullata.getInstance());
             ID_PREN_SCADUTA = creaPrenotazione(studente, postazione, fasciaFutura, dataFutura, StatoScaduta.getInstance());
             ID_PREN_CONCLUSA = creaPrenotazione(studente, postazione, fasciaFutura, dataFutura, StatoConclusa.getInstance());
@@ -113,7 +126,7 @@ class AnnullaPrenotazioneTest {
     @Test
     @DisplayName("TC1: Annullamento valido (Stato attiva, Anticipo >= 6h)")
     void annullaPrenotazione_Valida_Successo() {
-        bibliotecaFacade.annullaPrenotazione(ID_PREN_ATTIVA_VALIDA);
+        bibliotecaFacade.annullaPrenotazione(ID_PREN_ATTIVA_VALIDA, ID_STUDENTE);
 
         em.clear(); // Svuotiamo la cache per forzare la rilettura
         Prenotazione p = em.find(Prenotazione.class, ID_PREN_ATTIVA_VALIDA);
@@ -125,24 +138,25 @@ class AnnullaPrenotazioneTest {
     @DisplayName("TC2: Id di prenotazione inesistente")
     void annullaPrenotazione_IdInesistente_LanciaEccezione() {
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            bibliotecaFacade.annullaPrenotazione(99999L);
+            bibliotecaFacade.annullaPrenotazione(99999L, ID_STUDENTE);
         });
         assertTrue(exception.getMessage().contains("Prenotazione non trovata") || exception instanceof NullPointerException);
     }
 
-    /*
-     * TC3: Id di prenotazione di un altro utente
-     * NON IMPLEMENTABILE A QUESTO LIVELLO: Il Facade riceve solo l'idPrenotazione.
-     * Non avendo il contesto dell'utente loggato, il Facade annullerà la prenotazione a
-     * prescindere da chi effettua la richiesta. L'eccezione "Accesso non consentito"
-     * dovrebbe essere gestita a livello di Controller/Security.
-     */
+    @Test
+    @DisplayName("TC3: Id di prenotazione di un altro utente")
+    void annullaPrenotazione_AltroUtente_LanciaEccezione() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            bibliotecaFacade.annullaPrenotazione(ID_PREN_ALTRO_UTENTE, ID_STUDENTE);
+        });
+        assertEquals("Accesso non consentito alla prenotazione.", exception.getMessage());
+    }
 
     @Test
     @DisplayName("TC4: Prenotazione già annullata")
     void annullaPrenotazione_GiaAnnullata_LanciaEccezione() {
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            bibliotecaFacade.annullaPrenotazione(ID_PREN_ANNULLATA);
+            bibliotecaFacade.annullaPrenotazione(ID_PREN_ANNULLATA, ID_STUDENTE);
         });
         assertEquals("La prenotazione non può essere annullata nello stato attuale: ANNULLATA", exception.getMessage());
     }
@@ -151,7 +165,7 @@ class AnnullaPrenotazioneTest {
     @DisplayName("TC5: Prenotazione già scaduta")
     void annullaPrenotazione_GiaScaduta_LanciaEccezione() {
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            bibliotecaFacade.annullaPrenotazione(ID_PREN_SCADUTA);
+            bibliotecaFacade.annullaPrenotazione(ID_PREN_SCADUTA, ID_STUDENTE);
         });
         assertEquals("La prenotazione non può essere annullata nello stato attuale: SCADUTA", exception.getMessage());
     }
@@ -160,7 +174,7 @@ class AnnullaPrenotazioneTest {
     @DisplayName("TC6: Prenotazione conclusa")
     void annullaPrenotazione_Conclusa_LanciaEccezione() {
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            bibliotecaFacade.annullaPrenotazione(ID_PREN_CONCLUSA);
+            bibliotecaFacade.annullaPrenotazione(ID_PREN_CONCLUSA, ID_STUDENTE);
         });
         assertEquals("La prenotazione non può essere annullata nello stato attuale: CONCLUSA", exception.getMessage());
     }
@@ -169,7 +183,7 @@ class AnnullaPrenotazioneTest {
     @DisplayName("TC7: Check-in già effettuato (Stato Confermata)")
     void annullaPrenotazione_GiaConfermata_LanciaEccezione() {
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            bibliotecaFacade.annullaPrenotazione(ID_PREN_CONFERMATA);
+            bibliotecaFacade.annullaPrenotazione(ID_PREN_CONFERMATA, ID_STUDENTE);
         });
         assertEquals("La prenotazione non può essere annullata nello stato attuale: CONFERMATA", exception.getMessage());
     }
@@ -178,7 +192,7 @@ class AnnullaPrenotazioneTest {
     @DisplayName("TC8: Anticipo inferiore a 6 ore (Vincolo V07)")
     void annullaPrenotazione_AnticipoInferiore6Ore_LanciaEccezione() {
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            bibliotecaFacade.annullaPrenotazione(ID_PREN_MENO_DI_6_ORE);
+            bibliotecaFacade.annullaPrenotazione(ID_PREN_MENO_DI_6_ORE, ID_STUDENTE);
         });
         assertEquals("Annullamento non consentito: mancano meno di 6 ore all'inizio della fascia oraria", exception.getMessage());
     }

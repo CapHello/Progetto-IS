@@ -21,7 +21,9 @@ class EffettuaCheckInTest {
     private BibliotecaFacade bibliotecaFacade;
     private EntityManager em;
 
+    private Long ID_STUDENTE;
     private Long ID_PREN_VALIDA;
+    private Long ID_PREN_ALTRO_UTENTE;
     private Long ID_PREN_ANNULLATA;
     private Long ID_PREN_SCADUTA;
     private Long ID_PREN_CONCLUSA;
@@ -64,6 +66,16 @@ class EffettuaCheckInTest {
             studente.setPassword("Pass123!");
             studente.setMatricola("N86001234");
             em.persist(studente);
+            ID_STUDENTE = studente.getId();
+
+            // Secondo studente per il TC3 (prenotazione di un altro utente)
+            Studente altroStudente = new Studente();
+            altroStudente.setNome("Luigi");
+            altroStudente.setCognome("Bianchi");
+            altroStudente.setEmailIstituzionale("l.bianchi@studenti.unina.it");
+            altroStudente.setPassword("Pass123!");
+            altroStudente.setMatricola("N86005678");
+            em.persist(altroStudente);
 
             // 3. Setup Tempistiche Dinamiche
             LocalTime oraAttuale = LocalTime.now(ZoneId.of("Europe/Rome"));
@@ -81,6 +93,7 @@ class EffettuaCheckInTest {
 
             // 4. Creazione Prenotazioni
             ID_PREN_VALIDA = creaPrenotazione(studente, postazione, fasciaValida, dataOggi, StatoAttiva.getInstance());
+            ID_PREN_ALTRO_UTENTE = creaPrenotazione(altroStudente, postazione, fasciaValida, dataOggi, StatoAttiva.getInstance());
             ID_PREN_ALTRA_DATA = creaPrenotazione(studente, postazione, fasciaValida, dataFutura, StatoAttiva.getInstance());
             ID_PREN_RITARDO_TOLLERANZA = creaPrenotazione(studente, postazione, fasciaRitardo, dataOggi, StatoAttiva.getInstance());
 
@@ -115,7 +128,7 @@ class EffettuaCheckInTest {
     @Test
     @DisplayName("TC1: Check-in valido (Stato attiva, Giorno corrente, entro 10 min)")
     void effettuaCheckin_Valido_Successo() {
-        bibliotecaFacade.effettuaCheckin(ID_PREN_VALIDA);
+        bibliotecaFacade.effettuaCheckin(ID_PREN_VALIDA, ID_STUDENTE);
 
         em.clear(); // Pulisco la cache per rileggere l'entità dal DB
         Prenotazione p = em.find(Prenotazione.class, ID_PREN_VALIDA);
@@ -131,22 +144,25 @@ class EffettuaCheckInTest {
     @DisplayName("TC2: Id di prenotazione inesistente")
     void effettuaCheckin_IdInesistente_LanciaEccezione() {
         Exception exception = assertThrows(RuntimeException.class, () -> {
-            bibliotecaFacade.effettuaCheckin(99999L);
+            bibliotecaFacade.effettuaCheckin(99999L, ID_STUDENTE);
         });
         assertTrue(exception.getMessage().contains("Prenotazione non trovata") || exception instanceof NullPointerException);
     }
 
-    /*
-     * TC3: Id di prenotazione di un altro utente
-     * NON IMPLEMENTABILE SUL FACADE: Come per l'annullamento, l'Id utente non è nella
-     * firma del metodo. Il controllo va effettuato al livello del controller REST/Security.
-     */
+    @Test
+    @DisplayName("TC3: Id di prenotazione di un altro utente")
+    void effettuaCheckin_AltroUtente_LanciaEccezione() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            bibliotecaFacade.effettuaCheckin(ID_PREN_ALTRO_UTENTE, ID_STUDENTE);
+        });
+        assertEquals("Accesso non consentito alla prenotazione.", exception.getMessage());
+    }
 
     @Test
     @DisplayName("TC4: Prenotazione già annullata")
     void effettuaCheckin_GiaAnnullata_LanciaEccezione() {
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            bibliotecaFacade.effettuaCheckin(ID_PREN_ANNULLATA);
+            bibliotecaFacade.effettuaCheckin(ID_PREN_ANNULLATA, ID_STUDENTE);
         });
         assertTrue(exception.getMessage().contains("La prenotazione non è in stato ATTIVA"));
     }
@@ -155,7 +171,7 @@ class EffettuaCheckInTest {
     @DisplayName("TC5: Prenotazione già scaduta (o annullata in background)")
     void effettuaCheckin_GiaScaduta_LanciaEccezione() {
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            bibliotecaFacade.effettuaCheckin(ID_PREN_SCADUTA);
+            bibliotecaFacade.effettuaCheckin(ID_PREN_SCADUTA, ID_STUDENTE);
         });
         assertTrue(exception.getMessage().contains("La prenotazione non è in stato ATTIVA"));
     }
@@ -164,7 +180,7 @@ class EffettuaCheckInTest {
     @DisplayName("TC6: Prenotazione conclusa")
     void effettuaCheckin_Conclusa_LanciaEccezione() {
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            bibliotecaFacade.effettuaCheckin(ID_PREN_CONCLUSA);
+            bibliotecaFacade.effettuaCheckin(ID_PREN_CONCLUSA, ID_STUDENTE);
         });
         assertTrue(exception.getMessage().contains("La prenotazione non è in stato ATTIVA"));
     }
@@ -173,7 +189,7 @@ class EffettuaCheckInTest {
     @DisplayName("TC7: Check-in già effettuato (Stato confermata)")
     void effettuaCheckin_GiaConfermata_LanciaEccezione() {
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            bibliotecaFacade.effettuaCheckin(ID_PREN_CONFERMATA);
+            bibliotecaFacade.effettuaCheckin(ID_PREN_CONFERMATA, ID_STUDENTE);
         });
         assertTrue(exception.getMessage().contains("La prenotazione non è in stato ATTIVA"));
     }
@@ -182,7 +198,7 @@ class EffettuaCheckInTest {
     @DisplayName("TC8: Giorno diverso da quello corrente")
     void effettuaCheckin_GiornoDiverso_LanciaEccezione() {
         Exception exception = assertThrows(IllegalStateException.class, () -> {
-            bibliotecaFacade.effettuaCheckin(ID_PREN_ALTRA_DATA);
+            bibliotecaFacade.effettuaCheckin(ID_PREN_ALTRA_DATA, ID_STUDENTE);
         });
         assertTrue(exception.getMessage().contains("Il check-in è consentito solo nel giorno della prenotazione"));
     }

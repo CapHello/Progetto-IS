@@ -38,12 +38,14 @@ public class BoundaryPrenotazione {
     }
 
     /**
-     * UC9: annulla la prenotazione (consentito fino a 6 ore prima dell'inizio, V07).
+     * UC9: annulla la prenotazione dello studente (consentito fino a 6 ore prima dell'inizio, V07).
      * @param idPrenotazione idPrenotazione
+     * @param idStudente idStudente
      */
     @PutMapping("/{idPrenotazione}/annulla")
-    public void annullaPrenotazione(@PathVariable("idPrenotazione") Long idPrenotazione) {
-        BibliotecaFacade.getInstance().annullaPrenotazione(idPrenotazione);
+    public void annullaPrenotazione(@PathVariable("idPrenotazione") Long idPrenotazione,
+                                    @RequestParam("idStudente") Long idStudente) {
+        BibliotecaFacade.getInstance().annullaPrenotazione(idPrenotazione, idStudente);
     }
 
     /**
@@ -51,7 +53,8 @@ public class BoundaryPrenotazione {
      * @param idPrenotazione idPrenotazione
      */
     @PutMapping("/{idPrenotazione}/checkin")
-    public void effettuaCheckIn(@PathVariable("idPrenotazione") Long idPrenotazione) {
-        BibliotecaFacade.getInstance().effettuaCheckin(idPrenotazione);
+    public void effettuaCheckIn(@PathVariable("idPrenotazione") Long idPrenotazione,
+                                @RequestParam("idStudente") Long idStudente) {
+        BibliotecaFacade.getInstance().effettuaCheckin(idPrenotazione, idStudente);
     }
 }

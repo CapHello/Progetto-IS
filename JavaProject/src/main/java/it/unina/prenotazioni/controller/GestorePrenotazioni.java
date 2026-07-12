@@ -202,12 +202,14 @@ public class GestorePrenotazioni {
      * li verifica l'entity Prenotazione. La postazione torna libera da sola, perché una
      * prenotazione ANNULLATA non conta più nel calcolo della disponibilità.
      * @param idPrenotazione idPrenotazione
+     * @param idStudente idStudente
      */
-    public void annullaPrenotazione(Long idPrenotazione) {
+    public void annullaPrenotazione(Long idPrenotazione, Long idStudente) {
         Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);
         if (prenotazione == null) {
             throw new IllegalArgumentException("Prenotazione non trovata");
         }
+        verificaProprieta(prenotazione, idStudente);
 
         // L'entity verifica l'intervallo di annullamento (V07) e cambia lo stato;
         // se l'annullamento non è consentito lo comunica con un'eccezione.
@@ -223,17 +225,28 @@ public class GestorePrenotazioni {
         }
     }
 
+    /** La prenotazione può essere gestita solo dallo studente che l'ha effettuata. */
+    private void verificaProprieta(Prenotazione prenotazione, Long idStudente) {
+        Studente proprietario = prenotazione.getStudente();
+        if (idStudente == null || proprietario == null
+                || !proprietario.getId().equals(idStudente)) {
+            throw new IllegalArgumentException("Accesso non consentito alla prenotazione.");
+        }
+    }
+
     // ------------------------------------------------------------------ UC10
     /**
      * Segue il SD "EffettuaCheckIn": il check-in è consentito solo se la prenotazione
      * è ATTIVA nella data corrente; il passaggio a CONFERMATA lo fa l'entity Prenotazione.
      * @param idPrenotazione idPrenotazione
+     * @param idStudente idStudente
      */
-    public void effettuaCheckIn(Long idPrenotazione) {
+    public void effettuaCheckIn(Long idPrenotazione, Long idStudente) {
         Prenotazione prenotazione = registroPrenotazioni.trovaPerId(idPrenotazione);
         if (prenotazione == null) {
             throw new IllegalArgumentException("Prenotazione non trovata");
         }
+        verificaProprieta(prenotazione, idStudente);
 
         // attach del GestoreNotifiche: riceverà l'update al cambio di stato
         prenotazione.attach(GestoreNotifiche.getInstance());
@@ -256,7 +269,6 @@ public class GestorePrenotazioni {
             registroPrenotazioni.aggiorna(prenotazione);
 
             // Il check-in conta come accesso. Aggiorna esplicito dello studente:
-            // non c'è cascade MERGE da Prenotazione verso Studente.
             Studente s = prenotazione.getStudente();
             s.setNumeroTotaleAccessi(s.getNumeroTotaleAccessi() + 1);
             registroUtenti.aggiorna(s);

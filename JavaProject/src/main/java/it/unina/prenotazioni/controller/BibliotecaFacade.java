@@ -128,19 +128,21 @@ public class BibliotecaFacade {
     }
 
     /**
-     * UC9: annulla una prenotazione (entro il vincolo temporale V07).
+     * UC9: annulla una prenotazione dello studente (entro il vincolo temporale V07).
      * @param idPrenotazione idPrenotazione
+     * @param idStudente idStudente
      */
-    public void annullaPrenotazione(Long idPrenotazione) {
-        GestorePrenotazioni.getInstance().annullaPrenotazione(idPrenotazione);
+    public void annullaPrenotazione(Long idPrenotazione, Long idStudente) {
+        GestorePrenotazioni.getInstance().annullaPrenotazione(idPrenotazione, idStudente);
     }
 
     /**
-     * UC10: check-in della prenotazione nel giorno e nella finestra consentita (V08).
+     * UC10: check-in della prenotazione dello studente nel giorno e nella finestra consentita (V08).
      * @param idPrenotazione idPrenotazione
+     * @param idStudente idStudente
      */
-    public void effettuaCheckin(Long idPrenotazione) {
-        GestorePrenotazioni.getInstance().effettuaCheckIn(idPrenotazione);
+    public void effettuaCheckin(Long idPrenotazione, Long idStudente) {
+        GestorePrenotazioni.getInstance().effettuaCheckIn(idPrenotazione, idStudente);
     }
 
     /**

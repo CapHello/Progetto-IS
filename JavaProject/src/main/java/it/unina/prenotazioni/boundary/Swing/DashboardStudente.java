@@ -122,7 +122,7 @@ public class DashboardStudente {
 
     private void checkin(Long idPrenotazione) {
         try {
-            BibliotecaFacade.getInstance().effettuaCheckin(idPrenotazione);
+            BibliotecaFacade.getInstance().effettuaCheckin(idPrenotazione, utente.getId());
             carica();
         } catch (RuntimeException ex) {
             mostraErrore(ex.getMessage());
@@ -137,7 +137,7 @@ public class DashboardStudente {
             return;
         }
         try {
-            BibliotecaFacade.getInstance().annullaPrenotazione(idPrenotazione);
+            BibliotecaFacade.getInstance().annullaPrenotazione(idPrenotazione, utente.getId());
             carica();
         } catch (RuntimeException ex) {
             mostraErrore(ex.getMessage());
