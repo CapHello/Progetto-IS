@@ -57,7 +57,10 @@ public class GestoreSale {
         configuraAree(richiestaCreazione.getNumeroPostazioni(), tipi, posti, sala);
 
         //Persistenza
-        registroSale.salvaSala(sala);
+        boolean esito = registroSale.salvaSala(sala);
+        if (!esito){
+            throw new RuntimeException("Errore Lato Server: non è stato possibile salvare la sala studio, riprova");
+        }
         return toDTO(sala);
     }
 
