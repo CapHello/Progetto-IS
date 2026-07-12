@@ -23,7 +23,6 @@ public class BoundaryPrenotazione {
      * @param data data
      * @param idFascia idFascia
      * @param idStudente idStudente
-     * @return result
      */
     @PostMapping("/effettua")
     public PrenotazioneDTO effettuaPrenotazione(
