@@ -8,17 +8,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * [endpoint] Registrazione (UC1) e Autenticazione (UC2). Nessuna logica applicativa:
+ * Registrazione (UC1) e Autenticazione (UC2). Nessuna logica applicativa:
  * raccoglie l'input e lo inoltra alla BibliotecaFacade.
  */
 
 @RestController
 @RequestMapping("/api/auth")
 public class BoundaryAutenticazione {
-/**
- * Costruttore di default.
- */
-public BoundaryAutenticazione() {}
 
     /**
      * UC1: registrazione di uno Studente o Bibliotecario (parametri form url-encoded).
@@ -28,7 +24,6 @@ public BoundaryAutenticazione() {}
      * @param email email
      * @param password password
      * @param identificativo identificativo
-     * @return result
      */
     @PostMapping("/registrazione")
     public UtenteDTO registrazione(@RequestParam("ruolo") String ruolo,
@@ -45,7 +40,6 @@ public BoundaryAutenticazione() {}
      * UC2: login con email istituzionale e password.
      * @param email email
      * @param password password
-     * @return result
      */
     @PostMapping("/login")
     public UtenteDTO autenticazione(@RequestParam("email") String email,
