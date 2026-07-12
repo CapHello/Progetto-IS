@@ -57,7 +57,10 @@ public class GestoreSale {
         configuraAree(richiestaCreazione.getNumeroPostazioni(), tipi, posti, sala);
 
         //Persistenza
-        registroSale.salvaSala(sala);
+        boolean esito = registroSale.salvaSala(sala);
+        if (!esito){
+            throw new RuntimeException("Errore Lato Server: non è stato possibile salvare la sala studio, riprova");
+        }
         return toDTO(sala);
     }
 
@@ -163,6 +166,7 @@ public class GestoreSale {
 
         List<Prenotazione> prenotazioniSala = registroPrenotazioni.cercaTuttePerSala(idSalaStudio);
         List<UtenteDTO> destinatari = new ArrayList<>();
+        Set<Long> destinatariIds = new HashSet<>();
 
         for (Prenotazione p : prenotazioniSala) {
             if (RegistroPrenotazioni.occupaSlot(p)) {
@@ -171,14 +175,20 @@ public class GestoreSale {
                 registroPrenotazioni.aggiorna(p);
 
                 if (p.getStudente() != null) {
-                    destinatari.add(GestoreNotifiche.getInstance().toUtenteDTO(p.getStudente()));
+                    Long idStudente = p.getStudente().getId();
+                    if (!destinatariIds.contains(idStudente)) {
+                        destinatari.add(GestoreNotifiche.getInstance().toUtenteDTO(p.getStudente()));
+                        destinatariIds.add(idStudente);
+                    }
                 }
             }
         }
 
-        GestoreNotifiche.getInstance().inviaNotifica(destinatari,
-                "La sala '" + sala.getNome() + "' è stata chiusa o rimossa definitivamente. " +
-                        "Le tue prenotazioni ancora attive sono state annullate automaticamente.");
+        if(!destinatari.isEmpty()) {
+            GestoreNotifiche.getInstance().inviaNotifica(destinatari,
+                    "La sala '" + sala.getNome() + "' è stata chiusa o rimossa definitivamente. " +
+                            "Le tue prenotazioni ancora attive sono state annullate automaticamente.");
+        }
     }
 
     // ------------------------------------------------------------------ UC6

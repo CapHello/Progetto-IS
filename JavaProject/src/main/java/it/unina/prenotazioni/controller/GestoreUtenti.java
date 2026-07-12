@@ -89,7 +89,10 @@ public class GestoreUtenti {
         UtenteFactory factory = studente ? new StudenteFactory() : new BibliotecarioFactory();
         Utente nuovoUtente = factory.creaUtente(nome, cognome, email, password, identificativo);
 
-        registroUtenti.registraUtente(nuovoUtente);
+        boolean esito = registroUtenti.registraUtente(nuovoUtente);
+        if (!esito){
+            throw new RuntimeException("Errore Lato Server: non è stato possibile salvare l'utente, riprova");
+        }
         return toDTO(nuovoUtente);
     }
 
