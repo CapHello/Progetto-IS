@@ -162,7 +162,8 @@ public class GestoreSale {
         registroSale.aggiornaSala(sala);
 
         List<Prenotazione> prenotazioniSala = registroPrenotazioni.cercaTuttePerSala(idSalaStudio);
-        Set<UtenteDTO> destinatari = new HashSet<>();
+        List<UtenteDTO> destinatari = new ArrayList<>();
+        Set<Long> destinatariIds = new HashSet<>();
 
         for (Prenotazione p : prenotazioniSala) {
             if (RegistroPrenotazioni.occupaSlot(p)) {
@@ -171,13 +172,17 @@ public class GestoreSale {
                 registroPrenotazioni.aggiorna(p);
 
                 if (p.getStudente() != null) {
-                    destinatari.add(GestoreNotifiche.getInstance().toUtenteDTO(p.getStudente()));
+                    Long idStudente = p.getStudente().getId();
+                    if (!destinatariIds.contains(idStudente)) {
+                        destinatari.add(GestoreNotifiche.getInstance().toUtenteDTO(p.getStudente()));
+                        destinatariIds.add(idStudente);
+                    }
                 }
             }
         }
 
         if(!destinatari.isEmpty()) {
-            GestoreNotifiche.getInstance().inviaNotifica(new ArrayList<>(destinatari),
+            GestoreNotifiche.getInstance().inviaNotifica(destinatari,
                     "La sala '" + sala.getNome() + "' è stata chiusa o rimossa definitivamente. " +
                             "Le tue prenotazioni ancora attive sono state annullate automaticamente.");
         }
