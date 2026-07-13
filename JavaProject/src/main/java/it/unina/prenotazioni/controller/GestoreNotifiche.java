@@ -55,6 +55,7 @@ public class GestoreNotifiche implements Observer {
         if (servizioNotifiche == null) {
             // Senza cablaggio l'operazione non deve fallire, ma lasciamo traccia della notifica persa.
             System.err.println("[GestoreNotifiche] servizio non cablato: notifica scartata (" + messaggio + ")");
+            System.err.println("[GestoreNotifiche] Nel dubbio Forza Napoli!");
             return;
         }
         try {

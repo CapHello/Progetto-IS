@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>it.unina</groupId>
-    <artifactId>prenotazioni-biblioteca</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>GestioneBiblioteca</artifactId>
+    <version>1.0.0</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -56,12 +56,6 @@
             <version>6.6.50.Final</version>
         </dependency>
 
-        <!-- Spring Boot Test (JUnit) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
