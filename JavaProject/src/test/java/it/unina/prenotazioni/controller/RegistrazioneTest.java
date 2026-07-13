@@ -42,6 +42,7 @@ class RegistrazioneTest {
             em.createQuery("DELETE FROM Prenotazione").executeUpdate();
             em.createQuery("DELETE FROM Utente").executeUpdate();
 
+
             transaction.commit();
         } catch (Exception e) {
             if (transaction.isActive()) transaction.rollback();
@@ -58,13 +59,13 @@ class RegistrazioneTest {
 
         // Act
         UtenteDTO risultato = bibliotecaFacade.registrazione(
-                "Studente", "Antonio", "Rossi", email, "Password123!", matricola
+                "Studente", "Michele", "Rossi", email, "Password123!", matricola
         );
 
         // Assert
         assertNotNull(risultato, "Il DTO restituito non deve essere nullo");
         assertEquals("Studente", risultato.getRuolo());
-        assertEquals("Antonio", risultato.getNome());
+        assertEquals("Michele", risultato.getNome());
         assertEquals(email, risultato.getEmailIstituzionale());
         assertEquals(matricola, risultato.getIdentificativo());
     }

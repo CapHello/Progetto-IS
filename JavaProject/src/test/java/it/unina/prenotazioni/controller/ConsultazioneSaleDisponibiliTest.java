@@ -2,7 +2,8 @@ package it.unina.prenotazioni.controller;
 
 import it.unina.prenotazioni.database.JpaUtil;
 import it.unina.prenotazioni.dto.SalaStudioDTO;
-import it.unina.prenotazioni.entity.*;
+import it.unina.prenotazioni.entity.FasciaOraria;
+import it.unina.prenotazioni.entity.SalaStudio;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import org.junit.jupiter.api.BeforeEach;

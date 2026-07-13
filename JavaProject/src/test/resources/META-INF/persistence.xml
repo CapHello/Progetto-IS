@@ -6,7 +6,7 @@
 
     <persistence-unit name="prenotazioniPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        
+
         <class>it.unina.prenotazioni.entity.Utente</class>
         <class>it.unina.prenotazioni.entity.Studente</class>
         <class>it.unina.prenotazioni.entity.Bibliotecario</class>
@@ -18,7 +18,8 @@
 
         <properties>
             <!-- Connessione a MySQL -->
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/prenotazionidb?serverTimezone=UTC&amp;createDatabaseIfNotExist=true"/>
+            <property name="jakarta.persistence.jdbc.url"
+                      value="jdbc:mysql://localhost:3306/prenotazionidb_test?serverTimezone=UTC&amp;createDatabaseIfNotExist=true"/>
             <property name="jakarta.persistence.jdbc.user" value="root"/>
             <property name="jakarta.persistence.jdbc.password" value="admin"/>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
@@ -26,7 +27,7 @@
             <!-- Configurazione Hibernate per MySQL -->
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
-            <property name="hibernate.show_sql" value="false"/>
+            <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
         </properties>
     </persistence-unit>
