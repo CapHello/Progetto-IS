@@ -71,8 +71,8 @@
             const criterio = document.getElementById('ordina').value;
             const lista = [...prenotazioni].sort((x, y) =>
                 criterio === 'stato'
-                    ? x.stato.localeCompare(y.stato)
-                    : (y.data || '').localeCompare(x.data || ''));
+                    ? y.stato.localeCompare(x.stato)
+                    : (x.data || '').localeCompare(y.data || ''));
 
             const cont = document.getElementById('grigliaPrenotazioni');
             cont.innerHTML = '';
